@@ -43,6 +43,8 @@ namespace HaveIBeenPwned
         private void CheckHaveIBeenPwned(object sender, EventArgs e)
         {
             // Called when the menu item is clicked
+            var manipulator = new PwnedChecker(pluginHost.Database);
+            manipulator.CheckHaveIBeenPwned();
         }
     }
 }
