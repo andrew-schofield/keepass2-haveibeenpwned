@@ -10,7 +10,8 @@ namespace HaveIBeenPwned
     {
         private IPluginHost pluginHost = null;
         private ToolStripSeparator toolStripSeperator = null;
-        private ToolStripMenuItem pluginMenuItem = null;
+        private ToolStripMenuItem haveIBeenPwnedMenuItem = null;
+        private ToolStripMenuItem cloudBleedMenuItem = null;
         private static HttpClient client = new HttpClient();
 
         public HaveIBeenPwnedExt()
@@ -32,11 +33,18 @@ namespace HaveIBeenPwned
             tsMenu.Add(toolStripSeperator);
 
             // Add menu item 'Have I Been Pwned?'
-            pluginMenuItem = new ToolStripMenuItem();
-            pluginMenuItem.Text = "Have I Been Pwned?";
-            pluginMenuItem.Image = Resources.menuIcon.ToBitmap();
-            pluginMenuItem.Click += this.CheckHaveIBeenPwned;
-            tsMenu.Add(pluginMenuItem);
+            haveIBeenPwnedMenuItem = new ToolStripMenuItem();
+            haveIBeenPwnedMenuItem.Text = "Have I Been Pwned?";
+            haveIBeenPwnedMenuItem.Image = Resources.hibp.ToBitmap();
+            haveIBeenPwnedMenuItem.Click += this.CheckHaveIBeenPwned;
+            tsMenu.Add(haveIBeenPwnedMenuItem);
+
+            // Add menu item 'Cloudbleed Checker'
+            cloudBleedMenuItem = new ToolStripMenuItem();
+            cloudBleedMenuItem.Text = "Cloudbleed Checker";
+            cloudBleedMenuItem.Image = Resources.cloudbleed.ToBitmap();
+            cloudBleedMenuItem.Click += this.CheckCloudBleed;
+            tsMenu.Add(cloudBleedMenuItem);
 
             return true;
         }
@@ -45,8 +53,8 @@ namespace HaveIBeenPwned
         {
             // Remove all of our menu items
             ToolStripItemCollection tsMenu = pluginHost.MainWindow.ToolsMenu.DropDownItems;
-            pluginMenuItem.Click -= this.CheckHaveIBeenPwned;
-            tsMenu.Remove(pluginMenuItem);
+            haveIBeenPwnedMenuItem.Click -= this.CheckHaveIBeenPwned;
+            tsMenu.Remove(haveIBeenPwnedMenuItem);
             tsMenu.Remove(toolStripSeperator);
         }
 
@@ -64,6 +72,23 @@ namespace HaveIBeenPwned
                 // Called when the menu item is clicked
                 var haveIBeenPwnedChecker = new HaveIBeenPwnedChecker(pluginHost.Database, client);
                 haveIBeenPwnedChecker.CheckDatabase(dialog.ExpireEntries, dialog.OnlyCheckOldEntries);
+            }
+        }
+
+        private void CheckCloudBleed(object sender, EventArgs e)
+        {
+            if (!pluginHost.Database.IsOpen)
+            {
+                MessageBox.Show("You must first open a database", Resources.MessageTitle);
+                return;
+            }
+
+            var dialog = new CheckerPrompt(Resources.cloudbleed.ToBitmap(), "Cloudbleed Vulnerability");
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                // Called when the menu item is clicked
+                var cloudBleedChecker = new CloudbleedChecker(pluginHost.Database, client);
+                cloudBleedChecker.CheckDatabase(dialog.ExpireEntries, dialog.OnlyCheckOldEntries);
             }
         }
     }
