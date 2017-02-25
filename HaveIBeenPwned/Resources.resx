@@ -374,4 +374,7 @@
         AAD///////8AAP///////wAA////////AAA=
 </value>
   </data>
+  <data name="MessageTitle" xml:space="preserve">
+    <value>HaveIBeenPwned Checker</value>
+  </data>
 </root>

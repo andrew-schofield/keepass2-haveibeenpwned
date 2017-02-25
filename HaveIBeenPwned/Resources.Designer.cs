@@ -69,5 +69,14 @@ namespace HaveIBeenPwned {
                 return ((System.Drawing.Icon)(obj));
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to HaveIBeenPwned Checker.
+        /// </summary>
+        internal static string MessageTitle {
+            get {
+                return ResourceManager.GetString("MessageTitle", resourceCulture);
+            }
+        }
     }
 }

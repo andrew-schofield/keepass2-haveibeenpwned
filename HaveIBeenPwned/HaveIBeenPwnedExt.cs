@@ -1,6 +1,8 @@
 ﻿using System.Windows.Forms;
 using KeePass.Plugins;
 using System;
+using System.Net.Http;
+using System.Net.Http.Headers;
 
 namespace HaveIBeenPwned
 {
@@ -9,6 +11,14 @@ namespace HaveIBeenPwned
         private IPluginHost pluginHost = null;
         private ToolStripSeparator toolStripSeperator = null;
         private ToolStripMenuItem pluginMenuItem = null;
+        private static HttpClient client = new HttpClient();
+
+        public HaveIBeenPwnedExt()
+        {
+            client.DefaultRequestHeaders.UserAgent.ParseAdd($"KeePass HIBP Checker/{Application.ProductVersion}");
+            client.DefaultRequestHeaders.Accept.Clear();
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        }
 
         public override bool Initialize(IPluginHost host)
         {
@@ -43,7 +53,7 @@ namespace HaveIBeenPwned
         private void CheckHaveIBeenPwned(object sender, EventArgs e)
         {
             // Called when the menu item is clicked
-            var manipulator = new PwnedChecker(pluginHost.Database);
+            var manipulator = new HaveIBeenPwnedChecker(pluginHost.Database, client);
             manipulator.CheckHaveIBeenPwned();
         }
     }
