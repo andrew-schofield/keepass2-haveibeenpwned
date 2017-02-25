@@ -58,7 +58,7 @@ namespace HaveIBeenPwned
                 return;
             }
 
-            var dialog = new CheckerPrompt();
+            var dialog = new CheckerPrompt(Resources.hibp.ToBitmap(), "Have I Been Pwned");
             if (dialog.ShowDialog() == DialogResult.OK)
             {
                 // Called when the menu item is clicked

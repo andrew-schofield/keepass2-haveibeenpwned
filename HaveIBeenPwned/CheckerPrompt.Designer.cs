@@ -32,13 +32,18 @@
             this.cancelButton = new System.Windows.Forms.Button();
             this.checkOldEntries = new System.Windows.Forms.CheckBox();
             this.expireEntries = new System.Windows.Forms.CheckBox();
+            this.layoutPanel = new System.Windows.Forms.TableLayoutPanel();
+            this.breachCheckerLogo = new System.Windows.Forms.PictureBox();
+            this.breachCheckerText = new System.Windows.Forms.Label();
+            this.layoutPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.breachCheckerLogo)).BeginInit();
             this.SuspendLayout();
             // 
             // okButton
             // 
             this.okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.okButton.Location = new System.Drawing.Point(181, 65);
+            this.okButton.Location = new System.Drawing.Point(181, 108);
             this.okButton.Name = "okButton";
             this.okButton.Size = new System.Drawing.Size(75, 23);
             this.okButton.TabIndex = 0;
@@ -49,7 +54,7 @@
             // 
             this.cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.cancelButton.Location = new System.Drawing.Point(262, 65);
+            this.cancelButton.Location = new System.Drawing.Point(262, 108);
             this.cancelButton.Name = "cancelButton";
             this.cancelButton.Size = new System.Drawing.Size(75, 23);
             this.cancelButton.TabIndex = 1;
@@ -58,10 +63,11 @@
             // 
             // checkOldEntries
             // 
+            this.checkOldEntries.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.checkOldEntries.AutoSize = true;
             this.checkOldEntries.Checked = true;
             this.checkOldEntries.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkOldEntries.Location = new System.Drawing.Point(13, 13);
+            this.checkOldEntries.Location = new System.Drawing.Point(13, 59);
             this.checkOldEntries.Name = "checkOldEntries";
             this.checkOldEntries.Size = new System.Drawing.Size(331, 17);
             this.checkOldEntries.TabIndex = 2;
@@ -70,19 +76,56 @@
             // 
             // expireEntries
             // 
+            this.expireEntries.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.expireEntries.AutoSize = true;
-            this.expireEntries.Location = new System.Drawing.Point(13, 36);
+            this.expireEntries.Location = new System.Drawing.Point(13, 82);
             this.expireEntries.Name = "expireEntries";
             this.expireEntries.Size = new System.Drawing.Size(253, 17);
             this.expireEntries.TabIndex = 3;
             this.expireEntries.Text = "Expire any entries that are found to be breached";
             this.expireEntries.UseVisualStyleBackColor = true;
             // 
+            // layoutPanel
+            // 
+            this.layoutPanel.ColumnCount = 2;
+            this.layoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 38F));
+            this.layoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.layoutPanel.Controls.Add(this.breachCheckerLogo, 0, 0);
+            this.layoutPanel.Controls.Add(this.breachCheckerText, 1, 0);
+            this.layoutPanel.Location = new System.Drawing.Point(77, 12);
+            this.layoutPanel.Name = "layoutPanel";
+            this.layoutPanel.RowCount = 1;
+            this.layoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.layoutPanel.Size = new System.Drawing.Size(200, 38);
+            this.layoutPanel.TabIndex = 4;
+            // 
+            // breachCheckerLogo
+            // 
+            this.breachCheckerLogo.Location = new System.Drawing.Point(3, 3);
+            this.breachCheckerLogo.Name = "breachCheckerLogo";
+            this.breachCheckerLogo.Size = new System.Drawing.Size(32, 32);
+            this.breachCheckerLogo.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.breachCheckerLogo.TabIndex = 0;
+            this.breachCheckerLogo.TabStop = false;
+            // 
+            // breachCheckerText
+            // 
+            this.breachCheckerText.AutoSize = true;
+            this.breachCheckerText.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.breachCheckerText.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.breachCheckerText.Location = new System.Drawing.Point(41, 0);
+            this.breachCheckerText.Name = "breachCheckerText";
+            this.breachCheckerText.Size = new System.Drawing.Size(156, 38);
+            this.breachCheckerText.TabIndex = 1;
+            this.breachCheckerText.Text = "label1";
+            this.breachCheckerText.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
             // CheckerPrompt
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(349, 100);
+            this.ClientSize = new System.Drawing.Size(349, 143);
+            this.Controls.Add(this.layoutPanel);
             this.Controls.Add(this.expireEntries);
             this.Controls.Add(this.checkOldEntries);
             this.Controls.Add(this.cancelButton);
@@ -94,6 +137,9 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Have I Been Pwned?";
+            this.layoutPanel.ResumeLayout(false);
+            this.layoutPanel.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.breachCheckerLogo)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -105,5 +151,8 @@
         private System.Windows.Forms.Button cancelButton;
         private System.Windows.Forms.CheckBox checkOldEntries;
         private System.Windows.Forms.CheckBox expireEntries;
+        private System.Windows.Forms.TableLayoutPanel layoutPanel;
+        private System.Windows.Forms.PictureBox breachCheckerLogo;
+        private System.Windows.Forms.Label breachCheckerText;
     }
 }
