@@ -8,18 +8,13 @@ using Newtonsoft.Json;
 
 namespace HaveIBeenPwned
 {
-    public class HaveIBeenPwnedChecker
+    public class HaveIBeenPwnedChecker : BaseChecker
     {
-        private PwDatabase passwordDatabase;
-        private HttpClient client;
-
-        public HaveIBeenPwnedChecker(PwDatabase database, HttpClient httpClient)
+        public HaveIBeenPwnedChecker(PwDatabase database, HttpClient httpClient) : base(database, httpClient)
         {
-            passwordDatabase = database;
-            client = httpClient;
         }
 
-        public void CheckHaveIBeenPwned(bool expireEntries, bool oldEntriesOnly)
+        public override void CheckDatabase(bool expireEntries, bool oldEntriesOnly)
         {
             bool breachesFound = false;
             var breaches = GetBreaches();
@@ -38,8 +33,7 @@ namespace HaveIBeenPwned
                         MessageBox.Show($"Potentially pwned account details for: {url}\r\nBreached on: {domainBreaches.Last().BreachDate}\r\nThis entry was last modified on: {lastModified}", Resources.MessageTitle, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         if(expireEntries)
                         {
-                            entry.Expires = true;
-                            entry.ExpiryTime = DateTime.Now;
+                            ExpireEntry(entry);
                         }
                     }
                 }

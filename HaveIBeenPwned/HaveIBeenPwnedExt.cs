@@ -63,7 +63,7 @@ namespace HaveIBeenPwned
             {
                 // Called when the menu item is clicked
                 var haveIBeenPwnedChecker = new HaveIBeenPwnedChecker(pluginHost.Database, client);
-                haveIBeenPwnedChecker.CheckHaveIBeenPwned(dialog.ExpireEntries, dialog.OnlyCheckOldEntries);
+                haveIBeenPwnedChecker.CheckDatabase(dialog.ExpireEntries, dialog.OnlyCheckOldEntries);
             }
         }
     }
