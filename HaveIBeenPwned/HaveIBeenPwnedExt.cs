@@ -19,6 +19,7 @@ namespace HaveIBeenPwned
             client.DefaultRequestHeaders.UserAgent.ParseAdd($"KeePass HIBP Checker/{Application.ProductVersion}");
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            client.Timeout = new TimeSpan(0, 10, 0);
         }
 
         public override bool Initialize(IPluginHost host)
