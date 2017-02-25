@@ -31,7 +31,7 @@ namespace HaveIBeenPwned
             toolStripSeperator = new ToolStripSeparator();
             tsMenu.Add(toolStripSeperator);
 
-            // Add menu item 'Do Something'
+            // Add menu item 'Have I Been Pwned?'
             pluginMenuItem = new ToolStripMenuItem();
             pluginMenuItem.Text = "Have I Been Pwned?";
             pluginMenuItem.Image = Resources.menuIcon.ToBitmap();
@@ -52,9 +52,19 @@ namespace HaveIBeenPwned
 
         private void CheckHaveIBeenPwned(object sender, EventArgs e)
         {
-            // Called when the menu item is clicked
-            var manipulator = new HaveIBeenPwnedChecker(pluginHost.Database, client);
-            manipulator.CheckHaveIBeenPwned();
+            if (!pluginHost.Database.IsOpen)
+            {
+                MessageBox.Show("You must first open a database", Resources.MessageTitle);
+                return;
+            }
+
+            var dialog = new CheckerPrompt();
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                // Called when the menu item is clicked
+                var haveIBeenPwnedChecker = new HaveIBeenPwnedChecker(pluginHost.Database, client);
+                haveIBeenPwnedChecker.CheckHaveIBeenPwned(dialog.ExpireEntries, dialog.OnlyCheckOldEntries);
+            }
         }
     }
 }

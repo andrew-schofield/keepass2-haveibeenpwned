@@ -19,7 +19,7 @@ namespace HaveIBeenPwned
             client = httpClient;
         }
 
-        public void CheckHaveIBeenPwned()
+        public void CheckHaveIBeenPwned(bool expireEntries, bool oldEntriesOnly)
         {
             bool breachesFound = false;
             var breaches = GetBreaches();
@@ -31,11 +31,16 @@ namespace HaveIBeenPwned
                 var lastModified = entry.LastModificationTime;
                 if(!string.IsNullOrEmpty(url))
                 {
-                    var domainBreaches = breaches.Where(b => url.Contains(b.Domain)).OrderBy(b => b.BreachDate);
+                    var domainBreaches = breaches.Where(b => url.Contains(b.Domain) && (!oldEntriesOnly || lastModified < b.BreachDate)).OrderBy(b => b.BreachDate);
                     if (domainBreaches.Any())
                     {
                         breachesFound = true;
                         MessageBox.Show($"Potentially pwned account details for: {url}\r\nBreached on: {domainBreaches.Last().BreachDate}\r\nThis entry was last modified on: {lastModified}", Resources.MessageTitle, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        if(expireEntries)
+                        {
+                            entry.Expires = true;
+                            entry.ExpiryTime = DateTime.Now;
+                        }
                     }
                 }
             }
