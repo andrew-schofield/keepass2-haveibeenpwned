@@ -71,7 +71,7 @@ namespace HaveIBeenPwned
             if (dialog.ShowDialog() == DialogResult.OK)
             {
                 // Called when the menu item is clicked
-                var haveIBeenPwnedChecker = new HaveIBeenPwnedChecker(pluginHost.Database, client);
+                var haveIBeenPwnedChecker = new HaveIBeenPwnedChecker(pluginHost.Database, client, pluginHost);
                 haveIBeenPwnedChecker.CheckDatabase(dialog.ExpireEntries, dialog.OnlyCheckOldEntries);
             }
         }
@@ -88,7 +88,7 @@ namespace HaveIBeenPwned
             if (dialog.ShowDialog() == DialogResult.OK)
             {
                 // Called when the menu item is clicked
-                var cloudBleedChecker = new CloudbleedChecker(pluginHost.Database, client);
+                var cloudBleedChecker = new CloudbleedChecker(pluginHost.Database, client, pluginHost);
                 cloudBleedChecker.CheckDatabase(dialog.ExpireEntries, dialog.OnlyCheckOldEntries);
             }
         }

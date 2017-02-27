@@ -2,17 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 using KeePassLib;
 using System.IO;
 using System.Windows.Forms;
+using KeePass.Plugins;
+using KeePass.Forms;
 
 namespace HaveIBeenPwned
 {
     public class CloudbleedChecker : BaseChecker
     {
-        public CloudbleedChecker(PwDatabase database, HttpClient httpClient) : base(database, httpClient)
+        public CloudbleedChecker(PwDatabase database, HttpClient httpClient, IPluginHost pluginHost)
+            : base(database, httpClient, pluginHost)
         {
         }
 
@@ -21,9 +22,18 @@ namespace HaveIBeenPwned
             bool breachesFound = false;
             var breaches = GetBreaches();
             var entries = passwordDatabase.RootGroup.GetEntries(true);
+            StatusProgressForm progressForm = new StatusProgressForm();
+
+            progressForm.InitEx("Checking Cloudbleed Breaches", true, false, pluginHost.MainWindow);
+            progressForm.Show();
+            progressForm.SetProgress(0);
+            uint counter = 0;
+            var entryCount = entries.Count();
             foreach (var entry in entries)
             {
+                progressForm.SetProgress((uint)((double)counter / entryCount * 100));
                 var url = entry.Strings.ReadSafe(PwDefs.UrlField).ToLower();
+                progressForm.SetText($"Checking {url} for breaches", KeePassLib.Interfaces.LogStatusType.Info);
                 if (!string.IsNullOrEmpty(url))
                 {
                     if(!url.Contains("://"))
@@ -49,7 +59,14 @@ namespace HaveIBeenPwned
                         }
                     }
                 }
+                counter++;
+                if(progressForm.UserCancelled)
+                {
+                    break;
+                }
             }
+            progressForm.Hide();
+            progressForm.Close();
             if (!breachesFound)
             {
                 MessageBox.Show("No breached domains found.", Resources.MessageTitle);
@@ -72,6 +89,11 @@ namespace HaveIBeenPwned
             }
             else
             {
+                StatusProgressForm progressForm = new StatusProgressForm();
+
+                progressForm.InitEx("Downloading Cloudbleed Data File", true, false, pluginHost.MainWindow);
+                progressForm.Show();
+                progressForm.SetProgress(0);
                 HttpResponseMessage response = client.GetAsync(new Uri("https://raw.githubusercontent.com/pirate/sites-using-cloudflare/master/sorted_unique_cf.txt")).Result;
                 if (response.IsSuccessStatusCode)
                 {
@@ -82,12 +104,17 @@ namespace HaveIBeenPwned
                         stream.CopyTo(fileStream);
                     }
                     stream.Seek(0, SeekOrigin.Begin);
+
+                    progressForm.SetProgress(100);
                     ExtractBreachesFromStream(breaches, stream);
                 }
                 else
                 {
                     MessageBox.Show($"Unable to check githubusercontent.com (returned Status: {response.StatusCode})", Resources.MessageTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
+
+                progressForm.Hide();
+                progressForm.Close();
             }
             return breaches;
         }
