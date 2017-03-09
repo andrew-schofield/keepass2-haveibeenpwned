@@ -3,6 +3,7 @@ using KeePass.Plugins;
 using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Drawing;
 
 namespace HaveIBeenPwned
 {
@@ -57,6 +58,22 @@ namespace HaveIBeenPwned
             haveIBeenPwnedMenuItem.Click -= this.CheckHaveIBeenPwned;
             tsMenu.Remove(haveIBeenPwnedMenuItem);
             tsMenu.Remove(toolStripSeperator);
+        }
+
+        public override string UpdateUrl
+        {
+            get
+            {
+                return "https://raw.githubusercontent.com/andrew-schofield/keepass2-haveibeenpwned/master/VERSION";
+            }
+        }
+
+        public override Image SmallIcon
+        {
+            get
+            {
+                return Resources.hibp.ToBitmap();
+            }
         }
 
         private void CheckHaveIBeenPwned(object sender, EventArgs e)
