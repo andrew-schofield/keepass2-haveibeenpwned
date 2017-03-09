@@ -91,6 +91,8 @@ namespace HaveIBeenPwned
                 var haveIBeenPwnedChecker = new HaveIBeenPwnedChecker(pluginHost.Database, client, pluginHost);
                 haveIBeenPwnedChecker.CheckDatabase(dialog.ExpireEntries, dialog.OnlyCheckOldEntries);
             }
+
+            pluginHost.MainWindow.Show();
         }
 
         private void CheckCloudBleed(object sender, EventArgs e)
@@ -108,6 +110,8 @@ namespace HaveIBeenPwned
                 var cloudBleedChecker = new CloudbleedChecker(pluginHost.Database, client, pluginHost);
                 cloudBleedChecker.CheckDatabase(dialog.ExpireEntries, dialog.OnlyCheckOldEntries);
             }
+
+            pluginHost.MainWindow.Show();
         }
     }
 }
