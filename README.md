@@ -1,10 +1,12 @@
 # keepass2-haveibeenpwned
 
-KeePass 2.x plugin to check all entries with URLs against the haveibeenpwned breach list.
+**KeePass 2.x plugin to check all entries with URLs against the haveibeenpwned breach list.**
 
-Also compares URLs against the cloudbleed vulnerbility list from here: https://github.com/pirate/sites-using-cloudflare
+Also compares URLs against the cloudbleed vulnerability list from here: [https://github.com/pirate/sites-using-cloudflare](https://github.com/pirate/sites-using-cloudflare)
 
-Download plugin zip from [here](https://github.com/andrew-schofield/keepass2-haveibeenpwned/raw/master/HaveIBeenPwned.zip).
+**Download plgx from [here](https://github.com/andrew-schofield/keepass2-haveibeenpwned/raw/master/HaveIBeenPwned.plgx).**
+
+**Mono users can download the dlls from [here](https://github.com/andrew-schofield/keepass2-haveibeenpwned/tree/master/mono).**
 
 ## Usage
 
@@ -14,9 +16,8 @@ Download plugin zip from [here](https://github.com/andrew-schofield/keepass2-hav
 
 ## Known Issues
 
-* Built dll seems to be linked to a specific version of KeePass
 * Currently everything happens in the UI thread
-* No indication of download progress or processing progress
+* No indication of download progress
 * There is no way of getting the "password last modified" time from KeePass, so unfortunately both checking modes have drawbacks:
  * "Only check entries that have not changed since the breach date" will produce false negatives if you have changed something other than the password since the breach date
  * If unchecked you will potentially get false positives if you have already changed entries that have been breached (as this will return all entries that have ever been breached).
