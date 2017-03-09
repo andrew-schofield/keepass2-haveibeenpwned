@@ -12,8 +12,14 @@ namespace HaveIBeenPwned
             breachCheckerText.Text = checkerTitle;
         }
 
-        public bool ExpireEntries => expireEntries.Checked;
+        public bool ExpireEntries
+        {
+            get { return expireEntries.Checked; }
+        }
 
-        public bool OnlyCheckOldEntries => checkOldEntries.Checked;
+        public bool OnlyCheckOldEntries
+        {
+            get { return checkOldEntries.Checked; }
+        }
     }
 }

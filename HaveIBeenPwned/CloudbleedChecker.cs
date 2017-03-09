@@ -33,13 +33,13 @@ namespace HaveIBeenPwned
             {
                 progressForm.SetProgress((uint)((double)counter / entryCount * 100));
                 var url = entry.Strings.ReadSafe(PwDefs.UrlField).ToLower();
-                progressForm.SetText($"Checking {url} for breaches", KeePassLib.Interfaces.LogStatusType.Info);
+                progressForm.SetText(string.Format("Checking {0} for breaches", url), KeePassLib.Interfaces.LogStatusType.Info);
                 if (!string.IsNullOrEmpty(url))
                 {
                     if(!url.Contains("://"))
                     {
                         // add http as a fallback protocol
-                        url = $"http://{url}";
+                        url = string.Format("http://{0}", url);
                     }
                     var uri = new Uri(url).DnsSafeHost;
                     if(uri.StartsWith("www."))
@@ -52,7 +52,7 @@ namespace HaveIBeenPwned
                     if (domainBreaches.Any())
                     {
                         breachesFound = true;
-                        MessageBox.Show($"Potentially leaked account details for: {url}\r\nBreached on: {new DateTime(2017, 02, 17)}\r\nThis entry was last modified on: {lastModified}", Resources.MessageTitle, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        MessageBox.Show(string.Format("Potentially leaked account details for: {0}\r\nBreached on: {1}\r\nThis entry was last modified on: {2}", url, new DateTime(2017, 02, 17), lastModified), Resources.MessageTitle, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         if (expireEntries)
                         {
                             ExpireEntry(entry);
@@ -110,7 +110,7 @@ namespace HaveIBeenPwned
                 }
                 else
                 {
-                    MessageBox.Show($"Unable to check githubusercontent.com (returned Status: {response.StatusCode})", Resources.MessageTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show(string.Format("Unable to check githubusercontent.com (returned Status: {0})", response.StatusCode), Resources.MessageTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
 
                 progressForm.Hide();

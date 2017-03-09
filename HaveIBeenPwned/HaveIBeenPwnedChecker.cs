@@ -33,7 +33,7 @@ namespace HaveIBeenPwned
             {
                 progressForm.SetProgress((uint)((double)counter / entryCount * 100));
                 var url = entry.Strings.ReadSafe(PwDefs.UrlField).ToLower();
-                progressForm.SetText($"Checking {url} for breaches", KeePassLib.Interfaces.LogStatusType.Info);
+                progressForm.SetText(string.Format("Checking {0} for breaches", url), KeePassLib.Interfaces.LogStatusType.Info);
                 var userName = entry.Strings.ReadSafe(PwDefs.UserNameField);
                 var lastModified = entry.LastModificationTime;
                 if(!string.IsNullOrEmpty(url))
@@ -42,7 +42,7 @@ namespace HaveIBeenPwned
                     if (domainBreaches.Any())
                     {
                         breachesFound = true;
-                        MessageBox.Show($"Potentially pwned account details for: {url}\r\nBreached on: {domainBreaches.Last().BreachDate}\r\nThis entry was last modified on: {lastModified}", Resources.MessageTitle, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        MessageBox.Show(string.Format("Potentially pwned account details for: {0}\r\nBreached on: {1}\r\nThis entry was last modified on: {2}", url, domainBreaches.Last().BreachDate, lastModified), Resources.MessageTitle, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         if(expireEntries)
                         {
                             ExpireEntry(entry);
@@ -79,7 +79,7 @@ namespace HaveIBeenPwned
             }
             else
             {
-                MessageBox.Show($"Unable to check haveibeenpwned.com (returned Status: {response.StatusCode})", Resources.MessageTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(string.Format("Unable to check haveibeenpwned.com (returned Status: {0})", response.StatusCode), Resources.MessageTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             progressForm.SetProgress(100);
 
