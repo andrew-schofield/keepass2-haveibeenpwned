@@ -7,6 +7,7 @@ using System.Net.Http;
 using Newtonsoft.Json;
 using KeePass.Forms;
 using KeePass.Plugins;
+using System.Threading.Tasks;
 
 namespace HaveIBeenPwned
 {
@@ -17,10 +18,10 @@ namespace HaveIBeenPwned
         {
         }
 
-        public override void CheckDatabase(bool expireEntries, bool oldEntriesOnly)
+        public async override void CheckDatabase(bool expireEntries, bool oldEntriesOnly)
         {
             bool breachesFound = false;
-            var breaches = GetBreaches();
+            var breaches = await GetBreaches();
             var entries = passwordDatabase.RootGroup.GetEntries(true);
             StatusProgressForm progressForm = new StatusProgressForm();
 
@@ -63,7 +64,7 @@ namespace HaveIBeenPwned
             }
         }
 
-        private List<HaveIBeenPwnedEntry> GetBreaches()
+        private async Task<List<HaveIBeenPwnedEntry>> GetBreaches()
         {
             StatusProgressForm progressForm = new StatusProgressForm();
 
@@ -71,10 +72,10 @@ namespace HaveIBeenPwned
             progressForm.Show();
             progressForm.SetProgress(0);
             List<HaveIBeenPwnedEntry> breaches = null;
-            HttpResponseMessage response = client.GetAsync(new Uri("https://haveibeenpwned.com/api/v2/breaches")).Result;
+            HttpResponseMessage response = await client.GetAsync(new Uri("https://haveibeenpwned.com/api/v2/breaches"));
             if (response.IsSuccessStatusCode)
             {
-                var jsonString = response.Content.ReadAsStringAsync().Result;
+                var jsonString = await response.Content.ReadAsStringAsync();
                 breaches = JsonConvert.DeserializeObject<List<HaveIBeenPwnedEntry>>(jsonString);
             }
             else

@@ -7,6 +7,7 @@ using System.IO;
 using System.Windows.Forms;
 using KeePass.Plugins;
 using KeePass.Forms;
+using System.Threading.Tasks;
 
 namespace HaveIBeenPwned
 {
@@ -17,10 +18,10 @@ namespace HaveIBeenPwned
         {
         }
 
-        public override void CheckDatabase(bool expireEntries, bool oldEntriesOnly)
+        public async override void CheckDatabase(bool expireEntries, bool oldEntriesOnly)
         {
             bool breachesFound = false;
-            var breaches = GetBreaches();
+            var breaches = await GetBreaches();
             var entries = passwordDatabase.RootGroup.GetEntries(true);
             StatusProgressForm progressForm = new StatusProgressForm();
 
@@ -75,7 +76,7 @@ namespace HaveIBeenPwned
 
 
 
-        private HashSet<string> GetBreaches()
+        private async Task<HashSet<string>> GetBreaches()
         {
             HashSet<string> breaches = new HashSet<string>();
             var cloudBleedDataFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "KeePass", "cloudbleed.txt");
@@ -94,10 +95,10 @@ namespace HaveIBeenPwned
                 progressForm.InitEx("Downloading Cloudbleed Data File", true, false, pluginHost.MainWindow);
                 progressForm.Show();
                 progressForm.SetProgress(0);
-                HttpResponseMessage response = client.GetAsync(new Uri("https://raw.githubusercontent.com/pirate/sites-using-cloudflare/master/sorted_unique_cf.txt")).Result;
+                HttpResponseMessage response = await client.GetAsync(new Uri("https://raw.githubusercontent.com/pirate/sites-using-cloudflare/master/sorted_unique_cf.txt"));
                 if (response.IsSuccessStatusCode)
                 {
-                    var stream = response.Content.ReadAsStreamAsync().Result;
+                    var stream = await response.Content.ReadAsStreamAsync();
                     Directory.CreateDirectory(Path.GetDirectoryName(cloudBleedDataFile));
                     using (var fileStream = new FileStream(cloudBleedDataFile, FileMode.Create, FileAccess.Write))
                     {
