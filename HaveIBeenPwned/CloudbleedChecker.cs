@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using KeePass.Plugins;
 using KeePass.Forms;
 using System.Threading.Tasks;
+using System.Drawing;
 
 namespace HaveIBeenPwned
 {
@@ -18,11 +19,21 @@ namespace HaveIBeenPwned
         {
         }
 
-        public async override void CheckDatabase(bool expireEntries, bool oldEntriesOnly)
+        public override Image BreachLogo
         {
-            bool breachesFound = false;
+            get { return Resources.cloudbleed.ToBitmap(); }
+        }
+
+        public override string BreachTitle
+        {
+            get { return "Cloudbleed Vulnerability"; }
+        }
+
+        public async override Task<List<BreachedEntry>> CheckDatabase(bool expireEntries, bool oldEntriesOnly)
+        {
             var breaches = await GetBreaches();
             var entries = passwordDatabase.RootGroup.GetEntries(true);
+            var breachedEntries = new List<BreachedEntry>();
             StatusProgressForm progressForm = new StatusProgressForm();
 
             progressForm.InitEx("Checking Cloudbleed Breaches", true, false, pluginHost.MainWindow);
@@ -52,8 +63,7 @@ namespace HaveIBeenPwned
                     var domainBreaches = breaches.Where(b => uri == b && (!oldEntriesOnly || lastModified < new DateTime(2017, 02, 17)));
                     if (domainBreaches.Any())
                     {
-                        breachesFound = true;
-                        MessageBox.Show(string.Format("Potentially leaked account details for: {0}\r\nBreached on: {1}\r\nThis entry was last modified on: {2}", url, new DateTime(2017, 02, 17), lastModified), Resources.MessageTitle, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        breachedEntries.Add(new BreachedEntry(entry, new DateTime(2017, 02, 17)));
                         if (expireEntries)
                         {
                             ExpireEntry(entry);
@@ -68,14 +78,10 @@ namespace HaveIBeenPwned
             }
             progressForm.Hide();
             progressForm.Close();
-            if (!breachesFound)
-            {
-                MessageBox.Show("No breached domains found.", Resources.MessageTitle);
-            }
+
+            return breachedEntries;
         }
-
-
-
+        
         private async Task<HashSet<string>> GetBreaches()
         {
             HashSet<string> breaches = new HashSet<string>();

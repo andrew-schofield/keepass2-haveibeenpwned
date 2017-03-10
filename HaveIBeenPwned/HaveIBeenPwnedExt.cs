@@ -4,6 +4,7 @@ using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Drawing;
+using System.Linq;
 
 namespace HaveIBeenPwned
 {
@@ -78,24 +79,15 @@ namespace HaveIBeenPwned
 
         private void CheckHaveIBeenPwned(object sender, EventArgs e)
         {
-            if (!pluginHost.Database.IsOpen)
-            {
-                MessageBox.Show("You must first open a database", Resources.MessageTitle);
-                return;
-            }
-
-            var dialog = new CheckerPrompt(Resources.hibp.ToBitmap(), "Have I Been Pwned");
-            if (dialog.ShowDialog() == DialogResult.OK)
-            {
-                // Called when the menu item is clicked
-                var haveIBeenPwnedChecker = new HaveIBeenPwnedChecker(pluginHost.Database, client, pluginHost);
-                haveIBeenPwnedChecker.CheckDatabase(dialog.ExpireEntries, dialog.OnlyCheckOldEntries);
-            }
-
-            pluginHost.MainWindow.Show();
+            CheckBreaches(new HaveIBeenPwnedChecker(pluginHost.Database, client, pluginHost));
         }
 
         private void CheckCloudBleed(object sender, EventArgs e)
+        {
+            CheckBreaches(new CloudbleedChecker(pluginHost.Database, client, pluginHost));
+        }
+
+        private void CheckBreaches(BaseChecker breachChecker)
         {
             if (!pluginHost.Database.IsOpen)
             {
@@ -103,15 +95,27 @@ namespace HaveIBeenPwned
                 return;
             }
 
-            var dialog = new CheckerPrompt(Resources.cloudbleed.ToBitmap(), "Cloudbleed Vulnerability");
+            var dialog = new CheckerPrompt(breachChecker.BreachLogo, breachChecker.BreachTitle);
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                // Called when the menu item is clicked
-                var cloudBleedChecker = new CloudbleedChecker(pluginHost.Database, client, pluginHost);
-                cloudBleedChecker.CheckDatabase(dialog.ExpireEntries, dialog.OnlyCheckOldEntries);
+                var breachedEntries = breachChecker.CheckDatabase(dialog.ExpireEntries, dialog.OnlyCheckOldEntries);
+                breachedEntries.ContinueWith((result) =>
+                {
+                    if (!result.Result.Any())
+                    {
+                        MessageBox.Show("No breached entries found.", Resources.MessageTitle, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        var breachedEntriesDialog = new BreachedEntriesDialog(pluginHost);
+                        breachedEntriesDialog.AddBreaches(result.Result);
+                        breachedEntriesDialog.ShowDialog();
+                    }
+                });
             }
 
             pluginHost.MainWindow.Show();
+
         }
     }
 }

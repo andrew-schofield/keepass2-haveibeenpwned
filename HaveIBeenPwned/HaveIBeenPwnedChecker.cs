@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using KeePass.Forms;
 using KeePass.Plugins;
 using System.Threading.Tasks;
+using System.Drawing;
 
 namespace HaveIBeenPwned
 {
@@ -18,11 +19,21 @@ namespace HaveIBeenPwned
         {
         }
 
-        public async override void CheckDatabase(bool expireEntries, bool oldEntriesOnly)
+        public override Image BreachLogo
         {
-            bool breachesFound = false;
+            get { return Resources.hibp.ToBitmap(); }
+        }
+
+        public override string BreachTitle
+        {
+            get { return "Have I Been Pwned"; }
+        }
+
+        public async override Task<List<BreachedEntry>> CheckDatabase(bool expireEntries, bool oldEntriesOnly)
+        {
             var breaches = await GetBreaches();
             var entries = passwordDatabase.RootGroup.GetEntries(true);
+            var breachedEntries = new List<BreachedEntry>();
             StatusProgressForm progressForm = new StatusProgressForm();
 
             progressForm.InitEx("Checking Cloudbleed Breaches", true, false, pluginHost.MainWindow);
@@ -42,8 +53,7 @@ namespace HaveIBeenPwned
                     var domainBreaches = breaches.Where(b => !string.IsNullOrWhiteSpace(b.Domain) && url.Contains(b.Domain) && (!oldEntriesOnly || lastModified < b.BreachDate)).OrderBy(b => b.BreachDate);
                     if (domainBreaches.Any())
                     {
-                        breachesFound = true;
-                        MessageBox.Show(string.Format("Potentially pwned account details for: {0}\r\nBreached on: {1}\r\nThis entry was last modified on: {2}", url, domainBreaches.Last().BreachDate, lastModified), Resources.MessageTitle, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        breachedEntries.Add(new BreachedEntry(entry, domainBreaches.Last().BreachDate));
                         if(expireEntries)
                         {
                             ExpireEntry(entry);
@@ -58,10 +68,8 @@ namespace HaveIBeenPwned
             }
             progressForm.Hide();
             progressForm.Close();
-            if (!breachesFound)
-            {
-                MessageBox.Show("No breached domains found.", Resources.MessageTitle);
-            }
+
+            return breachedEntries;
         }
 
         private async Task<List<HaveIBeenPwnedEntry>> GetBreaches()

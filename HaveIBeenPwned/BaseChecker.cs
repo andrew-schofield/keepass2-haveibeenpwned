@@ -2,6 +2,9 @@
 using KeePassLib;
 using System.Net.Http;
 using KeePass.Plugins;
+using System.Drawing;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace HaveIBeenPwned
 {
@@ -18,7 +21,11 @@ namespace HaveIBeenPwned
             this.pluginHost = pluginHost;
         }
 
-        public abstract void CheckDatabase(bool expireEntries, bool oldEntriesOnly);
+        public abstract Task<List<BreachedEntry>> CheckDatabase(bool expireEntries, bool oldEntriesOnly);
+
+        public abstract Image BreachLogo { get; }
+
+        public abstract string BreachTitle { get; }
 
         protected void ExpireEntry(PwEntry entry)
         {
