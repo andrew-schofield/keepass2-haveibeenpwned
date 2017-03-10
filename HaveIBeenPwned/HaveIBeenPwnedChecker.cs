@@ -36,7 +36,7 @@ namespace HaveIBeenPwned
             var breachedEntries = new List<BreachedEntry>();
             StatusProgressForm progressForm = new StatusProgressForm();
 
-            progressForm.InitEx("Checking Cloudbleed Breaches", true, false, pluginHost.MainWindow);
+            progressForm.InitEx("Checking HIBP Breaches", true, false, pluginHost.MainWindow);
             progressForm.Show();
             progressForm.SetProgress(0);
             uint counter = 0;
