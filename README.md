@@ -16,7 +16,6 @@ Also compares URLs against the cloudbleed vulnerability list from here: [https:/
 
 ## Known Issues
 
-* Currently everything happens in the UI thread
 * No indication of download progress
 * There is no way of getting the "password last modified" time from KeePass, so unfortunately both checking modes have drawbacks:
  * "Only check entries that have not changed since the breach date" will produce false negatives if you have changed something other than the password since the breach date
