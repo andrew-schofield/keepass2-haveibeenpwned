@@ -20,7 +20,17 @@ namespace HaveIBeenPwned
             breachedEntryList.Items.Clear();
             foreach (var breach in breaches)
             {
-                var newItem = new ListViewItem(new[] { breach.Entry.Strings.ReadSafe(PwDefs.TitleField), breach.Entry.Strings.ReadSafe(PwDefs.UserNameField), breach.Entry.Strings.ReadSafe(PwDefs.UrlField), breach.Entry.LastModificationTime.ToShortDateString(), breach.BreachDate.ToShortDateString() }) { Tag = breach.Entry };
+                var newItem = new ListViewItem(new[]
+                {
+                    breach.Entry.Strings.ReadSafe(PwDefs.TitleField),
+                    breach.Entry.Strings.ReadSafe(PwDefs.UserNameField),
+                    breach.Entry.Strings.ReadSafe(PwDefs.UrlField),
+                    breach.Entry.GetPasswordLastModified().ToShortDateString(),
+                    breach.BreachDate.ToShortDateString()
+                })
+                {
+                    Tag = breach.Entry
+                };
                 breachedEntryList.Items.Add(newItem);
             }            
         }

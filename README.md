@@ -17,11 +17,9 @@ Also compares URLs against the cloudbleed vulnerability list from here: [https:/
 ## Known Issues
 
 * No indication of download progress
-* There is no way of getting the "password last modified" time from KeePass, so unfortunately both checking modes have drawbacks:
- * "Only check entries that have not changed since the breach date" will produce false negatives if you have changed something other than the password since the breach date
- * If unchecked you will potentially get false positives if you have already changed entries that have been breached (as this will return all entries that have ever been breached).
  
 ## Notes
 
 * HaveIBeenPwned breach data is downloaded every time the check is run as the data file is small.
 * Cloudbleed data is only downloaded once and then cached here: `%PROGRAMDATA%\KeePass\cloudbleed.txt` as this is currently a ~70MB download. If you wish to refresh the cache, simply delete this file.
+* As KeePass doesn't have a native method for determining when an entry's password was last changed, keepass2-haveibeenpwned will use the history entries if any exist and compare their passwords.

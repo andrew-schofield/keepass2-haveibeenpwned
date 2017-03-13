@@ -47,7 +47,7 @@ namespace HaveIBeenPwned
                 var url = entry.Strings.ReadSafe(PwDefs.UrlField).ToLower();
                 progressForm.SetText(string.Format("Checking {0} for breaches", url), KeePassLib.Interfaces.LogStatusType.Info);
                 var userName = entry.Strings.ReadSafe(PwDefs.UserNameField);
-                var lastModified = entry.LastModificationTime;
+                var lastModified = entry.GetPasswordLastModified();
                 if(!string.IsNullOrEmpty(url))
                 {
                     var domainBreaches = breaches.Where(b => !string.IsNullOrWhiteSpace(b.Domain) && url.Contains(b.Domain) && (!oldEntriesOnly || lastModified < b.BreachDate)).OrderBy(b => b.BreachDate);

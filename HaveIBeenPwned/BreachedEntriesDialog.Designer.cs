@@ -59,7 +59,7 @@
             this.breachedEntryList.Location = new System.Drawing.Point(12, 12);
             this.breachedEntryList.Name = "breachedEntryList";
             this.breachedEntryList.ShowGroups = false;
-            this.breachedEntryList.Size = new System.Drawing.Size(552, 268);
+            this.breachedEntryList.Size = new System.Drawing.Size(568, 268);
             this.breachedEntryList.TabIndex = 0;
             this.breachedEntryList.UseCompatibleStateImageBehavior = false;
             this.breachedEntryList.View = System.Windows.Forms.View.Details;
@@ -77,8 +77,8 @@
             // 
             // lastModifiedHeader
             // 
-            this.lastModifiedHeader.Text = "Last Modified";
-            this.lastModifiedHeader.Width = 88;
+            this.lastModifiedHeader.Text = "Password Changed";
+            this.lastModifiedHeader.Width = 105;
             // 
             // breachedHeader
             // 
@@ -89,7 +89,7 @@
             // 
             this.closeButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.closeButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.closeButton.Location = new System.Drawing.Point(489, 286);
+            this.closeButton.Location = new System.Drawing.Point(505, 286);
             this.closeButton.Name = "closeButton";
             this.closeButton.Size = new System.Drawing.Size(75, 23);
             this.closeButton.TabIndex = 1;
@@ -100,7 +100,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(576, 317);
+            this.ClientSize = new System.Drawing.Size(592, 317);
             this.Controls.Add(this.closeButton);
             this.Controls.Add(this.breachedEntryList);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
