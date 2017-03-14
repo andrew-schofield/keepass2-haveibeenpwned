@@ -12,7 +12,7 @@ Also compares URLs against the cloudbleed vulnerability list from here: [https:/
 
 * Install the plugin into KeePass, this will add 2 new entries to the Tools menu, "Have I Been Pwned?" and "Cloudbleed checker"
 * Clicking either of these will open a prompt asked whether to check only entries that have not been modified since the breach date. You also have the option of auto-expiring any breached entries.
-* Running the check will produce a series of messages with the details of any identified breaches.
+* Running the check will result in a dialog listing all the breached entries. These can then be modified directly from the list.
 
 ## Known Issues
 

@@ -35,6 +35,7 @@
             this.lastModifiedHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.breachedHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.closeButton = new System.Windows.Forms.Button();
+            this.label1 = new System.Windows.Forms.Label();
             titleHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.SuspendLayout();
             // 
@@ -96,11 +97,21 @@
             this.closeButton.Text = "Close";
             this.closeButton.UseVisualStyleBackColor = true;
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(12, 291);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(180, 13);
+            this.label1.TabIndex = 2;
+            this.label1.Text = "Double-click to edit breached entries";
+            // 
             // BreachedEntriesDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(592, 317);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.closeButton);
             this.Controls.Add(this.breachedEntryList);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
@@ -110,8 +121,8 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Breached Entries";
-            this.TopMost = true;
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -123,5 +134,6 @@
         private System.Windows.Forms.ColumnHeader lastModifiedHeader;
         private System.Windows.Forms.ColumnHeader breachedHeader;
         private System.Windows.Forms.Button closeButton;
+        private System.Windows.Forms.Label label1;
     }
 }
