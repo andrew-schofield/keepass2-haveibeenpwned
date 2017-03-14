@@ -45,7 +45,20 @@ namespace HaveIBeenPwned
                 var entry = ((PwEntry)breachedEntryList.SelectedItems[0].Tag);
                 var pwForm = new KeePass.Forms.PwEntryForm();
                 pwForm.InitEx(entry, KeePass.Forms.PwEditMode.EditExistingEntry, pluginHost.Database, pluginHost.MainWindow.ClientIcons, false, false);
-                var thread = new Thread(() => pwForm.ShowDialog());
+                var thread = new Thread(() => {
+                    if (pwForm.ShowDialog() == DialogResult.OK)
+                    {
+                        bool bUpdImg = pluginHost.Database.UINeedsIconUpdate;
+                        pluginHost.MainWindow.RefreshEntriesList(); // Update entry
+                        pluginHost.MainWindow.UpdateUI(false, null, bUpdImg, null, false, null, pwForm.HasModifiedEntry);
+                    }
+                    else
+                    {
+                        bool bUpdImg = pluginHost.Database.UINeedsIconUpdate;
+                        pluginHost.MainWindow.RefreshEntriesList(); // Update last access time
+                        pluginHost.MainWindow.UpdateUI(false, null, bUpdImg, null, false, null, false);
+                    }
+                });
                 thread.SetApartmentState(ApartmentState.STA);
                 thread.IsBackground = true;
                 thread.Start();
