@@ -85,7 +85,8 @@ namespace HaveIBeenPwned
         private async Task<HashSet<string>> GetBreaches()
         {
             HashSet<string> breaches = new HashSet<string>();
-            var cloudBleedDataFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "KeePass", "cloudbleed.txt");
+            var dataLocation = KeePassLib.Native.NativeLib.IsUnix() ? Environment.SpecialFolder.LocalApplicationData : Environment.SpecialFolder.CommonApplicationData;
+            var cloudBleedDataFile = Path.Combine(Environment.GetFolderPath(dataLocation), "KeePass", "cloudbleed.txt");
 
             if (File.Exists(cloudBleedDataFile))
             {
