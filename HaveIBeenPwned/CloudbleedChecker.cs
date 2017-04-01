@@ -53,21 +53,26 @@ namespace HaveIBeenPwned
                         // add http as a fallback protocol
                         url = string.Format("http://{0}", url);
                     }
-                    var uri = new Uri(url).DnsSafeHost;
-                    if(uri.StartsWith("www."))
+
+                    try
                     {
-                        uri = uri.Skip(4).ToString();
-                    }
-                    var lastModified = entry.GetPasswordLastModified();
-                    var domainBreaches = breaches.Where(b => uri == b && (!oldEntriesOnly || lastModified < new DateTime(2017, 02, 17)));
-                    if (domainBreaches.Any())
-                    {
-                        breachedEntries.Add(new BreachedEntry(entry, new DateTime(2017, 02, 17)));
-                        if (expireEntries)
+                        var uri = new Uri(url).DnsSafeHost;
+                        if (uri.StartsWith("www."))
                         {
-                            ExpireEntry(entry);
+                            uri = uri.Skip(4).ToString();
+                        }
+                        var lastModified = entry.GetPasswordLastModified();
+                        var domainBreaches = breaches.Where(b => uri == b && (!oldEntriesOnly || lastModified < new DateTime(2017, 02, 17)));
+                        if (domainBreaches.Any())
+                        {
+                            breachedEntries.Add(new BreachedEntry(entry, new DateTime(2017, 02, 17)));
+                            if (expireEntries)
+                            {
+                                ExpireEntry(entry);
+                            }
                         }
                     }
+                    catch(UriFormatException) { }
                 }
                 counter++;
                 if(progressForm.UserCancelled)

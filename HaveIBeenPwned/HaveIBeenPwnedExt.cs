@@ -101,6 +101,12 @@ namespace HaveIBeenPwned
                 var breachedEntries = breachChecker.CheckDatabase(dialog.ExpireEntries, dialog.OnlyCheckOldEntries);
                 breachedEntries.ContinueWith((result) =>
                 {
+                    // make sure any exceptions we aren't catching ourselves (like URIFormatException) are thrown correctly
+                    if(result.IsFaulted)
+                    {
+                        throw result.Exception;
+                    }
+
                     if (!result.Result.Any())
                     {
                         MessageBox.Show("No breached entries found.", Resources.MessageTitle, MessageBoxButtons.OK, MessageBoxIcon.Information);
