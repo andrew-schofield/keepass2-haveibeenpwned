@@ -58,7 +58,6 @@ namespace HaveIBeenPwned
                     {
                         uri = uri.Skip(4).ToString();
                     }
-                    var userName = entry.Strings.ReadSafe(PwDefs.UserNameField);
                     var lastModified = entry.GetPasswordLastModified();
                     var domainBreaches = breaches.Where(b => uri == b && (!oldEntriesOnly || lastModified < new DateTime(2017, 02, 17)));
                     if (domainBreaches.Any())
