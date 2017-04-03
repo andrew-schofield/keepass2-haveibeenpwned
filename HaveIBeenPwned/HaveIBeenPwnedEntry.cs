@@ -3,6 +3,7 @@
 namespace HaveIBeenPwned
 {
     public class HaveIBeenPwnedEntry
+    public class HaveIBeenPwnedEntry : IBreach
     {
         public string Name { get; set; }
         public string Title { get; set; }

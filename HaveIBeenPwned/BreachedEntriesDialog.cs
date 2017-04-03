@@ -28,6 +28,7 @@ namespace HaveIBeenPwned
                     breach.Entry.Strings.ReadSafe(PwDefs.UserNameField),
                     breach.Entry.Strings.ReadSafe(PwDefs.UrlField),
                     breach.Entry.GetPasswordLastModified().ToShortDateString(),
+                    breach.BreachName,
                     breach.BreachDate.ToShortDateString()
                 })
                 {

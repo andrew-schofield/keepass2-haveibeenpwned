@@ -5,14 +5,30 @@ namespace HaveIBeenPwned
 {
     public class BreachedEntry
     {
+        private IBreach breach;
+
         public PwEntry Entry { get; private set; }
 
-        public DateTime BreachDate { get; private set; }
+        public DateTime BreachDate
+        {
+            get
+            {
+                return breach.BreachDate;
+            }
+        }
 
-        public BreachedEntry(PwEntry entry, DateTime breachDate)
+        public string BreachName
+        {
+            get
+            {
+                return breach.Name;
+            }
+        }
+
+        public BreachedEntry(PwEntry entry, IBreach breach)
         {
             Entry = entry;
-            BreachDate = breachDate;
+            this.breach = breach;
         }
     }
 }

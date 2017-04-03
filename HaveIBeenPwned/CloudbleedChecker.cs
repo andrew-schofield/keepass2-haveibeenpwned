@@ -35,6 +35,7 @@ namespace HaveIBeenPwned
             var entries = passwordDatabase.RootGroup.GetEntries(true);
             var breachedEntries = new List<BreachedEntry>();
             StatusProgressForm progressForm = new StatusProgressForm();
+            var cloudbleedEntry = new CloudbleedEntry();
 
             progressForm.InitEx("Checking Cloudbleed Breaches", true, false, pluginHost.MainWindow);
             progressForm.Show();
@@ -65,7 +66,7 @@ namespace HaveIBeenPwned
                         var domainBreaches = breaches.Where(b => uri == b && (!oldEntriesOnly || lastModified < new DateTime(2017, 02, 17)));
                         if (domainBreaches.Any())
                         {
-                            breachedEntries.Add(new BreachedEntry(entry, new DateTime(2017, 02, 17)));
+                            breachedEntries.Add(new BreachedEntry(entry, cloudbleedEntry));
                             if (expireEntries)
                             {
                                 ExpireEntry(entry);

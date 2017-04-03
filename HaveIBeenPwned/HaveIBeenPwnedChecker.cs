@@ -53,7 +53,7 @@ namespace HaveIBeenPwned
                     var domainBreaches = breaches.Where(b => !string.IsNullOrWhiteSpace(b.Domain) && url.Contains(b.Domain) && (!oldEntriesOnly || lastModified < b.BreachDate)).OrderBy(b => b.BreachDate);
                     if (domainBreaches.Any())
                     {
-                        breachedEntries.Add(new BreachedEntry(entry, domainBreaches.Last().BreachDate));
+                        breachedEntries.Add(new BreachedEntry(entry, domainBreaches.Last()));
                         if(expireEntries)
                         {
                             ExpireEntry(entry);
