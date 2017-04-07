@@ -2,6 +2,7 @@
 using KeePassLib;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -20,6 +21,13 @@ namespace HaveIBeenPwned
         public void AddBreaches(IList<BreachedEntry> breaches)
         {
             breachedEntryList.Items.Clear();
+            breachedEntryList.Groups.Clear();
+            var groupNames = breaches.Select(b => b.Entry.ParentGroup.GetFullPath(" - ", false)).Distinct();
+            foreach(var group in groupNames)
+            {
+                breachedEntryList.Groups.Add(new ListViewGroup(group, HorizontalAlignment.Left));
+            }
+            breachedEntryList.ShowGroups = true;
             foreach (var breach in breaches)
             {
                 var newItem = new ListViewItem(new[]
@@ -34,6 +42,14 @@ namespace HaveIBeenPwned
                 {
                     Tag = breach.Entry
                 };
+
+                foreach(ListViewGroup group in breachedEntryList.Groups)
+                {
+                    if (group.Header == breach.Entry.ParentGroup.GetFullPath(" - ", false))
+                    {
+                        newItem.Group = group;
+                    }
+                }
                 breachedEntryList.Items.Add(newItem);
             }            
         }
