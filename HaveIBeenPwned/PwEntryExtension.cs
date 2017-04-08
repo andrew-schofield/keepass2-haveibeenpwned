@@ -1,4 +1,5 @@
-﻿using KeePassLib;
+﻿using KeePass.Plugins;
+using KeePassLib;
 using System;
 using System.Linq;
 
@@ -22,6 +23,11 @@ namespace HaveIBeenPwned
             }
 
             return entry.LastModificationTime;
+        }
+
+        public static bool IsDeleted(this PwEntry entry, IPluginHost pluginHost)
+        {
+            return entry.ParentGroup.Uuid.CompareTo(pluginHost.Database.RecycleBinUuid) == 0;
         }
     }
 }
