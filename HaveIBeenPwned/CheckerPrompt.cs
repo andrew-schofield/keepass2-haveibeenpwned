@@ -21,5 +21,10 @@ namespace HaveIBeenPwned
         {
             get { return checkOldEntries.Checked; }
         }
+
+        public bool IgnoreDeletedEntries
+        {
+            get { return ignoreDeletedEntries.Checked; }
+        }
     }
 }
