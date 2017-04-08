@@ -68,7 +68,7 @@
             this.checkOldEntries.AutoSize = true;
             this.checkOldEntries.Checked = true;
             this.checkOldEntries.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkOldEntries.Location = new System.Drawing.Point(12, 59);
+            this.checkOldEntries.Location = new System.Drawing.Point(13, 59);
             this.checkOldEntries.Name = "checkOldEntries";
             this.checkOldEntries.Size = new System.Drawing.Size(331, 17);
             this.checkOldEntries.TabIndex = 2;
