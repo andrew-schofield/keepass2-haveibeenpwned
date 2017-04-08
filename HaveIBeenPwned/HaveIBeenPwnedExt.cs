@@ -98,7 +98,7 @@ namespace HaveIBeenPwned
             var dialog = new CheckerPrompt(breachChecker.BreachLogo, breachChecker.BreachTitle);
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                var breachedEntries = breachChecker.CheckDatabase(dialog.ExpireEntries, dialog.OnlyCheckOldEntries);
+                var breachedEntries = breachChecker.CheckDatabase(dialog.ExpireEntries, dialog.OnlyCheckOldEntries, dialog.IgnoreDeletedEntries);
                 breachedEntries.ContinueWith((result) =>
                 {
                     // make sure any exceptions we aren't catching ourselves (like URIFormatException) are thrown correctly
