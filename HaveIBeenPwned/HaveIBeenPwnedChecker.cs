@@ -29,10 +29,10 @@ namespace HaveIBeenPwned
             get { return "Have I Been Pwned"; }
         }
 
-        public async override Task<List<BreachedEntry>> CheckDatabase(bool expireEntries, bool oldEntriesOnly)
+        public async override Task<List<BreachedEntry>> CheckDatabase(bool expireEntries, bool oldEntriesOnly, bool ignoreDeleted)
         {
             var breaches = await GetBreaches();
-            var entries = passwordDatabase.RootGroup.GetEntries(true);
+            var entries = passwordDatabase.RootGroup.GetEntries(true).Where(e => !ignoreDeleted || !e.IsDeleted(pluginHost));
             var breachedEntries = new List<BreachedEntry>();
             StatusProgressForm progressForm = new StatusProgressForm();
 
