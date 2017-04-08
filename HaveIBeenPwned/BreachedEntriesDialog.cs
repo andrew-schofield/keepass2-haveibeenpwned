@@ -16,6 +16,7 @@ namespace HaveIBeenPwned
         {
             this.pluginHost = pluginHost;
             InitializeComponent();
+            this.Icon = pluginHost.MainWindow.Icon;
         }
 
         public void AddBreaches(IList<BreachedEntry> breaches)
