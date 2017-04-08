@@ -21,7 +21,7 @@ namespace HaveIBeenPwned
         {
             get
             {
-                return breach.Name;
+                return breach.Title;
             }
         }
 

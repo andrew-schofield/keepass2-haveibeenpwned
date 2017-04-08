@@ -18,7 +18,7 @@ namespace HaveIBeenPwned
             }
         }
 
-        public string Name
+        public string Title
         {
             get
             {

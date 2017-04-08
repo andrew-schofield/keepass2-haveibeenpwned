@@ -4,7 +4,7 @@ namespace HaveIBeenPwned
 {
     public interface IBreach
     {
-        string Name { get; }
+        string Title { get; }
 
         DateTime BreachDate { get; }
     }
