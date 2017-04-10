@@ -44,13 +44,13 @@ namespace HaveIBeenPwned
             foreach (var entry in entries)
             {
                 progressForm.SetProgress((uint)((double)counter / entryCount * 100));
-                var url = entry.Strings.ReadSafe(PwDefs.UrlField).ToLower();
+                var url = entry.GetUrlDomain();
                 progressForm.SetText(string.Format("Checking {0} for breaches", url), KeePassLib.Interfaces.LogStatusType.Info);
                 var userName = entry.Strings.ReadSafe(PwDefs.UserNameField);
                 var lastModified = entry.GetPasswordLastModified();
                 if(!string.IsNullOrEmpty(url))
                 {
-                    var domainBreaches = breaches.Where(b => !string.IsNullOrWhiteSpace(b.Domain) && url.Contains(b.Domain) && (!oldEntriesOnly || lastModified < b.BreachDate)).OrderBy(b => b.BreachDate);
+                    var domainBreaches = breaches.Where(b => !string.IsNullOrWhiteSpace(b.Domain) && url == b.Domain && (!oldEntriesOnly || lastModified < b.BreachDate)).OrderBy(b => b.BreachDate);
                     if (domainBreaches.Any())
                     {
                         breachedEntries.Add(new BreachedEntry(entry, domainBreaches.Last()));
