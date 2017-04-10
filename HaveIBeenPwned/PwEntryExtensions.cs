@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace HaveIBeenPwned
 {
-    public static class PwEntryExtension
+    public static class PwEntryExtensions
     {
         public static DateTime GetPasswordLastModified(this PwEntry entry)
         {
@@ -14,7 +14,7 @@ namespace HaveIBeenPwned
                 var sortedEntries = entry.History.OrderByDescending(h => h.LastModificationTime);
                 foreach (var historyEntry in sortedEntries)
                 {
-                    if (entry.Strings.GetSafe(PwDefs.PasswordField).ReadString() != historyEntry.Strings.GetSafe(PwDefs.PasswordField).ReadString())
+                    if(!entry.Strings.GetSafe(PwDefs.PasswordField).Equals(historyEntry.Strings.GetSafe(PwDefs.PasswordField)))
                     {
                         return historyEntry.LastModificationTime;
                     }

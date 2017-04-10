@@ -72,7 +72,8 @@
     <Compile Include="HaveIBeenPwnedExt.cs" />
     <Compile Include="IBreach.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="PwEntryExtension.cs" />
+    <Compile Include="ProtectedStringExtensions.cs" />
+    <Compile Include="PwEntryExtensions.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
