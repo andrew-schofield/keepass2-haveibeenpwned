@@ -45,35 +45,20 @@ namespace HaveIBeenPwned
             foreach (var entry in entries)
             {
                 progressForm.SetProgress((uint)((double)counter / entryCount * 100));
-                var url = entry.Strings.ReadSafe(PwDefs.UrlField).ToLower();
+                var url = entry.GetUrlDomain();
                 progressForm.SetText(string.Format("Checking {0} for breaches", url), KeePassLib.Interfaces.LogStatusType.Info);
                 if (!string.IsNullOrEmpty(url))
-                {
-                    if(!url.Contains("://"))
+                {                    
+                    var lastModified = entry.GetPasswordLastModified();
+                    var domainBreaches = breaches.Where(b => url == b && (!oldEntriesOnly || lastModified < new DateTime(2017, 02, 17)));
+                    if (domainBreaches.Any())
                     {
-                        // add http as a fallback protocol
-                        url = string.Format("http://{0}", url);
-                    }
-
-                    try
-                    {
-                        var uri = new Uri(url).DnsSafeHost;
-                        if (uri.StartsWith("www."))
+                        breachedEntries.Add(new BreachedEntry(entry, cloudbleedEntry));
+                        if (expireEntries)
                         {
-                            uri = uri.Skip(4).ToString();
-                        }
-                        var lastModified = entry.GetPasswordLastModified();
-                        var domainBreaches = breaches.Where(b => uri == b && (!oldEntriesOnly || lastModified < new DateTime(2017, 02, 17)));
-                        if (domainBreaches.Any())
-                        {
-                            breachedEntries.Add(new BreachedEntry(entry, cloudbleedEntry));
-                            if (expireEntries)
-                            {
-                                ExpireEntry(entry);
-                            }
+                            ExpireEntry(entry);
                         }
                     }
-                    catch(UriFormatException) { }
                 }
                 counter++;
                 if(progressForm.UserCancelled)
