@@ -23,6 +23,7 @@ namespace HaveIBeenPwned
         {
             breachedEntryList.Items.Clear();
             breachedEntryList.Groups.Clear();
+            breachedEntryList.SmallImageList = new ImageList();
             var groupNames = breaches.Select(b => b.Entry.ParentGroup.GetFullPath(" - ", false)).Distinct();
             foreach(var group in groupNames)
             {
@@ -31,6 +32,7 @@ namespace HaveIBeenPwned
             breachedEntryList.ShowGroups = true;
             foreach (var breach in breaches)
             {
+                breachedEntryList.SmallImageList.Images.Add(breach.Entry.GetIcon(pluginHost));
                 var newItem = new ListViewItem(new[]
                 {
                     breach.Entry.Strings.ReadSafe(PwDefs.TitleField),
@@ -41,7 +43,8 @@ namespace HaveIBeenPwned
                     breach.BreachDate.ToShortDateString()
                 })
                 {
-                    Tag = breach.Entry
+                    Tag = breach.Entry,
+                    ImageIndex = breachedEntryList.SmallImageList.Images.Count - 1
                 };
 
                 foreach(ListViewGroup group in breachedEntryList.Groups)
