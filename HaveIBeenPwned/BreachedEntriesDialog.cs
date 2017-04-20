@@ -21,6 +21,8 @@ namespace HaveIBeenPwned
 
         public void AddBreaches(IList<BreachedEntry> breaches)
         {
+            this.Text = string.Format(this.Text, breaches.Count, breaches.Count > 1 ? "Entries" : "Entry");
+
             breachedEntryList.Items.Clear();
             breachedEntryList.Groups.Clear();
             var groupNames = breaches.Select(b => b.Entry.ParentGroup.GetFullPath(" - ", false)).Distinct();
