@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             System.Windows.Forms.ColumnHeader titleHeader;
-            this.breachedEntryList = new System.Windows.Forms.ListView();
+            this.breachedEntryList = new KeePass.UI.CustomListViewEx();
             this.usernameHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.urlHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.lastModifiedHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -134,7 +134,7 @@
 
         #endregion
 
-        private System.Windows.Forms.ListView breachedEntryList;
+        private KeePass.UI.CustomListViewEx breachedEntryList;
         private System.Windows.Forms.ColumnHeader usernameHeader;
         private System.Windows.Forms.ColumnHeader urlHeader;
         private System.Windows.Forms.ColumnHeader lastModifiedHeader;
