@@ -59,6 +59,7 @@
       <DependentUpon>BreachedEntriesDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="BreachedEntry.cs" />
+    <Compile Include="BreachEnum.cs" />
     <Compile Include="CheckerPrompt.cs">
       <SubType>Form</SubType>
     </Compile>

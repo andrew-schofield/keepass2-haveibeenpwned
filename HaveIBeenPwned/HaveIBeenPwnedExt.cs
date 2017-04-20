@@ -6,6 +6,7 @@ using System.Net.Http.Headers;
 using System.Drawing;
 using System.Linq;
 using System.Net;
+using System.Collections.Generic;
 
 namespace HaveIBeenPwned
 {
@@ -16,6 +17,13 @@ namespace HaveIBeenPwned
         private ToolStripMenuItem haveIBeenPwnedMenuItem = null;
         private ToolStripMenuItem cloudBleedMenuItem = null;
         private static HttpClient client = new HttpClient();
+
+        private Dictionary<BreachEnum, Func<KeePassLib.PwDatabase, HttpClient, IPluginHost, BaseChecker>> supportedBreachCheckers =
+            new Dictionary<BreachEnum, Func<KeePassLib.PwDatabase, HttpClient, IPluginHost, BaseChecker>>
+        {
+            { BreachEnum.HIBP, (d,h,p) => new HaveIBeenPwnedChecker(d, h, p) },
+            { BreachEnum.CloudBleed, (d,h,p) => new CloudbleedChecker(d, h, p) },
+        };
 
         public HaveIBeenPwnedExt()
         {
@@ -82,12 +90,12 @@ namespace HaveIBeenPwned
 
         private void CheckHaveIBeenPwned(object sender, EventArgs e)
         {
-            CheckBreaches(new HaveIBeenPwnedChecker(pluginHost.Database, client, pluginHost));
+            CheckBreaches(supportedBreachCheckers[BreachEnum.HIBP](pluginHost.Database, client, pluginHost));
         }
 
         private void CheckCloudBleed(object sender, EventArgs e)
         {
-            CheckBreaches(new CloudbleedChecker(pluginHost.Database, client, pluginHost));
+            CheckBreaches(supportedBreachCheckers[BreachEnum.CloudBleed](pluginHost.Database, client, pluginHost));
         }
 
         private void CheckBreaches(BaseChecker breachChecker)
