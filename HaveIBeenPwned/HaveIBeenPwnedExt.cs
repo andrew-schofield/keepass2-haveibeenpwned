@@ -7,6 +7,7 @@ using System.Drawing;
 using System.Linq;
 using System.Net;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace HaveIBeenPwned
 {
@@ -92,45 +93,56 @@ namespace HaveIBeenPwned
 
             if (dialog.ShowDialog() == DialogResult.OK)
             {
+                List<BreachedEntry> result = new List<BreachedEntry>();
                 if(dialog.CheckAllBreaches)
                 {
                     foreach(var breach in Enum.GetValues(typeof(BreachEnum)))
                     {
-                        CheckBreaches(supportedBreachCheckers[(BreachEnum)breach](pluginHost.Database, client, pluginHost),
-                        dialog.ExpireEntries, dialog.OnlyCheckOldEntries, dialog.IgnoreDeletedEntries);
+                        result.AddRange(CheckBreaches(supportedBreachCheckers[(BreachEnum)breach](pluginHost.Database, client, pluginHost),
+                        dialog.ExpireEntries, dialog.OnlyCheckOldEntries, dialog.IgnoreDeletedEntries));
                     }
                 }
                 else
                 {
-                    CheckBreaches(supportedBreachCheckers[dialog.SelectedBreach](pluginHost.Database, client, pluginHost),
-                        dialog.ExpireEntries, dialog.OnlyCheckOldEntries, dialog.IgnoreDeletedEntries);
-                }
-            }
-            pluginHost.MainWindow.Show();
-        }
-
-        private void CheckBreaches(BaseChecker breachChecker, bool expireEntries, bool oldEntriesOnly, bool ignoreDeleted)
-        {         
-            var breachedEntries = breachChecker.CheckDatabase(expireEntries, oldEntriesOnly, ignoreDeleted);
-            breachedEntries.ContinueWith((result) =>
-            {
-                // make sure any exceptions we aren't catching ourselves (like URIFormatException) are thrown correctly
-                if(result.IsFaulted)
-                {
-                    throw result.Exception;
+                    result.AddRange(CheckBreaches(supportedBreachCheckers[dialog.SelectedBreach](pluginHost.Database, client, pluginHost),
+                        dialog.ExpireEntries, dialog.OnlyCheckOldEntries, dialog.IgnoreDeletedEntries));
                 }
 
-                if (!result.Result.Any())
+                if (!result.Any())
                 {
                     MessageBox.Show("No breached entries found.", Resources.MessageTitle, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 else
                 {
                     var breachedEntriesDialog = new BreachedEntriesDialog(pluginHost);
-                    breachedEntriesDialog.AddBreaches(result.Result);
+                    breachedEntriesDialog.AddBreaches(result);
                     breachedEntriesDialog.ShowDialog();
                 }
-            });
+            }
+
+            pluginHost.MainWindow.Show();
+        }
+
+        private IList<BreachedEntry> CheckBreaches(
+            BaseChecker breachChecker, 
+            bool expireEntries,
+            bool oldEntriesOnly,
+            bool ignoreDeleted)
+        {         
+            var breachedEntries = breachChecker.CheckDatabase(expireEntries, oldEntriesOnly, ignoreDeleted);
+            var breaches =  breachedEntries.ContinueWith((result) =>
+            {
+                // make sure any exceptions we aren't catching ourselves (like URIFormatException) are thrown correctly
+                if (result.IsFaulted)
+                {
+                    throw result.Exception;
+                }
+
+                return result.Result;
+                
+            }).Result;
+
+            return breaches;
         }
     }
 }
