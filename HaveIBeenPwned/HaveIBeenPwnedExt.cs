@@ -15,7 +15,6 @@ namespace HaveIBeenPwned
         private IPluginHost pluginHost = null;
         private ToolStripSeparator toolStripSeperator = null;
         private ToolStripMenuItem haveIBeenPwnedMenuItem = null;
-        private ToolStripMenuItem cloudBleedMenuItem = null;
         private static HttpClient client = new HttpClient();
 
         private Dictionary<BreachEnum, Func<KeePassLib.PwDatabase, HttpClient, IPluginHost, BaseChecker>> supportedBreachCheckers =
@@ -53,13 +52,6 @@ namespace HaveIBeenPwned
             haveIBeenPwnedMenuItem.Click += this.CheckHaveIBeenPwned;
             tsMenu.Add(haveIBeenPwnedMenuItem);
 
-            // Add menu item 'Cloudbleed Checker'
-            cloudBleedMenuItem = new ToolStripMenuItem();
-            cloudBleedMenuItem.Text = "Cloudbleed Checker";
-            cloudBleedMenuItem.Image = Resources.cloudbleed.ToBitmap();
-            cloudBleedMenuItem.Click += this.CheckCloudBleed;
-            tsMenu.Add(cloudBleedMenuItem);
-
             return true;
         }
 
@@ -90,49 +82,55 @@ namespace HaveIBeenPwned
 
         private void CheckHaveIBeenPwned(object sender, EventArgs e)
         {
-            CheckBreaches(supportedBreachCheckers[BreachEnum.HIBP](pluginHost.Database, client, pluginHost));
-        }
-
-        private void CheckCloudBleed(object sender, EventArgs e)
-        {
-            CheckBreaches(supportedBreachCheckers[BreachEnum.CloudBleed](pluginHost.Database, client, pluginHost));
-        }
-
-        private void CheckBreaches(BaseChecker breachChecker)
-        {
             if (!pluginHost.Database.IsOpen)
             {
                 MessageBox.Show("You must first open a database", Resources.MessageTitle);
                 return;
             }
 
-            var dialog = new CheckerPrompt(breachChecker.BreachLogo, breachChecker.BreachTitle);
+            var dialog = new CheckerPrompt();
+
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                var breachedEntries = breachChecker.CheckDatabase(dialog.ExpireEntries, dialog.OnlyCheckOldEntries, dialog.IgnoreDeletedEntries);
-                breachedEntries.ContinueWith((result) =>
+                if(dialog.CheckAllBreaches)
                 {
-                    // make sure any exceptions we aren't catching ourselves (like URIFormatException) are thrown correctly
-                    if(result.IsFaulted)
+                    foreach(var breach in Enum.GetValues(typeof(BreachEnum)))
                     {
-                        throw result.Exception;
+                        CheckBreaches(supportedBreachCheckers[(BreachEnum)breach](pluginHost.Database, client, pluginHost),
+                        dialog.ExpireEntries, dialog.OnlyCheckOldEntries, dialog.IgnoreDeletedEntries);
                     }
-
-                    if (!result.Result.Any())
-                    {
-                        MessageBox.Show("No breached entries found.", Resources.MessageTitle, MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
-                    else
-                    {
-                        var breachedEntriesDialog = new BreachedEntriesDialog(pluginHost);
-                        breachedEntriesDialog.AddBreaches(result.Result);
-                        breachedEntriesDialog.ShowDialog();
-                    }
-                });
+                }
+                else
+                {
+                    CheckBreaches(supportedBreachCheckers[dialog.SelectedBreach](pluginHost.Database, client, pluginHost),
+                        dialog.ExpireEntries, dialog.OnlyCheckOldEntries, dialog.IgnoreDeletedEntries);
+                }
             }
-
             pluginHost.MainWindow.Show();
+        }
 
+        private void CheckBreaches(BaseChecker breachChecker, bool expireEntries, bool oldEntriesOnly, bool ignoreDeleted)
+        {         
+            var breachedEntries = breachChecker.CheckDatabase(expireEntries, oldEntriesOnly, ignoreDeleted);
+            breachedEntries.ContinueWith((result) =>
+            {
+                // make sure any exceptions we aren't catching ourselves (like URIFormatException) are thrown correctly
+                if(result.IsFaulted)
+                {
+                    throw result.Exception;
+                }
+
+                if (!result.Result.Any())
+                {
+                    MessageBox.Show("No breached entries found.", Resources.MessageTitle, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    var breachedEntriesDialog = new BreachedEntriesDialog(pluginHost);
+                    breachedEntriesDialog.AddBreaches(result.Result);
+                    breachedEntriesDialog.ShowDialog();
+                }
+            });
         }
     }
 }

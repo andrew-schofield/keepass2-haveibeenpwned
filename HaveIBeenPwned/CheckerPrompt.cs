@@ -1,15 +1,25 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace HaveIBeenPwned
 {
     public partial class CheckerPrompt : Form
     {
-        public CheckerPrompt(Image checkerLogo, string checkerTitle)
+        public CheckerPrompt()
         {
             InitializeComponent();
-            breachCheckerLogo.Image = checkerLogo;
-            breachCheckerText.Text = checkerTitle;
+            this.supportedBreachList.DataSource = Enum.GetValues(typeof(BreachEnum)).Cast<BreachEnum>()
+                .Select(b => new ListViewItem { Text = b.GetAttribute<DisplayAttribute>().Name, Tag = b }).ToList();
+
+            checkAllBreaches.CheckedChanged += CheckAllBreachesCheckedChanged;
+        }
+
+        private void CheckAllBreachesCheckedChanged(object sender, EventArgs e)
+        {
+            supportedBreachList.Enabled = !checkAllBreaches.Checked;
+            checkAllBreachLabel.Enabled = !checkAllBreaches.Checked;
         }
 
         public bool ExpireEntries
@@ -25,6 +35,16 @@ namespace HaveIBeenPwned
         public bool IgnoreDeletedEntries
         {
             get { return ignoreDeletedEntries.Checked; }
+        }
+
+        public BreachEnum SelectedBreach
+        {
+            get { return (BreachEnum)((ListViewItem)supportedBreachList.SelectedItem).Tag; }
+        }
+
+        public bool CheckAllBreaches
+        {
+            get { return checkAllBreaches.Checked; }
         }
     }
 }
