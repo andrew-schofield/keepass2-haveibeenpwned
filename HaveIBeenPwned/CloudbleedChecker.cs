@@ -82,16 +82,11 @@ namespace HaveIBeenPwned
             {
                 using (var fileStream = new FileStream(cloudBleedDataFile, FileMode.Open, FileAccess.Read))
                 {
-                    ExtractBreachesFromStream(breaches, fileStream);
+                    breaches = await ExtractBreachesFromStream(fileStream);
                 }
             }
             else
-            {
-                StatusProgressForm progressForm = new StatusProgressForm();
-
-                progressForm.InitEx("Downloading Cloudbleed Data File", true, false, pluginHost.MainWindow);
-                progressForm.Show();
-                progressForm.SetProgress(0);
+            {                
                 HttpResponseMessage response = await client.GetAsync(new Uri("https://raw.githubusercontent.com/pirate/sites-using-cloudflare/master/sorted_unique_cf.txt"));
                 if (response.IsSuccessStatusCode)
                 {
@@ -103,27 +98,25 @@ namespace HaveIBeenPwned
                     }
                     stream.Seek(0, SeekOrigin.Begin);
 
-                    progressForm.SetProgress(100);
-                    ExtractBreachesFromStream(breaches, stream);
+                    breaches = await ExtractBreachesFromStream(stream);
                 }
                 else
                 {
                     MessageBox.Show(string.Format("Unable to check githubusercontent.com (returned Status: {0})", response.StatusCode), Resources.MessageTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
-
-                progressForm.Hide();
-                progressForm.Close();
             }
+
             return breaches;
         }
 
-        private static void ExtractBreachesFromStream(HashSet<string> breaches, Stream stream)
+        private async Task<HashSet<string>> ExtractBreachesFromStream(Stream stream)
         {
+            var breaches = new HashSet<string>();
             using (var rd = new StreamReader(stream))
             {
                 while (true)
                 {
-                    var line = rd.ReadLine();
+                    var line = await rd.ReadLineAsync();
                     if (line == null)
                         break;
                     if (!string.IsNullOrWhiteSpace(line))
@@ -132,6 +125,8 @@ namespace HaveIBeenPwned
                     }
                 }
             }
+
+            return breaches;
         }
     }
 }

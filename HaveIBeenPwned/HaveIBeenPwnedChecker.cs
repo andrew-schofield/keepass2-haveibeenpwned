@@ -73,14 +73,17 @@ namespace HaveIBeenPwned
         }
 
         private async Task<List<HaveIBeenPwnedEntry>> GetBreaches()
-        {
-            StatusProgressForm progressForm = new StatusProgressForm();
-
-            progressForm.InitEx("Downloading Have I Been Pwned? Breach List", true, false, pluginHost.MainWindow);
-            progressForm.Show();
-            progressForm.SetProgress(0);
+        {            
             List<HaveIBeenPwnedEntry> breaches = null;
-            HttpResponseMessage response = await client.GetAsync(new Uri("https://haveibeenpwned.com/api/v2/breaches"));
+            HttpResponseMessage response = null;
+            try
+            {
+                response = await client.GetAsync(new Uri("https://haveibeenpwned.com/api/v2/breaches"));
+            }
+            catch(Exception ex)
+            {
+                throw ex;
+            }
             if (response.IsSuccessStatusCode)
             {
                 var jsonString = await response.Content.ReadAsStringAsync();
@@ -90,10 +93,7 @@ namespace HaveIBeenPwned
             {
                 MessageBox.Show(string.Format("Unable to check haveibeenpwned.com (returned Status: {0})", response.StatusCode), Resources.MessageTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            progressForm.SetProgress(100);
-
-            progressForm.Hide();
-            progressForm.Close();
+                        
             return breaches;
         }
     }

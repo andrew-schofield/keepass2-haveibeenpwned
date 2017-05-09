@@ -8,6 +8,7 @@ using System.Linq;
 using System.Net;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace HaveIBeenPwned
 {
@@ -99,13 +100,13 @@ namespace HaveIBeenPwned
                     foreach(var breach in Enum.GetValues(typeof(BreachEnum)))
                     {
                         result.AddRange(CheckBreaches(supportedBreachCheckers[(BreachEnum)breach](pluginHost.Database, client, pluginHost),
-                        dialog.ExpireEntries, dialog.OnlyCheckOldEntries, dialog.IgnoreDeletedEntries));
+                        dialog.ExpireEntries, dialog.OnlyCheckOldEntries, dialog.IgnoreDeletedEntries).Result);
                     }
                 }
                 else
                 {
                     result.AddRange(CheckBreaches(supportedBreachCheckers[dialog.SelectedBreach](pluginHost.Database, client, pluginHost),
-                        dialog.ExpireEntries, dialog.OnlyCheckOldEntries, dialog.IgnoreDeletedEntries));
+                        dialog.ExpireEntries, dialog.OnlyCheckOldEntries, dialog.IgnoreDeletedEntries).Result);
                 }
 
                 if (!result.Any())
@@ -123,26 +124,26 @@ namespace HaveIBeenPwned
             pluginHost.MainWindow.Show();
         }
 
-        private IList<BreachedEntry> CheckBreaches(
-            BaseChecker breachChecker, 
+        private async Task<IList<BreachedEntry>> CheckBreaches(
+            BaseChecker breachChecker,
             bool expireEntries,
             bool oldEntriesOnly,
             bool ignoreDeleted)
-        {         
-            var breachedEntries = breachChecker.CheckDatabase(expireEntries, oldEntriesOnly, ignoreDeleted);
-            var breaches =  breachedEntries.ContinueWith((result) =>
-            {
-                // make sure any exceptions we aren't catching ourselves (like URIFormatException) are thrown correctly
-                if (result.IsFaulted)
-                {
-                    throw result.Exception;
-                }
+        {
+            var breachedEntries = await breachChecker.CheckDatabase(expireEntries, oldEntriesOnly, ignoreDeleted);
+            //var breaches = breachedEntries.ContinueWith((result) =>
+            //{
+            //    // make sure any exceptions we aren't catching ourselves (like URIFormatException) are thrown correctly
+            //    if (result.IsFaulted)
+            //    {
+            //        throw result.Exception;
+            //    }
 
-                return result.Result;
-                
-            }).Result;
+            //    return result.Result;
 
-            return breaches;
+            //}).Result;
+
+            return breachedEntries;
         }
     }
 }
