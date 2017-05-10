@@ -74,6 +74,7 @@
     <Compile Include="HaveIBeenPwnedEntry.cs" />
     <Compile Include="HaveIBeenPwnedExt.cs" />
     <Compile Include="IBreach.cs" />
+    <Compile Include="ProgressHelper.cs" />
     <Compile Include="ProgressItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ProtectedStringExtensions.cs" />
