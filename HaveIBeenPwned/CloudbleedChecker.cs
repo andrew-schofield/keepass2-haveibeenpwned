@@ -29,24 +29,24 @@ namespace HaveIBeenPwned
             get { return "Cloudbleed Vulnerability"; }
         }
 
-        public async override Task<List<BreachedEntry>> CheckDatabase(bool expireEntries, bool oldEntriesOnly, bool ignoreDeleted)
+        public async override Task<List<BreachedEntry>> CheckDatabase(bool expireEntries, bool oldEntriesOnly, bool ignoreDeleted, IProgress<ProgressItem> progressIndicator)
         {
-            var breaches = await GetBreaches();
+            var breaches = await GetBreaches(progressIndicator);
             var entries = passwordDatabase.RootGroup.GetEntries(true).Where(e => !ignoreDeleted || !e.IsDeleted(pluginHost));
             var breachedEntries = new List<BreachedEntry>();
-            StatusProgressForm progressForm = new StatusProgressForm();
+            // StatusProgressForm progressForm = new StatusProgressForm();
             var cloudbleedEntry = new CloudbleedEntry();
 
-            progressForm.InitEx("Checking Cloudbleed Breaches", true, false, pluginHost.MainWindow);
-            progressForm.Show();
-            progressForm.SetProgress(0);
+            //progressForm.InitEx("Checking Cloudbleed Breaches", true, false, pluginHost.MainWindow);
+            //progressForm.Show();
+            //progressForm.SetProgress(0);
             uint counter = 0;
             var entryCount = entries.Count();
             foreach (var entry in entries)
             {
-                progressForm.SetProgress((uint)((double)counter / entryCount * 100));
+                //progressForm.SetProgress((uint)((double)counter / entryCount * 100));
                 var url = entry.GetUrlDomain();
-                progressForm.SetText(string.Format("Checking {0} for breaches", url), KeePassLib.Interfaces.LogStatusType.Info);
+                //progressForm.SetText(string.Format("Checking {0} for breaches", url), KeePassLib.Interfaces.LogStatusType.Info);
                 if (!string.IsNullOrEmpty(url))
                 {                    
                     var lastModified = entry.GetPasswordLastModified();
@@ -61,18 +61,18 @@ namespace HaveIBeenPwned
                     }
                 }
                 counter++;
-                if(progressForm.UserCancelled)
-                {
-                    break;
-                }
+                //if(progressForm.UserCancelled)
+                //{
+                //    break;
+                //}
             }
-            progressForm.Hide();
-            progressForm.Close();
+            //progressForm.Hide();
+            //progressForm.Close();
 
             return breachedEntries;
         }
         
-        private async Task<HashSet<string>> GetBreaches()
+        private async Task<HashSet<string>> GetBreaches(IProgress<ProgressItem> progressIndicator)
         {
             HashSet<string> breaches = new HashSet<string>();
             var dataLocation = KeePassLib.Native.NativeLib.IsUnix() ? Environment.SpecialFolder.LocalApplicationData : Environment.SpecialFolder.CommonApplicationData;
@@ -82,7 +82,7 @@ namespace HaveIBeenPwned
             {
                 using (var fileStream = new FileStream(cloudBleedDataFile, FileMode.Open, FileAccess.Read))
                 {
-                    breaches = await ExtractBreachesFromStream(fileStream);
+                    breaches = await ExtractBreachesFromStream(fileStream, progressIndicator);
                 }
             }
             else
@@ -98,7 +98,7 @@ namespace HaveIBeenPwned
                     }
                     stream.Seek(0, SeekOrigin.Begin);
 
-                    breaches = await ExtractBreachesFromStream(stream);
+                    breaches = await ExtractBreachesFromStream(stream, progressIndicator);
                 }
                 else
                 {
@@ -109,7 +109,7 @@ namespace HaveIBeenPwned
             return breaches;
         }
 
-        private async Task<HashSet<string>> ExtractBreachesFromStream(Stream stream)
+        private async Task<HashSet<string>> ExtractBreachesFromStream(Stream stream, IProgress<ProgressItem> progressIndicator)
         {
             var breaches = new HashSet<string>();
             using (var rd = new StreamReader(stream))

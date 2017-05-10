@@ -29,23 +29,23 @@ namespace HaveIBeenPwned
             get { return "Have I Been Pwned"; }
         }
 
-        public async override Task<List<BreachedEntry>> CheckDatabase(bool expireEntries, bool oldEntriesOnly, bool ignoreDeleted)
+        public async override Task<List<BreachedEntry>> CheckDatabase(bool expireEntries, bool oldEntriesOnly, bool ignoreDeleted, IProgress<ProgressItem> progressIndicator)
         {
-            var breaches = await GetBreaches();
+            var breaches = await GetBreaches(progressIndicator);
             var entries = passwordDatabase.RootGroup.GetEntries(true).Where(e => !ignoreDeleted || !e.IsDeleted(pluginHost));
             var breachedEntries = new List<BreachedEntry>();
-            StatusProgressForm progressForm = new StatusProgressForm();
+            //StatusProgressForm progressForm = new StatusProgressForm();
 
-            progressForm.InitEx("Checking HIBP Breaches", true, false, pluginHost.MainWindow);
-            progressForm.Show();
-            progressForm.SetProgress(0);
+            //progressForm.InitEx("Checking HIBP Breaches", true, false, pluginHost.MainWindow);
+            //progressForm.Show();
+            //progressForm.SetProgress(0);
             uint counter = 0;
             var entryCount = entries.Count();
             foreach (var entry in entries)
             {
-                progressForm.SetProgress((uint)((double)counter / entryCount * 100));
+                //progressForm.SetProgress((uint)((double)counter / entryCount * 100));
                 var url = entry.GetUrlDomain();
-                progressForm.SetText(string.Format("Checking {0} for breaches", url), KeePassLib.Interfaces.LogStatusType.Info);
+                //progressForm.SetText(string.Format("Checking {0} for breaches", url), KeePassLib.Interfaces.LogStatusType.Info);
                 var userName = entry.Strings.ReadSafe(PwDefs.UserNameField);
                 var lastModified = entry.GetPasswordLastModified();
                 if(!string.IsNullOrEmpty(url))
@@ -61,18 +61,18 @@ namespace HaveIBeenPwned
                     }
                 }
                 counter++;
-                if (progressForm.UserCancelled)
-                {
-                    break;
-                }
+                //if (progressForm.UserCancelled)
+                //{
+                //    break;
+                //}
             }
-            progressForm.Hide();
-            progressForm.Close();
+            //progressForm.Hide();
+            //progressForm.Close();
 
             return breachedEntries;
         }
 
-        private async Task<List<HaveIBeenPwnedEntry>> GetBreaches()
+        private async Task<List<HaveIBeenPwnedEntry>> GetBreaches(IProgress<ProgressItem> progressIndicator)
         {            
             List<HaveIBeenPwnedEntry> breaches = null;
             HttpResponseMessage response = null;

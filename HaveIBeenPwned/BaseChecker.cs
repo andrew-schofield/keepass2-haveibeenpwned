@@ -21,7 +21,7 @@ namespace HaveIBeenPwned
             this.pluginHost = pluginHost;
         }
 
-        public abstract Task<List<BreachedEntry>> CheckDatabase(bool expireEntries, bool oldEntriesOnly, bool ignoreDeleted);
+        public abstract Task<List<BreachedEntry>> CheckDatabase(bool expireEntries, bool oldEntriesOnly, bool ignoreDeleted, IProgress<ProgressItem> progressIndicator);
 
         public abstract Image BreachLogo { get; }
 

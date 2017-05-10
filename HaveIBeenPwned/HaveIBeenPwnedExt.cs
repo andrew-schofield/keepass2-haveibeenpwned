@@ -9,6 +9,7 @@ using System.Net;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using KeePass.Forms;
 
 namespace HaveIBeenPwned
 {
@@ -18,6 +19,7 @@ namespace HaveIBeenPwned
         private ToolStripSeparator toolStripSeperator = null;
         private ToolStripMenuItem haveIBeenPwnedMenuItem = null;
         private static HttpClient client = new HttpClient();
+        private StatusProgressForm progressForm = new StatusProgressForm(); 
 
         private Dictionary<BreachEnum, Func<KeePassLib.PwDatabase, HttpClient, IPluginHost, BaseChecker>> supportedBreachCheckers =
             new Dictionary<BreachEnum, Func<KeePassLib.PwDatabase, HttpClient, IPluginHost, BaseChecker>>
@@ -82,7 +84,13 @@ namespace HaveIBeenPwned
             }
         }
 
-        private void CheckHaveIBeenPwned(object sender, EventArgs e)
+        private void ReportProgress(ProgressItem progress)
+        {
+            progressForm.SetProgress(progress.Progress);
+            progressForm.SetText(progress.ProgressText, KeePassLib.Interfaces.LogStatusType.Info);
+        }
+
+        private async void CheckHaveIBeenPwned(object sender, EventArgs e)
         {
             if (!pluginHost.Database.IsOpen)
             {
@@ -94,20 +102,27 @@ namespace HaveIBeenPwned
 
             if (dialog.ShowDialog() == DialogResult.OK)
             {
+                var progressIndicator = new Progress<ProgressItem>(ReportProgress);
+                progressForm.InitEx("Checking Breaches", false, true, pluginHost.MainWindow);
+                progressForm.Show();
+                progressForm.SetProgress(0);
                 List<BreachedEntry> result = new List<BreachedEntry>();
                 if(dialog.CheckAllBreaches)
                 {
                     foreach(var breach in Enum.GetValues(typeof(BreachEnum)))
                     {
-                        result.AddRange(CheckBreaches(supportedBreachCheckers[(BreachEnum)breach](pluginHost.Database, client, pluginHost),
-                        dialog.ExpireEntries, dialog.OnlyCheckOldEntries, dialog.IgnoreDeletedEntries).Result);
+                        var foundBreaches = await CheckBreaches(supportedBreachCheckers[(BreachEnum)breach](pluginHost.Database, client, pluginHost),
+                        dialog.ExpireEntries, dialog.OnlyCheckOldEntries, dialog.IgnoreDeletedEntries, progressIndicator);
+                        result.AddRange(foundBreaches);
                     }
                 }
                 else
                 {
-                    result.AddRange(CheckBreaches(supportedBreachCheckers[dialog.SelectedBreach](pluginHost.Database, client, pluginHost),
-                        dialog.ExpireEntries, dialog.OnlyCheckOldEntries, dialog.IgnoreDeletedEntries).Result);
+                    var foundBreaches = await CheckBreaches(supportedBreachCheckers[dialog.SelectedBreach](pluginHost.Database, client, pluginHost),
+                        dialog.ExpireEntries, dialog.OnlyCheckOldEntries, dialog.IgnoreDeletedEntries, progressIndicator);
+                    result.AddRange(foundBreaches);
                 }
+                progressForm.Hide();
 
                 if (!result.Any())
                 {
@@ -128,22 +143,10 @@ namespace HaveIBeenPwned
             BaseChecker breachChecker,
             bool expireEntries,
             bool oldEntriesOnly,
-            bool ignoreDeleted)
+            bool ignoreDeleted,
+            IProgress<ProgressItem> progressIndicator)
         {
-            var breachedEntries = await breachChecker.CheckDatabase(expireEntries, oldEntriesOnly, ignoreDeleted);
-            //var breaches = breachedEntries.ContinueWith((result) =>
-            //{
-            //    // make sure any exceptions we aren't catching ourselves (like URIFormatException) are thrown correctly
-            //    if (result.IsFaulted)
-            //    {
-            //        throw result.Exception;
-            //    }
-
-            //    return result.Result;
-
-            //}).Result;
-
-            return breachedEntries;
+           return await breachChecker.CheckDatabase(expireEntries, oldEntriesOnly, ignoreDeleted, progressIndicator);
         }
     }
 }
