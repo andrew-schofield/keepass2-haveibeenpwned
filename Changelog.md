@@ -1,5 +1,9 @@
 # keepass2-haveibeenpwned Changelog
 
+### v0.3 - 2017-05-12
+* Combine breach selection dialogs into one
+* Allow checking of all supported breaches
+
 ### v0.2.10 - 2017-04-20
 * Add breach count to results dialog
 * Show entry icon in results dialog
