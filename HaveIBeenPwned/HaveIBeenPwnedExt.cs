@@ -7,7 +7,6 @@ using System.Drawing;
 using System.Linq;
 using System.Net;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using KeePass.Forms;
 

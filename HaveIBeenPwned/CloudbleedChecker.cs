@@ -38,31 +38,30 @@ namespace HaveIBeenPwned
             uint counter = 0;
             var entryCount = entries.Count();
             await Task.Run(() =>
+            {
+                foreach (var entry in entries)
                 {
-                    foreach (var entry in entries)
+                    var url = entry.GetUrlDomain();
+
+                    if (!string.IsNullOrEmpty(url))
                     {
-                        var url = entry.GetUrlDomain();
-
-
-                        if (!string.IsNullOrEmpty(url))
+                        var lastModified = entry.GetPasswordLastModified();
+                        var domainBreaches = breaches.Where(b => url == b && (!oldEntriesOnly || lastModified < new DateTime(2017, 02, 17)));
+                        if (domainBreaches.Any())
                         {
-                            var lastModified = entry.GetPasswordLastModified();
-                            var domainBreaches = breaches.Where(b => url == b && (!oldEntriesOnly || lastModified < new DateTime(2017, 02, 17)));
-                            if (domainBreaches.Any())
+                            breachedEntries.Add(new BreachedEntry(entry, cloudbleedEntry));
+                            if (expireEntries)
                             {
-                                breachedEntries.Add(new BreachedEntry(entry, cloudbleedEntry));
-                                if (expireEntries)
-                                {
-                                    ExpireEntry(entry);
-                                }
+                                ExpireEntry(entry);
                             }
                         }
-
-                        progressIndicator.Report(new ProgressItem((uint)((double)counter / entryCount * 100), string.Format("Checking {0} for breaches", url)));
-
-                        counter++;
                     }
-                });
+
+                    progressIndicator.Report(new ProgressItem((uint)((double)counter / entryCount * 100), string.Format("Checking {0} for breaches", url)));
+
+                    counter++;
+                }
+            });
 
             breaches = null;
 

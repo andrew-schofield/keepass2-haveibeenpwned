@@ -38,30 +38,30 @@ namespace HaveIBeenPwned
             uint counter = 0;
             var entryCount = entries.Count();
             await Task.Run(() =>
+            {
+                foreach (var entry in entries)
                 {
-                    foreach (var entry in entries)
-                    {
-                        var url = entry.GetUrlDomain();
+                    var url = entry.GetUrlDomain();
 
-                        var userName = entry.Strings.ReadSafe(PwDefs.UserNameField);
-                        var lastModified = entry.GetPasswordLastModified();
-                        if (!string.IsNullOrEmpty(url))
+                    var userName = entry.Strings.ReadSafe(PwDefs.UserNameField);
+                    var lastModified = entry.GetPasswordLastModified();
+                    if (!string.IsNullOrEmpty(url))
+                    {
+                        var domainBreaches = breaches.Where(b => !string.IsNullOrWhiteSpace(b.Domain) && url == b.Domain && (!oldEntriesOnly || lastModified < b.BreachDate)).OrderBy(b => b.BreachDate);
+                        if (domainBreaches.Any())
                         {
-                            var domainBreaches = breaches.Where(b => !string.IsNullOrWhiteSpace(b.Domain) && url == b.Domain && (!oldEntriesOnly || lastModified < b.BreachDate)).OrderBy(b => b.BreachDate);
-                            if (domainBreaches.Any())
+                            breachedEntries.Add(new BreachedEntry(entry, domainBreaches.Last()));
+                            if (expireEntries)
                             {
-                                breachedEntries.Add(new BreachedEntry(entry, domainBreaches.Last()));
-                                if (expireEntries)
-                                {
-                                    ExpireEntry(entry);
-                                }
+                                ExpireEntry(entry);
                             }
                         }
-                        // this checker is so quick it probably doesn't need to report progress
-                        //progressIndicator.Report(new ProgressItem((uint)((double)counter / entryCount * 100), string.Format("Checking {0} for breaches", url)));
                     }
-                    counter++;
-                });
+                    // this checker is so quick it probably doesn't need to report progress
+                    //progressIndicator.Report(new ProgressItem((uint)((double)counter / entryCount * 100), string.Format("Checking {0} for breaches", url)));
+                }
+                counter++;
+            });
 
             return breachedEntries;
         }
@@ -78,6 +78,7 @@ namespace HaveIBeenPwned
             {
                 throw ex;
             }
+
             if (response.IsSuccessStatusCode)
             {
                 var jsonString = await response.Content.ReadAsStringAsync();
