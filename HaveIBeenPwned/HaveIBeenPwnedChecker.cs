@@ -31,6 +31,7 @@ namespace HaveIBeenPwned
 
         public async override Task<List<BreachedEntry>> CheckDatabase(bool expireEntries, bool oldEntriesOnly, bool ignoreDeleted, IProgress<ProgressItem> progressIndicator)
         {
+            progressIndicator.Report(new ProgressItem(0, "Getting HaveIBeenPwned breach list..."));
             var breaches = await GetBreaches(progressIndicator);
             var entries = passwordDatabase.RootGroup.GetEntries(true).Where(e => !ignoreDeleted || !e.IsDeleted(pluginHost));
             var breachedEntries = new List<BreachedEntry>();
