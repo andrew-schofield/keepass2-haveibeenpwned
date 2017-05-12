@@ -14,6 +14,6 @@ rd /s /q HaveIBeenPwned\bin
 rd /s /q HaveIBeenPwned\obj
 "%ProgramFiles(x86)%\KeePass Password Safe 2\KeePass.exe" --plgx-create "%base%HaveIBeenPwned"
 %netframework%MSBuild.exe /target:clean HaveIBeenPwned.sln
-%netframework%MSBuild.exe /p:Configuration=Release HaveIBeenPwned.sln
+%netframework%MSBuild.exe /p:Configuration=Release /m HaveIBeenPwned.sln
 copy /y HaveIBeenPwned\bin\Release\HaveIBeenPwned.dll mono
 popd

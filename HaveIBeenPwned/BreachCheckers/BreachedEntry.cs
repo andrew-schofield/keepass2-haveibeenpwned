@@ -1,7 +1,7 @@
 ﻿using KeePassLib;
 using System;
 
-namespace HaveIBeenPwned
+namespace HaveIBeenPwned.BreachCheckers
 {
     public class BreachedEntry
     {

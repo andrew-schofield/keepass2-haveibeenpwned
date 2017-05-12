@@ -2,20 +2,19 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using KeePassLib;
 using System.IO;
 using System.Windows.Forms;
 using KeePass.Plugins;
-using KeePass.Forms;
 using System.Threading.Tasks;
 using System.Drawing;
+using HaveIBeenPwned.Extensions;
 
-namespace HaveIBeenPwned
+namespace HaveIBeenPwned.BreachCheckers.Cloudbleed
 {
     public class CloudbleedChecker : BaseChecker
     {
-        public CloudbleedChecker(PwDatabase database, HttpClient httpClient, IPluginHost pluginHost)
-            : base(database, httpClient, pluginHost)
+        public CloudbleedChecker(HttpClient httpClient, IPluginHost pluginHost)
+            : base(httpClient, pluginHost)
         {
         }
 
@@ -29,50 +28,48 @@ namespace HaveIBeenPwned
             get { return "Cloudbleed Vulnerability"; }
         }
 
-        public async override Task<List<BreachedEntry>> CheckDatabase(bool expireEntries, bool oldEntriesOnly, bool ignoreDeleted)
+        public async override Task<List<BreachedEntry>> CheckDatabase(bool expireEntries, bool oldEntriesOnly, bool ignoreDeleted, IProgress<ProgressItem> progressIndicator)
         {
-            var breaches = await GetBreaches();
+            progressIndicator.Report(new ProgressItem(0, "Getting Cloudbleed breach list..."));
+            var breaches = await GetBreaches(progressIndicator);
             var entries = passwordDatabase.RootGroup.GetEntries(true).Where(e => !ignoreDeleted || !e.IsDeleted(pluginHost));
             var breachedEntries = new List<BreachedEntry>();
-            StatusProgressForm progressForm = new StatusProgressForm();
             var cloudbleedEntry = new CloudbleedEntry();
 
-            progressForm.InitEx("Checking Cloudbleed Breaches", true, false, pluginHost.MainWindow);
-            progressForm.Show();
-            progressForm.SetProgress(0);
             uint counter = 0;
             var entryCount = entries.Count();
-            foreach (var entry in entries)
+            await Task.Run(() =>
             {
-                progressForm.SetProgress((uint)((double)counter / entryCount * 100));
-                var url = entry.GetUrlDomain();
-                progressForm.SetText(string.Format("Checking {0} for breaches", url), KeePassLib.Interfaces.LogStatusType.Info);
-                if (!string.IsNullOrEmpty(url))
-                {                    
-                    var lastModified = entry.GetPasswordLastModified();
-                    var domainBreaches = breaches.Where(b => url == b && (!oldEntriesOnly || lastModified < new DateTime(2017, 02, 17)));
-                    if (domainBreaches.Any())
+                foreach (var entry in entries)
+                {
+                    var url = entry.GetUrlDomain();
+
+                    if (!string.IsNullOrEmpty(url))
                     {
-                        breachedEntries.Add(new BreachedEntry(entry, cloudbleedEntry));
-                        if (expireEntries)
+                        var lastModified = entry.GetPasswordLastModified();
+                        var domainBreaches = breaches.Where(b => url == b && (!oldEntriesOnly || lastModified < new DateTime(2017, 02, 17)));
+                        if (domainBreaches.Any())
                         {
-                            ExpireEntry(entry);
+                            breachedEntries.Add(new BreachedEntry(entry, cloudbleedEntry));
+                            if (expireEntries)
+                            {
+                                ExpireEntry(entry);
+                            }
                         }
                     }
+
+                    progressIndicator.Report(new ProgressItem((uint)((double)counter / entryCount * 100), string.Format("Checking {0} for breaches", url)));
+
+                    counter++;
                 }
-                counter++;
-                if(progressForm.UserCancelled)
-                {
-                    break;
-                }
-            }
-            progressForm.Hide();
-            progressForm.Close();
+            });
+
+            breaches = null;
 
             return breachedEntries;
         }
         
-        private async Task<HashSet<string>> GetBreaches()
+        private async Task<HashSet<string>> GetBreaches(IProgress<ProgressItem> progressIndicator)
         {
             HashSet<string> breaches = new HashSet<string>();
             var dataLocation = KeePassLib.Native.NativeLib.IsUnix() ? Environment.SpecialFolder.LocalApplicationData : Environment.SpecialFolder.CommonApplicationData;
@@ -82,16 +79,11 @@ namespace HaveIBeenPwned
             {
                 using (var fileStream = new FileStream(cloudBleedDataFile, FileMode.Open, FileAccess.Read))
                 {
-                    ExtractBreachesFromStream(breaches, fileStream);
+                    breaches = await ExtractBreachesFromStream(fileStream, progressIndicator);
                 }
             }
             else
-            {
-                StatusProgressForm progressForm = new StatusProgressForm();
-
-                progressForm.InitEx("Downloading Cloudbleed Data File", true, false, pluginHost.MainWindow);
-                progressForm.Show();
-                progressForm.SetProgress(0);
+            {                
                 HttpResponseMessage response = await client.GetAsync(new Uri("https://raw.githubusercontent.com/pirate/sites-using-cloudflare/master/sorted_unique_cf.txt"));
                 if (response.IsSuccessStatusCode)
                 {
@@ -103,27 +95,25 @@ namespace HaveIBeenPwned
                     }
                     stream.Seek(0, SeekOrigin.Begin);
 
-                    progressForm.SetProgress(100);
-                    ExtractBreachesFromStream(breaches, stream);
+                    breaches = await ExtractBreachesFromStream(stream, progressIndicator);
                 }
                 else
                 {
                     MessageBox.Show(string.Format("Unable to check githubusercontent.com (returned Status: {0})", response.StatusCode), Resources.MessageTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
-
-                progressForm.Hide();
-                progressForm.Close();
             }
+
             return breaches;
         }
 
-        private static void ExtractBreachesFromStream(HashSet<string> breaches, Stream stream)
+        private async Task<HashSet<string>> ExtractBreachesFromStream(Stream stream, IProgress<ProgressItem> progressIndicator)
         {
+            var breaches = new HashSet<string>();
             using (var rd = new StreamReader(stream))
             {
                 while (true)
                 {
-                    var line = rd.ReadLine();
+                    var line = await rd.ReadLineAsync();
                     if (line == null)
                         break;
                     if (!string.IsNullOrWhiteSpace(line))
@@ -132,6 +122,8 @@ namespace HaveIBeenPwned
                     }
                 }
             }
+
+            return breaches;
         }
     }
 }

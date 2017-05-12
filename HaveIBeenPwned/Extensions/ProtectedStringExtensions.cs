@@ -1,7 +1,7 @@
 ﻿using KeePassLib.Security;
 using KeePassLib.Utility;
 
-namespace HaveIBeenPwned
+namespace HaveIBeenPwned.Extensions
 {
     public static class ProtectedStringExtensions
     {

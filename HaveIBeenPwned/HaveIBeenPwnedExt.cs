@@ -6,6 +6,12 @@ using System.Net.Http.Headers;
 using System.Drawing;
 using System.Linq;
 using System.Net;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using KeePass.Forms;
+using HaveIBeenPwned.BreachCheckers;
+using HaveIBeenPwned.BreachCheckers.HaveIBeenPwned;
+using HaveIBeenPwned.BreachCheckers.Cloudbleed;
 
 namespace HaveIBeenPwned
 {
@@ -14,11 +20,19 @@ namespace HaveIBeenPwned
         private IPluginHost pluginHost = null;
         private ToolStripSeparator toolStripSeperator = null;
         private ToolStripMenuItem haveIBeenPwnedMenuItem = null;
-        private ToolStripMenuItem cloudBleedMenuItem = null;
         private static HttpClient client = new HttpClient();
+        private StatusProgressForm progressForm;
+
+        private Dictionary<BreachEnum, Func<HttpClient, IPluginHost, BaseChecker>> supportedBreachCheckers =
+            new Dictionary<BreachEnum, Func<HttpClient, IPluginHost, BaseChecker>>
+        {
+            { BreachEnum.HIBP, (h,p) => new HaveIBeenPwnedChecker(h, p) },
+            { BreachEnum.CloudBleed, (h,p) => new CloudbleedChecker(h, p) },
+        };
 
         public HaveIBeenPwnedExt()
         {
+            // we need to force the security protocol to use Tls first, as HIBP only accepts this as a valid secure protocol
             ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
             client.DefaultRequestHeaders.UserAgent.ParseAdd(string.Format("KeePass HIBP Checker/{0}", Application.ProductVersion));
@@ -44,13 +58,6 @@ namespace HaveIBeenPwned
             haveIBeenPwnedMenuItem.Image = Resources.hibp.ToBitmap();
             haveIBeenPwnedMenuItem.Click += this.CheckHaveIBeenPwned;
             tsMenu.Add(haveIBeenPwnedMenuItem);
-
-            // Add menu item 'Cloudbleed Checker'
-            cloudBleedMenuItem = new ToolStripMenuItem();
-            cloudBleedMenuItem.Text = "Cloudbleed Checker";
-            cloudBleedMenuItem.Image = Resources.cloudbleed.ToBitmap();
-            cloudBleedMenuItem.Click += this.CheckCloudBleed;
-            tsMenu.Add(cloudBleedMenuItem);
 
             return true;
         }
@@ -80,17 +87,18 @@ namespace HaveIBeenPwned
             }
         }
 
-        private void CheckHaveIBeenPwned(object sender, EventArgs e)
+        private void ReportProgress(ProgressItem progress)
         {
-            CheckBreaches(new HaveIBeenPwnedChecker(pluginHost.Database, client, pluginHost));
+            if (progressForm != null && !progressForm.IsDisposed)
+            {
+                var progressHelper = (ProgressHelper)progressForm.Tag;
+                var currentProgress = ((100f / progressHelper.TotalBreaches) * progressHelper.CurrentBreach) + (progress.Progress / progressHelper.TotalBreaches);
+                progressForm.SetProgress((uint)currentProgress);
+                progressForm.SetText(progress.ProgressText, KeePassLib.Interfaces.LogStatusType.Info);
+            }
         }
 
-        private void CheckCloudBleed(object sender, EventArgs e)
-        {
-            CheckBreaches(new CloudbleedChecker(pluginHost.Database, client, pluginHost));
-        }
-
-        private void CheckBreaches(BaseChecker breachChecker)
+        private async void CheckHaveIBeenPwned(object sender, EventArgs e)
         {
             if (!pluginHost.Database.IsOpen)
             {
@@ -98,33 +106,59 @@ namespace HaveIBeenPwned
                 return;
             }
 
-            var dialog = new CheckerPrompt(breachChecker.BreachLogo, breachChecker.BreachTitle);
+            var dialog = new CheckerPrompt();
+
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                var breachedEntries = breachChecker.CheckDatabase(dialog.ExpireEntries, dialog.OnlyCheckOldEntries, dialog.IgnoreDeletedEntries);
-                breachedEntries.ContinueWith((result) =>
+                progressForm = new StatusProgressForm();
+                var progressIndicator = new Progress<ProgressItem>(ReportProgress);
+                progressForm.InitEx("Checking Breaches", false, true, pluginHost.MainWindow);
+                progressForm.Show();
+                progressForm.SetProgress(0);
+                List<BreachedEntry> result = new List<BreachedEntry>();
+                if(dialog.CheckAllBreaches)
                 {
-                    // make sure any exceptions we aren't catching ourselves (like URIFormatException) are thrown correctly
-                    if(result.IsFaulted)
+                    progressForm.Tag = new ProgressHelper(Enum.GetValues(typeof(BreachEnum)).Length);
+                    foreach(var breach in Enum.GetValues(typeof(BreachEnum)))
                     {
-                        throw result.Exception;
+                        var foundBreaches = await CheckBreaches(supportedBreachCheckers[(BreachEnum)breach](client, pluginHost),
+                        dialog.ExpireEntries, dialog.OnlyCheckOldEntries, dialog.IgnoreDeletedEntries, progressIndicator);
+                        result.AddRange(foundBreaches);
+                        ((ProgressHelper)progressForm.Tag).CurrentBreach++;
                     }
+                }
+                else
+                {
+                    progressForm.Tag = new ProgressHelper(1);
+                    var foundBreaches = await CheckBreaches(supportedBreachCheckers[dialog.SelectedBreach](client, pluginHost),
+                        dialog.ExpireEntries, dialog.OnlyCheckOldEntries, dialog.IgnoreDeletedEntries, progressIndicator);
+                    result.AddRange(foundBreaches);
+                }
+                progressForm.Close();
 
-                    if (!result.Result.Any())
-                    {
-                        MessageBox.Show("No breached entries found.", Resources.MessageTitle, MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
-                    else
-                    {
-                        var breachedEntriesDialog = new BreachedEntriesDialog(pluginHost);
-                        breachedEntriesDialog.AddBreaches(result.Result);
-                        breachedEntriesDialog.ShowDialog();
-                    }
-                });
+                if (!result.Any())
+                {
+                    MessageBox.Show("No breached entries found.", Resources.MessageTitle, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    var breachedEntriesDialog = new BreachedEntriesDialog(pluginHost);
+                    breachedEntriesDialog.AddBreaches(result);
+                    breachedEntriesDialog.ShowDialog();
+                }
             }
 
             pluginHost.MainWindow.Show();
+        }
 
+        private async Task<IList<BreachedEntry>> CheckBreaches(
+            BaseChecker breachChecker,
+            bool expireEntries,
+            bool oldEntriesOnly,
+            bool ignoreDeleted,
+            IProgress<ProgressItem> progressIndicator)
+        {
+           return await breachChecker.CheckDatabase(expireEntries, oldEntriesOnly, ignoreDeleted, progressIndicator);
         }
     }
 }
