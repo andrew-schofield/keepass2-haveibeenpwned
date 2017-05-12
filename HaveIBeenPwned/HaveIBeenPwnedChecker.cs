@@ -5,7 +5,6 @@ using System.Windows.Forms;
 using KeePassLib;
 using System.Net.Http;
 using Newtonsoft.Json;
-using KeePass.Forms;
 using KeePass.Plugins;
 using System.Threading.Tasks;
 using System.Drawing;
@@ -14,8 +13,8 @@ namespace HaveIBeenPwned
 {
     public class HaveIBeenPwnedChecker : BaseChecker
     {
-        public HaveIBeenPwnedChecker(PwDatabase database, HttpClient httpClient, IPluginHost pluginHost)
-            : base(database, httpClient, pluginHost)
+        public HaveIBeenPwnedChecker(HttpClient httpClient, IPluginHost pluginHost)
+            : base(httpClient, pluginHost)
         {
         }
 

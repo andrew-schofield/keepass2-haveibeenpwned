@@ -21,15 +21,16 @@ namespace HaveIBeenPwned
         private static HttpClient client = new HttpClient();
         private StatusProgressForm progressForm;
 
-        private Dictionary<BreachEnum, Func<KeePassLib.PwDatabase, HttpClient, IPluginHost, BaseChecker>> supportedBreachCheckers =
-            new Dictionary<BreachEnum, Func<KeePassLib.PwDatabase, HttpClient, IPluginHost, BaseChecker>>
+        private Dictionary<BreachEnum, Func<HttpClient, IPluginHost, BaseChecker>> supportedBreachCheckers =
+            new Dictionary<BreachEnum, Func<HttpClient, IPluginHost, BaseChecker>>
         {
-            { BreachEnum.HIBP, (d,h,p) => new HaveIBeenPwnedChecker(d, h, p) },
-            { BreachEnum.CloudBleed, (d,h,p) => new CloudbleedChecker(d, h, p) },
+            { BreachEnum.HIBP, (h,p) => new HaveIBeenPwnedChecker(h, p) },
+            { BreachEnum.CloudBleed, (h,p) => new CloudbleedChecker(h, p) },
         };
 
         public HaveIBeenPwnedExt()
         {
+            // we need to force the security protocol to use Tls first, as HIBP only accepts this as a valid secure protocol
             ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
             client.DefaultRequestHeaders.UserAgent.ParseAdd(string.Format("KeePass HIBP Checker/{0}", Application.ProductVersion));
@@ -118,7 +119,7 @@ namespace HaveIBeenPwned
                     progressForm.Tag = new ProgressHelper(Enum.GetValues(typeof(BreachEnum)).Length);
                     foreach(var breach in Enum.GetValues(typeof(BreachEnum)))
                     {
-                        var foundBreaches = await CheckBreaches(supportedBreachCheckers[(BreachEnum)breach](pluginHost.Database, client, pluginHost),
+                        var foundBreaches = await CheckBreaches(supportedBreachCheckers[(BreachEnum)breach](client, pluginHost),
                         dialog.ExpireEntries, dialog.OnlyCheckOldEntries, dialog.IgnoreDeletedEntries, progressIndicator);
                         result.AddRange(foundBreaches);
                         ((ProgressHelper)progressForm.Tag).CurrentBreach++;
@@ -127,7 +128,7 @@ namespace HaveIBeenPwned
                 else
                 {
                     progressForm.Tag = new ProgressHelper(1);
-                    var foundBreaches = await CheckBreaches(supportedBreachCheckers[dialog.SelectedBreach](pluginHost.Database, client, pluginHost),
+                    var foundBreaches = await CheckBreaches(supportedBreachCheckers[dialog.SelectedBreach](client, pluginHost),
                         dialog.ExpireEntries, dialog.OnlyCheckOldEntries, dialog.IgnoreDeletedEntries, progressIndicator);
                     result.AddRange(foundBreaches);
                 }

@@ -14,9 +14,9 @@ namespace HaveIBeenPwned
         protected HttpClient client;
         protected IPluginHost pluginHost;
 
-        protected BaseChecker(PwDatabase database, HttpClient httpClient, IPluginHost pluginHost)
+        protected BaseChecker(HttpClient httpClient, IPluginHost pluginHost)
         {
-            passwordDatabase = database;
+            passwordDatabase = pluginHost.Database;
             client = httpClient;
             this.pluginHost = pluginHost;
         }

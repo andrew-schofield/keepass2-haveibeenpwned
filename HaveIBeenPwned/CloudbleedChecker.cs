@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using KeePassLib;
 using System.IO;
 using System.Windows.Forms;
 using KeePass.Plugins;
-using KeePass.Forms;
 using System.Threading.Tasks;
 using System.Drawing;
 
@@ -14,8 +12,8 @@ namespace HaveIBeenPwned
 {
     public class CloudbleedChecker : BaseChecker
     {
-        public CloudbleedChecker(PwDatabase database, HttpClient httpClient, IPluginHost pluginHost)
-            : base(database, httpClient, pluginHost)
+        public CloudbleedChecker(HttpClient httpClient, IPluginHost pluginHost)
+            : base(httpClient, pluginHost)
         {
         }
 
