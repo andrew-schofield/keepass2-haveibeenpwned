@@ -37,26 +37,31 @@ namespace HaveIBeenPwned
 
             uint counter = 0;
             var entryCount = entries.Count();
-            foreach (var entry in entries)
-            {
-                var url = entry.GetUrlDomain();
-                //progressIndicator.Report(new ProgressItem((uint)((double)counter / entryCount * 100), string.Format("Checking {0} for breaches", url)));
-                var userName = entry.Strings.ReadSafe(PwDefs.UserNameField);
-                var lastModified = entry.GetPasswordLastModified();
-                if(!string.IsNullOrEmpty(url))
+            await Task.Run(() =>
                 {
-                    var domainBreaches = breaches.Where(b => !string.IsNullOrWhiteSpace(b.Domain) && url == b.Domain && (!oldEntriesOnly || lastModified < b.BreachDate)).OrderBy(b => b.BreachDate);
-                    if (domainBreaches.Any())
+                    foreach (var entry in entries)
                     {
-                        breachedEntries.Add(new BreachedEntry(entry, domainBreaches.Last()));
-                        if(expireEntries)
+                        var url = entry.GetUrlDomain();
+
+                        var userName = entry.Strings.ReadSafe(PwDefs.UserNameField);
+                        var lastModified = entry.GetPasswordLastModified();
+                        if (!string.IsNullOrEmpty(url))
                         {
-                            ExpireEntry(entry);
+                            var domainBreaches = breaches.Where(b => !string.IsNullOrWhiteSpace(b.Domain) && url == b.Domain && (!oldEntriesOnly || lastModified < b.BreachDate)).OrderBy(b => b.BreachDate);
+                            if (domainBreaches.Any())
+                            {
+                                breachedEntries.Add(new BreachedEntry(entry, domainBreaches.Last()));
+                                if (expireEntries)
+                                {
+                                    ExpireEntry(entry);
+                                }
+                            }
                         }
+                        // this checker is so quick it probably doesn't need to report progress
+                        //progressIndicator.Report(new ProgressItem((uint)((double)counter / entryCount * 100), string.Format("Checking {0} for breaches", url)));
                     }
-                }
-                counter++;
-            }
+                    counter++;
+                });
 
             return breachedEntries;
         }

@@ -38,26 +38,34 @@ namespace HaveIBeenPwned
 
             uint counter = 0;
             var entryCount = entries.Count();
-            foreach (var entry in entries)
-            {
-                var url = entry.GetUrlDomain();
-
-                //progressIndicator.Report(new ProgressItem((uint)((double)counter / entryCount * 100), string.Format("Checking {0} for breaches", url)));
-                if (!string.IsNullOrEmpty(url))
-                {                    
-                    var lastModified = entry.GetPasswordLastModified();
-                    var domainBreaches = breaches.Where(b => url == b && (!oldEntriesOnly || lastModified < new DateTime(2017, 02, 17)));
-                    if (domainBreaches.Any())
+            await Task.Run(() =>
+                {
+                    foreach (var entry in entries)
                     {
-                        breachedEntries.Add(new BreachedEntry(entry, cloudbleedEntry));
-                        if (expireEntries)
+                        var url = entry.GetUrlDomain();
+
+
+                        if (!string.IsNullOrEmpty(url))
                         {
-                            ExpireEntry(entry);
+                            var lastModified = entry.GetPasswordLastModified();
+                            var domainBreaches = breaches.Where(b => url == b && (!oldEntriesOnly || lastModified < new DateTime(2017, 02, 17)));
+                            if (domainBreaches.Any())
+                            {
+                                breachedEntries.Add(new BreachedEntry(entry, cloudbleedEntry));
+                                if (expireEntries)
+                                {
+                                    ExpireEntry(entry);
+                                }
+                            }
                         }
+
+                        progressIndicator.Report(new ProgressItem((uint)((double)counter / entryCount * 100), string.Format("Checking {0} for breaches", url)));
+
+                        counter++;
                     }
-                }
-                counter++;
-            }
+                });
+
+            breaches = null;
 
             return breachedEntries;
         }
