@@ -19,7 +19,7 @@ namespace HaveIBeenPwned
         private ToolStripSeparator toolStripSeperator = null;
         private ToolStripMenuItem haveIBeenPwnedMenuItem = null;
         private static HttpClient client = new HttpClient();
-        private StatusProgressForm progressForm = new StatusProgressForm();
+        private StatusProgressForm progressForm;
 
         private Dictionary<BreachEnum, Func<KeePassLib.PwDatabase, HttpClient, IPluginHost, BaseChecker>> supportedBreachCheckers =
             new Dictionary<BreachEnum, Func<KeePassLib.PwDatabase, HttpClient, IPluginHost, BaseChecker>>
@@ -86,11 +86,13 @@ namespace HaveIBeenPwned
 
         private void ReportProgress(ProgressItem progress)
         {
-            var progressHelper = (ProgressHelper)progressForm.Tag;
-            var currentProgress = ((100f / progressHelper.TotalBreaches) * progressHelper.CurrentBreach) + (progress.Progress / progressHelper.TotalBreaches);
-
-            progressForm.SetProgress((uint)currentProgress);
-            progressForm.SetText(progress.ProgressText, KeePassLib.Interfaces.LogStatusType.Info);
+            if (progressForm != null && !progressForm.IsDisposed)
+            {
+                var progressHelper = (ProgressHelper)progressForm.Tag;
+                var currentProgress = ((100f / progressHelper.TotalBreaches) * progressHelper.CurrentBreach) + (progress.Progress / progressHelper.TotalBreaches);
+                progressForm.SetProgress((uint)currentProgress);
+                progressForm.SetText(progress.ProgressText, KeePassLib.Interfaces.LogStatusType.Info);
+            }
         }
 
         private async void CheckHaveIBeenPwned(object sender, EventArgs e)
@@ -105,8 +107,9 @@ namespace HaveIBeenPwned
 
             if (dialog.ShowDialog() == DialogResult.OK)
             {
+                progressForm = new StatusProgressForm();
                 var progressIndicator = new Progress<ProgressItem>(ReportProgress);
-                progressForm.InitEx("Checking Breaches", false, false, pluginHost.MainWindow);
+                progressForm.InitEx("Checking Breaches", false, true, pluginHost.MainWindow);
                 progressForm.Show();
                 progressForm.SetProgress(0);
                 List<BreachedEntry> result = new List<BreachedEntry>();
@@ -128,7 +131,7 @@ namespace HaveIBeenPwned
                         dialog.ExpireEntries, dialog.OnlyCheckOldEntries, dialog.IgnoreDeletedEntries, progressIndicator);
                     result.AddRange(foundBreaches);
                 }
-                progressForm.Hide();
+                progressForm.Close();
 
                 if (!result.Any())
                 {
@@ -138,7 +141,6 @@ namespace HaveIBeenPwned
                 {
                     var breachedEntriesDialog = new BreachedEntriesDialog(pluginHost);
                     breachedEntriesDialog.AddBreaches(result);
-                    progressForm.Hide();
                     breachedEntriesDialog.ShowDialog();
                 }
             }
