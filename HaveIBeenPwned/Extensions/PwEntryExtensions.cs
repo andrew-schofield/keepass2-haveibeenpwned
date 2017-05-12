@@ -4,7 +4,7 @@ using System;
 using System.Drawing;
 using System.Linq;
 
-namespace HaveIBeenPwned
+namespace HaveIBeenPwned.Extensions
 {
     public static class PwEntryExtensions
     {

@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Reflection;
 
-namespace HaveIBeenPwned
+namespace HaveIBeenPwned.Extensions
 {
     public static class Extensions
     {

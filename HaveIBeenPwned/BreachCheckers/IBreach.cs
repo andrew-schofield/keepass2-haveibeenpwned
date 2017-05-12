@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace HaveIBeenPwned
+namespace HaveIBeenPwned.BreachCheckers
 {
     public interface IBreach
     {

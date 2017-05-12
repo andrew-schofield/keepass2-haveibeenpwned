@@ -7,8 +7,9 @@ using System.Windows.Forms;
 using KeePass.Plugins;
 using System.Threading.Tasks;
 using System.Drawing;
+using HaveIBeenPwned.Extensions;
 
-namespace HaveIBeenPwned
+namespace HaveIBeenPwned.BreachCheckers.Cloudbleed
 {
     public class CloudbleedChecker : BaseChecker
     {

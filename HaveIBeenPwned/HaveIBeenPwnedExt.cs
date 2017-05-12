@@ -9,6 +9,9 @@ using System.Net;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using KeePass.Forms;
+using HaveIBeenPwned.BreachCheckers;
+using HaveIBeenPwned.BreachCheckers.HaveIBeenPwned;
+using HaveIBeenPwned.BreachCheckers.Cloudbleed;
 
 namespace HaveIBeenPwned
 {

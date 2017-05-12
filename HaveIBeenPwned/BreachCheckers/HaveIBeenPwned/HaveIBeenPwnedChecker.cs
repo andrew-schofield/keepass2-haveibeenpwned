@@ -8,8 +8,9 @@ using Newtonsoft.Json;
 using KeePass.Plugins;
 using System.Threading.Tasks;
 using System.Drawing;
+using HaveIBeenPwned.Extensions;
 
-namespace HaveIBeenPwned
+namespace HaveIBeenPwned.BreachCheckers.HaveIBeenPwned
 {
     public class HaveIBeenPwnedChecker : BaseChecker
     {
