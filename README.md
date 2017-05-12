@@ -24,6 +24,12 @@
 * Cloudbleed data is only downloaded once and then cached here: `%PROGRAMDATA%\KeePass\cloudbleed.txt` (Windows) or `%LOCALAPPDATA%\KeePass\cloudbleed.txt` (Linux) as this is currently a ~70MB download. If you wish to refresh the cache, simply delete this file.
 * As KeePass doesn't have a native method for determining when an entry's password was last changed, keepass2-haveibeenpwned will use the history entries if any exist and compare their passwords.
 
+## Donate
+
+keepass2-haveibeenpwned is developed entirely in my own time. If you wish to support development you can donate via paypal here.
+
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=S2DVYTS47PX4S)
+
 ## Copyright
 
 &copy; 2017 Andrew Schofield
