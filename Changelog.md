@@ -1,5 +1,8 @@
 # keepass2-haveibeenpwned Changelog
 
+### v0.3.1 - 2017-05-23
+* Fix password-last-modified algorithm
+
 ### v0.3 - 2017-05-12
 * Combine breach selection dialogs into one
 * Allow checking of all supported breaches
