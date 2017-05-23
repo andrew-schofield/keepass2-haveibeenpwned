@@ -66,18 +66,12 @@ namespace HaveIBeenPwned.Extensions
             var entryIcon = entry.IconId;
             var customIcon = entry.CustomIconUuid;
 
-            if (!customIcon.Equals(PwUuid.Zero))
-            {
-                int w = KeePass.UI.DpiUtil.ScaleIntX(16);
-                int h = KeePass.UI.DpiUtil.ScaleIntY(16);
+            if (customIcon.Equals(PwUuid.Zero)) return pluginHost.MainWindow.ClientIcons.Images[(int) entryIcon];
+            var w = KeePass.UI.DpiUtil.ScaleIntX(16);
+            var h = KeePass.UI.DpiUtil.ScaleIntY(16);
 
-                var imgCustom = pluginHost.Database.GetCustomIcon(customIcon, w, h);
-                return (imgCustom ?? pluginHost.MainWindow.ClientIcons.Images[(int)entryIcon]);
-            }
-            else
-            {
-                return pluginHost.MainWindow.ClientIcons.Images[(int)entryIcon];
-            }
+            var imgCustom = pluginHost.Database.GetCustomIcon(customIcon, w, h);
+            return (imgCustom ?? pluginHost.MainWindow.ClientIcons.Images[(int)entryIcon]);
         }
     }
 }

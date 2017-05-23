@@ -27,7 +27,7 @@ namespace HaveIBeenPwned
             new Dictionary<BreachEnum, Func<HttpClient, IPluginHost, BaseChecker>>
         {
             { BreachEnum.HIBP, (h,p) => new HaveIBeenPwnedChecker(h, p) },
-            { BreachEnum.CloudBleed, (h,p) => new CloudbleedChecker(h, p) },
+            { BreachEnum.CloudBleed, (h,p) => new CloudbleedChecker(h, p) }
         };
 
         public HaveIBeenPwnedExt()
