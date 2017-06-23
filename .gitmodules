@@ -1,0 +1,3 @@
+[submodule "keepass2-developerextensions"]
+	path = keepass2-developerextensions
+	url = https://github.com/andrew-schofield/keepass2-developerextensions.git

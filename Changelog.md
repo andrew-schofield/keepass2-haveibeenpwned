@@ -1,5 +1,10 @@
 # keepass2-haveibeenpwned Changelog
 
+### v1.0 - 2017-06-23
+* v1 release.
+* Moved password entry extensions into a separate library
+* Fix password last changed algorithm to match canonical KeePas 2.36 implementation
+
 ### v0.3.1 - 2017-05-23
 * Fix password-last-modified algorithm
 

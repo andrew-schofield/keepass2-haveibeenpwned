@@ -1,6 +1,6 @@
 ﻿using HaveIBeenPwned.BreachCheckers;
-using HaveIBeenPwned.Extensions;
 using KeePass.Plugins;
+using KeePassExtensions;
 using KeePassLib;
 using System;
 using System.Collections.Generic;

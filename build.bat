@@ -9,11 +9,9 @@ for /f "tokens=* USEBACKQ" %%I in (`%findnet%`) DO (
 pushd ""%base%
 cd /d ""%base%
 del HaveIBeenPwned.plgx
-del mono\HaveIBeenPwned.dll
-rd /s /q HaveIBeenPwned\bin
-rd /s /q HaveIBeenPwned\obj
-"%ProgramFiles(x86)%\KeePass Password Safe 2\KeePass.exe" --plgx-create "%base%HaveIBeenPwned"
 %netframework%MSBuild.exe /target:clean HaveIBeenPwned.sln
-%netframework%MSBuild.exe /p:Configuration=Release /m HaveIBeenPwned.sln
+%netframework%MSBuild.exe /p:Configuration=ReleasePlgx /m HaveIBeenPwned.sln
 copy /y HaveIBeenPwned\bin\Release\HaveIBeenPwned.dll mono
+copy /y HaveIBeenPwned\bin\ReleasePlgx\keepass2-developerextensions.dll mono
+copy /y HaveIBeenPwned\bin\ReleasePlgx\HaveIBeenPwned.plgx .
 popd

@@ -2,6 +2,19 @@
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
+    <!-- For building .plgx -->
+    <PlgxConfiguration>
+      <Prerequisites>
+        <KeePassVersion>2.19</KeePassVersion>
+        <DotNetVersion>4.0</DotNetVersion>
+      </Prerequisites>
+    </PlgxConfiguration>
+    <PlgxToolDir>$(MSBuildProjectDirectory)\..\packages\PlgxTool.1.0.0\tools\</PlgxToolDir>
+    <ReleaseVersion>0.7.11</ReleaseVersion>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{185AC93C-BF8E-4D41-B6ED-C66839A3512D}</ProjectGuid>
@@ -11,6 +24,8 @@
     <AssemblyName>HaveIBeenPwned</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -28,6 +43,15 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ReleasePlgx|AnyCPU'">
+    <OutputPath>bin\ReleasePlgx\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="KeePass, Version=2.35.0.36675, Culture=neutral, processorArchitecture=MSIL">
@@ -69,7 +93,6 @@
     <Compile Include="BreachCheckers\Cloudbleed\CloudbleedChecker.cs" />
     <Compile Include="BreachCheckers\Cloudbleed\CloudbleedEntry.cs" />
     <Compile Include="DisplayAttribute.cs" />
-    <Compile Include="Extensions\EnumExtensions.cs" />
     <Compile Include="BreachCheckers\HaveIBeenPwned\HaveIBeenPwnedChecker.cs" />
     <Compile Include="BreachCheckers\HaveIBeenPwned\HaveIBeenPwnedEntry.cs" />
     <Compile Include="HaveIBeenPwnedExt.cs" />
@@ -77,8 +100,6 @@
     <Compile Include="ProgressHelper.cs" />
     <Compile Include="ProgressItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Extensions\ProtectedStringExtensions.cs" />
-    <Compile Include="Extensions\PwEntryExtensions.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -97,7 +118,41 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\keepass2-developerextensions\keepass2-developerextensions\keepass2-developerextensions.csproj">
+      <Project>{5f46d79a-c383-41f0-9c77-49381d4eb002}</Project>
+      <Name>keepass2-developerextensions</Name>
+      <PlgxReference>..\keepass2-developerextensions\keepass2-developerextensions\bin\ReleasePlgx\keepass2-developerextensions.dll</PlgxReference>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'ReleasePlgx|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>True</Optimize>
+    <OutputPath>bin\ReleasePlgx</OutputPath>
+    <WarningLevel>4</WarningLevel>
+    <CustomCommands>
+      <CustomCommands>
+        <Command>
+          <type>Execute</type>
+          <command>bin/ReleasePlgx/KeePass.exe --debug --saveplgxcr</command>
+        </Command>
+      </CustomCommands>
+    </CustomCommands>
+  </PropertyGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="AfterBuild" Condition="'$(Configuration)' == 'ReleasePlgx'">
+    <CallTarget Targets="BuildPlgx" />
+  </Target>
+  <Import Project="..\packages\PlgxTool.1.0.0\build\PlgxTool.targets" Condition="Exists('..\packages\PlgxTool.1.0.0\build\PlgxTool.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\PlgxTool.1.0.0\build\PlgxTool.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\PlgxTool.1.0.0\build\PlgxTool.targets'))" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
