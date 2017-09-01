@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace HaveIBeenPwned.BreachCheckers.HaveIBeenPwned
+namespace HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedSite
 {
-    public class HaveIBeenPwnedEntry : IBreach
+    public class HaveIBeenPwnedSiteEntry : IBreach
     {
         public string Name { get; set; }
         public string Title { get; set; }

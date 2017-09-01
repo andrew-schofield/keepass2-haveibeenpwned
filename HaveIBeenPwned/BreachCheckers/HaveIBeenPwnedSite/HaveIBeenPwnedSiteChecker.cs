@@ -10,11 +10,11 @@ using System.Threading.Tasks;
 using System.Drawing;
 using KeePassExtensions;
 
-namespace HaveIBeenPwned.BreachCheckers.HaveIBeenPwned
+namespace HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedSite
 {
-    public class HaveIBeenPwnedChecker : BaseChecker
+    public class HaveIBeenPwnedSiteChecker : BaseChecker
     {
-        public HaveIBeenPwnedChecker(HttpClient httpClient, IPluginHost pluginHost)
+        public HaveIBeenPwnedSiteChecker(HttpClient httpClient, IPluginHost pluginHost)
             : base(httpClient, pluginHost)
         {
         }
@@ -67,9 +67,9 @@ namespace HaveIBeenPwned.BreachCheckers.HaveIBeenPwned
             return breachedEntries;
         }
 
-        private async Task<List<HaveIBeenPwnedEntry>> GetBreaches(IProgress<ProgressItem> progressIndicator)
+        private async Task<List<HaveIBeenPwnedSiteEntry>> GetBreaches(IProgress<ProgressItem> progressIndicator)
         {            
-            List<HaveIBeenPwnedEntry> breaches = null;
+            List<HaveIBeenPwnedSiteEntry> breaches = null;
             HttpResponseMessage response = null;
             try
             {
@@ -83,7 +83,7 @@ namespace HaveIBeenPwned.BreachCheckers.HaveIBeenPwned
             if (response.IsSuccessStatusCode)
             {
                 var jsonString = await response.Content.ReadAsStringAsync();
-                breaches = JsonConvert.DeserializeObject<List<HaveIBeenPwnedEntry>>(jsonString);
+                breaches = JsonConvert.DeserializeObject<List<HaveIBeenPwnedSiteEntry>>(jsonString);
             }
             else
             {

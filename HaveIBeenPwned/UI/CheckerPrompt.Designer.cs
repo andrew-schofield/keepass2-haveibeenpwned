@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Windows.Forms;
 
-namespace HaveIBeenPwned
+namespace HaveIBeenPwned.UI
 {
     partial class CheckerPrompt
     {

@@ -1,4 +1,4 @@
-﻿namespace HaveIBeenPwned
+﻿namespace HaveIBeenPwned.UI
 {
     partial class BreachedEntriesDialog
     {

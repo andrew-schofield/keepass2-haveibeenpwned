@@ -8,7 +8,7 @@ using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
 
-namespace HaveIBeenPwned
+namespace HaveIBeenPwned.UI
 {
     public partial class BreachedEntriesDialog : Form
     {

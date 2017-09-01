@@ -3,15 +3,16 @@ using System;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace HaveIBeenPwned
+namespace HaveIBeenPwned.UI
 {
     public partial class CheckerPrompt : Form
     {
-        public CheckerPrompt()
+        public CheckerPrompt(string title, CheckTypeEnum checkType)
         {
             InitializeComponent();
-            this.supportedBreachList.DataSource = Enum.GetValues(typeof(BreachEnum)).Cast<BreachEnum>()
-                .Select(b => new ListViewItem { Text = b.GetAttribute<DisplayAttribute>().Name, Tag = b }).ToList();
+            Text = string.Format("Have I Been Pwned? - {0}", title);
+            this.supportedBreachList.DataSource = Enum.GetValues(typeof(BreachEnum)).Cast<BreachEnum>().Where(b => b.GetAttribute<CheckerTypeAttribute>().Type == checkType)
+                .Select(b => new ListViewItem { Text = b.GetAttribute<CheckerTypeAttribute>().Name, Tag = b }).ToList();
 
             checkAllBreaches.CheckedChanged += CheckAllBreachesCheckedChanged;
         }

@@ -2,10 +2,10 @@
 {
     public enum BreachEnum
     {
-        [Display(Name = "Have I Been Pwned")]
-        HIBP,
+        [CheckerType(Name = "Have I Been Pwned", Type = CheckTypeEnum.SiteDomain)]
+        HIBPSite,
 
-        [Display(Name = "Cloudbleed")]
-        CloudBleed
+        [CheckerType(Name = "Cloudbleed", Type = CheckTypeEnum.SiteDomain)]
+        CloudBleedSite
     }
 }

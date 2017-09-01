@@ -76,25 +76,26 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BreachCheckers\BaseChecker.cs" />
-    <Compile Include="BreachedEntriesDialog.cs">
+    <Compile Include="UI\BreachedEntriesDialog.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="BreachedEntriesDialog.Designer.cs">
+    <Compile Include="UI\BreachedEntriesDialog.Designer.cs">
       <DependentUpon>BreachedEntriesDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="BreachCheckers\BreachedEntry.cs" />
     <Compile Include="BreachEnum.cs" />
-    <Compile Include="CheckerPrompt.cs">
+    <Compile Include="UI\CheckerPrompt.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="CheckerPrompt.Designer.cs">
+    <Compile Include="UI\CheckerPrompt.Designer.cs">
       <DependentUpon>CheckerPrompt.cs</DependentUpon>
     </Compile>
-    <Compile Include="BreachCheckers\Cloudbleed\CloudbleedChecker.cs" />
-    <Compile Include="BreachCheckers\Cloudbleed\CloudbleedEntry.cs" />
-    <Compile Include="DisplayAttribute.cs" />
-    <Compile Include="BreachCheckers\HaveIBeenPwned\HaveIBeenPwnedChecker.cs" />
-    <Compile Include="BreachCheckers\HaveIBeenPwned\HaveIBeenPwnedEntry.cs" />
+    <Compile Include="BreachCheckers\CloudbleedSite\CloudbleedSiteChecker.cs" />
+    <Compile Include="BreachCheckers\CloudbleedSite\CloudbleedSiteEntry.cs" />
+    <Compile Include="CheckerTypeAttribute.cs" />
+    <Compile Include="BreachCheckers\HaveIBeenPwnedSite\HaveIBeenPwnedSiteChecker.cs" />
+    <Compile Include="BreachCheckers\HaveIBeenPwnedSite\HaveIBeenPwnedSiteEntry.cs" />
+    <Compile Include="CheckTypeEnum.cs" />
     <Compile Include="HaveIBeenPwnedExt.cs" />
     <Compile Include="BreachCheckers\IBreach.cs" />
     <Compile Include="ProgressHelper.cs" />
@@ -107,11 +108,12 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="BreachedEntriesDialog.resx">
+    <EmbeddedResource Include="UI\BreachedEntriesDialog.resx">
       <DependentUpon>BreachedEntriesDialog.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="CheckerPrompt.resx">
+    <EmbeddedResource Include="UI\CheckerPrompt.resx">
       <DependentUpon>CheckerPrompt.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

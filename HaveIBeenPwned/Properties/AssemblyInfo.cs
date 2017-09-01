@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("HaveIBeenPwned checker")]
-[assembly: AssemblyDescription("Checks keepass entries for usernames and passwords that have been exposed in various breaches by using the haveibeenpwned.com API")]
+[assembly: AssemblyDescription("Checks KeePass entries for usernames and passwords that have been exposed in various breaches by using the haveibeenpwned.com API")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Andrew Schofield")]
 [assembly: AssemblyProduct("KeePass Plugin")]

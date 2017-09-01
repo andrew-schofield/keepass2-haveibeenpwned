@@ -10,8 +10,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using KeePass.Forms;
 using HaveIBeenPwned.BreachCheckers;
-using HaveIBeenPwned.BreachCheckers.HaveIBeenPwned;
-using HaveIBeenPwned.BreachCheckers.Cloudbleed;
+using HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedSite;
+using HaveIBeenPwned.BreachCheckers.CloudbleedSite;
+using HaveIBeenPwned.UI;
 
 namespace HaveIBeenPwned
 {
@@ -20,14 +21,15 @@ namespace HaveIBeenPwned
         private IPluginHost pluginHost = null;
         private ToolStripSeparator toolStripSeperator = null;
         private ToolStripMenuItem haveIBeenPwnedMenuItem = null;
+        private ToolStripMenuItem haveIBeenPwnedServiceMenuItem = null;
         private static HttpClient client = new HttpClient();
         private StatusProgressForm progressForm;
 
         private Dictionary<BreachEnum, Func<HttpClient, IPluginHost, BaseChecker>> supportedBreachCheckers =
             new Dictionary<BreachEnum, Func<HttpClient, IPluginHost, BaseChecker>>
         {
-            { BreachEnum.HIBP, (h,p) => new HaveIBeenPwnedChecker(h, p) },
-            { BreachEnum.CloudBleed, (h,p) => new CloudbleedChecker(h, p) }
+            { BreachEnum.HIBPSite, (h,p) => new HaveIBeenPwnedSiteChecker(h, p) },
+            { BreachEnum.CloudBleedSite, (h,p) => new CloudbleedSiteChecker(h, p) }
         };
 
         public HaveIBeenPwnedExt()
@@ -56,7 +58,13 @@ namespace HaveIBeenPwned
             haveIBeenPwnedMenuItem = new ToolStripMenuItem();
             haveIBeenPwnedMenuItem.Text = "Have I Been Pwned?";
             haveIBeenPwnedMenuItem.Image = Resources.hibp.ToBitmap();
-            haveIBeenPwnedMenuItem.Click += this.CheckHaveIBeenPwned;
+
+            haveIBeenPwnedServiceMenuItem = new ToolStripMenuItem();
+            haveIBeenPwnedServiceMenuItem.Text = "Check for breaches based on site/service";
+            haveIBeenPwnedServiceMenuItem.Image = Resources.hibp.ToBitmap();
+            haveIBeenPwnedServiceMenuItem.Click += this.CheckHaveIBeenPwnedSites;
+            haveIBeenPwnedMenuItem.DropDown.Items.Add(haveIBeenPwnedServiceMenuItem);
+
             tsMenu.Add(haveIBeenPwnedMenuItem);
 
             return true;
@@ -66,7 +74,8 @@ namespace HaveIBeenPwned
         {
             // Remove all of our menu items
             ToolStripItemCollection tsMenu = pluginHost.MainWindow.ToolsMenu.DropDownItems;
-            haveIBeenPwnedMenuItem.Click -= this.CheckHaveIBeenPwned;
+            haveIBeenPwnedServiceMenuItem.Click -= this.CheckHaveIBeenPwnedSites;
+            haveIBeenPwnedMenuItem.DropDown.Items.Remove(haveIBeenPwnedServiceMenuItem);
             tsMenu.Remove(haveIBeenPwnedMenuItem);
             tsMenu.Remove(toolStripSeperator);
         }
@@ -98,7 +107,7 @@ namespace HaveIBeenPwned
             }
         }
 
-        private async void CheckHaveIBeenPwned(object sender, EventArgs e)
+        private async void CheckHaveIBeenPwnedSites(object sender, EventArgs e)
         {
             if (!pluginHost.Database.IsOpen)
             {
@@ -106,7 +115,7 @@ namespace HaveIBeenPwned
                 return;
             }
 
-            var dialog = new CheckerPrompt();
+            var dialog = new CheckerPrompt("Site/Service Checker", CheckTypeEnum.SiteDomain);
 
             if (dialog.ShowDialog() == DialogResult.OK)
             {

@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 using System.Drawing;
 using KeePassExtensions;
 
-namespace HaveIBeenPwned.BreachCheckers.Cloudbleed
+namespace HaveIBeenPwned.BreachCheckers.CloudbleedSite
 {
-    public class CloudbleedChecker : BaseChecker
+    public class CloudbleedSiteChecker : BaseChecker
     {
-        public CloudbleedChecker(HttpClient httpClient, IPluginHost pluginHost)
+        public CloudbleedSiteChecker(HttpClient httpClient, IPluginHost pluginHost)
             : base(httpClient, pluginHost)
         {
         }
@@ -34,7 +34,7 @@ namespace HaveIBeenPwned.BreachCheckers.Cloudbleed
             var breaches = await GetBreaches(progressIndicator);
             var entries = passwordDatabase.RootGroup.GetEntries(true).Where(e => !ignoreDeleted || !e.IsDeleted(pluginHost));
             var breachedEntries = new List<BreachedEntry>();
-            var cloudbleedEntry = new CloudbleedEntry();
+            var cloudbleedEntry = new CloudbleedSiteEntry();
 
             uint counter = 0;
             var entryCount = entries.Count();

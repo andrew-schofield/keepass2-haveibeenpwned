@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace HaveIBeenPwned.BreachCheckers.Cloudbleed
+namespace HaveIBeenPwned.BreachCheckers.CloudbleedSite
 {
-    public class CloudbleedEntry : IBreach
+    public class CloudbleedSiteEntry : IBreach
     {
         private readonly DateTime breachDate = new DateTime(2017, 02, 17);
 
