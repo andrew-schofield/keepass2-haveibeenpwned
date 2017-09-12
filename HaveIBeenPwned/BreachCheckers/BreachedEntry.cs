@@ -25,6 +25,22 @@ namespace HaveIBeenPwned.BreachCheckers
             }
         }
 
+        public string BreachUrl
+        {
+            get
+            {
+                return breach.Domain;
+            }
+        }
+
+        public string BreachUsername
+        {
+            get
+            {
+                return breach.Username;
+            }
+        }
+
         public BreachedEntry(PwEntry entry, IBreach breach)
         {
             Entry = entry;

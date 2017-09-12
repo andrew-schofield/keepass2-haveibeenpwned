@@ -6,6 +6,9 @@
         HIBPSite,
 
         [CheckerType(Name = "Cloudbleed", Type = CheckTypeEnum.SiteDomain)]
-        CloudBleedSite
+        CloudBleedSite,
+
+        [CheckerType(Name = "Have I Been Pwned", Type = CheckTypeEnum.Username)]
+        HIBPUsername
     }
 }

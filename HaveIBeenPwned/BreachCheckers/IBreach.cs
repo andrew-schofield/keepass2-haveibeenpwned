@@ -7,5 +7,9 @@ namespace HaveIBeenPwned.BreachCheckers
         string Title { get; }
 
         DateTime BreachDate { get; }
+
+        string Domain { get; }
+
+        string Username { get; }
     }
 }

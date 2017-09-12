@@ -7,10 +7,10 @@ namespace HaveIBeenPwned.UI
 {
     public partial class CheckerPrompt : Form
     {
-        public CheckerPrompt(string title, CheckTypeEnum checkType)
+        public CheckerPrompt(CheckTypeEnum checkType)
         {
             InitializeComponent();
-            Text = string.Format("Have I Been Pwned? - {0}", title);
+            Text = string.Format("Have I Been Pwned? - {0}", checkType.GetAttribute<DisplayAttribute>().Name);
             this.supportedBreachList.DataSource = Enum.GetValues(typeof(BreachEnum)).Cast<BreachEnum>().Where(b => b.GetAttribute<CheckerTypeAttribute>().Type == checkType)
                 .Select(b => new ListViewItem { Text = b.GetAttribute<CheckerTypeAttribute>().Name, Tag = b }).ToList();
 

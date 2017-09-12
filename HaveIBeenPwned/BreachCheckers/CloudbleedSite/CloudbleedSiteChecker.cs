@@ -34,7 +34,6 @@ namespace HaveIBeenPwned.BreachCheckers.CloudbleedSite
             var breaches = await GetBreaches(progressIndicator);
             var entries = passwordDatabase.RootGroup.GetEntries(true).Where(e => !ignoreDeleted || !e.IsDeleted(pluginHost));
             var breachedEntries = new List<BreachedEntry>();
-            var cloudbleedEntry = new CloudbleedSiteEntry();
 
             uint counter = 0;
             var entryCount = entries.Count();
@@ -50,7 +49,7 @@ namespace HaveIBeenPwned.BreachCheckers.CloudbleedSite
                         var domainBreaches = breaches.Where(b => url == b && (!oldEntriesOnly || lastModified < new DateTime(2017, 02, 17)));
                         if (domainBreaches.Any())
                         {
-                            breachedEntries.Add(new BreachedEntry(entry, cloudbleedEntry));
+                            breachedEntries.Add(new BreachedEntry(entry, new CloudbleedSiteEntry(string.Empty, entry.GetUrlDomain())));
                             if (expireEntries)
                             {
                                 ExpireEntry(entry);
