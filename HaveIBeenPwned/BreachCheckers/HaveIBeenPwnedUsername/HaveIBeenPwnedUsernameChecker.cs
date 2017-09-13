@@ -37,15 +37,27 @@ namespace HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedUsername
             var usernames = entries.Select(e => e.Strings.ReadSafe(PwDefs.UserNameField)).Distinct();
             var breaches = await GetBreaches(progressIndicator, usernames);
             var breachedEntries = new List<BreachedEntry>();
-
-            uint counter = 0;
-            var entryCount = entries.Count();
             
             await Task.Run(() =>
             {
                 foreach (var breach in breaches)
                 {
-                    breachedEntries.Add(new BreachedEntry(entries.FirstOrDefault(e => e.GetUrlDomain() == breach.Domain), breach));
+                    var pwEntry = entries.FirstOrDefault(e => e.GetUrlDomain() == breach.Domain);
+                    if(pwEntry != null)
+                    {
+                        var lastModified = pwEntry.GetPasswordLastModified();
+                        if (oldEntriesOnly && lastModified >= breach.BreachDate)
+                        {
+                            continue;
+                        }
+
+                        if (expireEntries)
+                        {
+                            ExpireEntry(pwEntry);
+                        }
+                    }
+
+                    breachedEntries.Add(new BreachedEntry(pwEntry, breach));
                 }
             });
 
@@ -55,8 +67,12 @@ namespace HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedUsername
         private async Task<List<HaveIBeenPwnedUsernameEntry>> GetBreaches(IProgress<ProgressItem> progressIndicator, IEnumerable<string> usernames)
         {
             List<HaveIBeenPwnedUsernameEntry> allBreaches = new List<HaveIBeenPwnedUsernameEntry>();
-            foreach (var username in usernames.Where(u => !string.IsNullOrWhiteSpace(u) && !u.StartsWith("{REF:")))
+            var filteredUsernames = usernames.Where(u => !string.IsNullOrWhiteSpace(u) && !u.StartsWith("{REF:"));
+            int counter = 0;
+            foreach (var username in filteredUsernames)
             {
+                counter++;
+                progressIndicator.Report(new ProgressItem((uint)((double)counter / filteredUsernames.Count() * 100), string.Format("Checking \"{0}\" for breaches", username)));
                 List<HaveIBeenPwnedUsernameEntry> breaches = null;
                 HttpResponseMessage response = null;
                 try
