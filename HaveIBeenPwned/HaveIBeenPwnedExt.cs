@@ -142,7 +142,7 @@ namespace HaveIBeenPwned
             {
                 progressForm = new StatusProgressForm();
                 var progressIndicator = new Progress<ProgressItem>(ReportProgress);
-                progressForm.InitEx("Checking Breaches", false, true, pluginHost.MainWindow);
+                progressForm.InitEx("Checking Breaches", false, breachType == CheckTypeEnum.SiteDomain, pluginHost.MainWindow);
                 progressForm.Show();
                 progressForm.SetProgress(0);
                 List<BreachedEntry> result = new List<BreachedEntry>();
