@@ -76,6 +76,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BreachCheckers\BaseChecker.cs" />
+    <Compile Include="BreachCheckers\HaveIBeenPwnedPassword\HaveIBeenPwnedPasswordChecker.cs" />
+    <Compile Include="BreachCheckers\HaveIBeenPwnedPassword\HaveIBeenPwnedPasswordEntry.cs" />
     <Compile Include="BreachCheckers\HaveIBeenPwnedUsername\HaveIBeenPwnedUsernameChecker.cs" />
     <Compile Include="BreachCheckers\HaveIBeenPwnedUsername\HaveIBeenPwnedUsernameEntry.cs" />
     <Compile Include="DisplayAttribute.cs" />

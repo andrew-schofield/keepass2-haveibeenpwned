@@ -13,6 +13,7 @@ using HaveIBeenPwned.BreachCheckers;
 using HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedSite;
 using HaveIBeenPwned.BreachCheckers.CloudbleedSite;
 using HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedUsername;
+using HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedPassword;
 using HaveIBeenPwned.UI;
 
 namespace HaveIBeenPwned
@@ -24,6 +25,7 @@ namespace HaveIBeenPwned
         private ToolStripMenuItem haveIBeenPwnedMenuItem = null;
         private ToolStripMenuItem haveIBeenPwnedServiceMenuItem = null;
         private ToolStripMenuItem haveIBeenPwnedUsernameMenuItem = null;
+        private ToolStripMenuItem haveIBeenPwnedPasswordMenuItem = null;
         private static HttpClient client = new HttpClient();
         private StatusProgressForm progressForm;
 
@@ -32,7 +34,8 @@ namespace HaveIBeenPwned
         {
             { BreachEnum.HIBPSite, (h,p) => new HaveIBeenPwnedSiteChecker(h, p) },
             { BreachEnum.CloudBleedSite, (h,p) => new CloudbleedSiteChecker(h, p) },
-            { BreachEnum.HIBPUsername, (h, p) => new HaveIBeenPwnedUsernameChecker(h, p) }
+            { BreachEnum.HIBPUsername, (h, p) => new HaveIBeenPwnedUsernameChecker(h, p) },
+            { BreachEnum.HIBPPassword, (h, p) => new HaveIBeenPwnedPasswordChecker(h, p) }
         };
 
         public HaveIBeenPwnedExt()
@@ -74,6 +77,12 @@ namespace HaveIBeenPwned
             haveIBeenPwnedUsernameMenuItem.Click += this.CheckHaveIBeenPwnedUsernames;
             haveIBeenPwnedMenuItem.DropDown.Items.Add(haveIBeenPwnedUsernameMenuItem);
 
+            haveIBeenPwnedPasswordMenuItem = new ToolStripMenuItem();
+            haveIBeenPwnedPasswordMenuItem.Text = "Check for breaches based on password";
+            haveIBeenPwnedPasswordMenuItem.Image = Resources.hibp.ToBitmap();
+            haveIBeenPwnedPasswordMenuItem.Click += this.CheckHaveIBeenPwnedPasswords;
+            haveIBeenPwnedMenuItem.DropDown.Items.Add(haveIBeenPwnedPasswordMenuItem);
+
             tsMenu.Add(haveIBeenPwnedMenuItem);
 
             return true;
@@ -85,8 +94,10 @@ namespace HaveIBeenPwned
             ToolStripItemCollection tsMenu = pluginHost.MainWindow.ToolsMenu.DropDownItems;
             haveIBeenPwnedServiceMenuItem.Click -= this.CheckHaveIBeenPwnedSites;
             haveIBeenPwnedUsernameMenuItem.Click -= this.CheckHaveIBeenPwnedUsernames;
+            haveIBeenPwnedPasswordMenuItem.Click -= this.CheckHaveIBeenPwnedPasswords;
             haveIBeenPwnedMenuItem.DropDown.Items.Remove(haveIBeenPwnedServiceMenuItem);
             haveIBeenPwnedMenuItem.DropDown.Items.Remove(haveIBeenPwnedUsernameMenuItem);
+            haveIBeenPwnedMenuItem.DropDown.Items.Remove(haveIBeenPwnedPasswordMenuItem);
             tsMenu.Remove(haveIBeenPwnedMenuItem);
             tsMenu.Remove(toolStripSeperator);
         }
@@ -126,6 +137,11 @@ namespace HaveIBeenPwned
         private async void CheckHaveIBeenPwnedUsernames(object sender, EventArgs e)
         {
             await CheckBreach(CheckTypeEnum.Username);
+        }
+
+        private async void CheckHaveIBeenPwnedPasswords(object sender, EventArgs e)
+        {
+            await CheckBreach(CheckTypeEnum.Password);
         }
 
         private async Task CheckBreach(CheckTypeEnum breachType)
