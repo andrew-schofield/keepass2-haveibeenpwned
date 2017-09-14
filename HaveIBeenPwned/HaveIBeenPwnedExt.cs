@@ -12,6 +12,7 @@ using KeePass.Forms;
 using HaveIBeenPwned.BreachCheckers;
 using HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedSite;
 using HaveIBeenPwned.BreachCheckers.CloudbleedSite;
+using HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedUsername;
 using HaveIBeenPwned.UI;
 
 namespace HaveIBeenPwned
@@ -22,6 +23,7 @@ namespace HaveIBeenPwned
         private ToolStripSeparator toolStripSeperator = null;
         private ToolStripMenuItem haveIBeenPwnedMenuItem = null;
         private ToolStripMenuItem haveIBeenPwnedServiceMenuItem = null;
+        private ToolStripMenuItem haveIBeenPwnedUsernameMenuItem = null;
         private static HttpClient client = new HttpClient();
         private StatusProgressForm progressForm;
 
@@ -29,7 +31,8 @@ namespace HaveIBeenPwned
             new Dictionary<BreachEnum, Func<HttpClient, IPluginHost, BaseChecker>>
         {
             { BreachEnum.HIBPSite, (h,p) => new HaveIBeenPwnedSiteChecker(h, p) },
-            { BreachEnum.CloudBleedSite, (h,p) => new CloudbleedSiteChecker(h, p) }
+            { BreachEnum.CloudBleedSite, (h,p) => new CloudbleedSiteChecker(h, p) },
+            { BreachEnum.HIBPUsername, (h, p) => new HaveIBeenPwnedUsernameChecker(h, p) }
         };
 
         public HaveIBeenPwnedExt()
@@ -65,6 +68,12 @@ namespace HaveIBeenPwned
             haveIBeenPwnedServiceMenuItem.Click += this.CheckHaveIBeenPwnedSites;
             haveIBeenPwnedMenuItem.DropDown.Items.Add(haveIBeenPwnedServiceMenuItem);
 
+            haveIBeenPwnedUsernameMenuItem = new ToolStripMenuItem();
+            haveIBeenPwnedUsernameMenuItem.Text = "Check for breaches based on username";
+            haveIBeenPwnedUsernameMenuItem.Image = Resources.hibp.ToBitmap();
+            haveIBeenPwnedUsernameMenuItem.Click += this.CheckHaveIBeenPwnedUsernames;
+            haveIBeenPwnedMenuItem.DropDown.Items.Add(haveIBeenPwnedUsernameMenuItem);
+
             tsMenu.Add(haveIBeenPwnedMenuItem);
 
             return true;
@@ -75,7 +84,9 @@ namespace HaveIBeenPwned
             // Remove all of our menu items
             ToolStripItemCollection tsMenu = pluginHost.MainWindow.ToolsMenu.DropDownItems;
             haveIBeenPwnedServiceMenuItem.Click -= this.CheckHaveIBeenPwnedSites;
+            haveIBeenPwnedUsernameMenuItem.Click -= this.CheckHaveIBeenPwnedUsernames;
             haveIBeenPwnedMenuItem.DropDown.Items.Remove(haveIBeenPwnedServiceMenuItem);
+            haveIBeenPwnedMenuItem.DropDown.Items.Remove(haveIBeenPwnedUsernameMenuItem);
             tsMenu.Remove(haveIBeenPwnedMenuItem);
             tsMenu.Remove(toolStripSeperator);
         }
@@ -109,26 +120,36 @@ namespace HaveIBeenPwned
 
         private async void CheckHaveIBeenPwnedSites(object sender, EventArgs e)
         {
+            await CheckBreach(CheckTypeEnum.SiteDomain);
+        }
+
+        private async void CheckHaveIBeenPwnedUsernames(object sender, EventArgs e)
+        {
+            await CheckBreach(CheckTypeEnum.Username);
+        }
+
+        private async Task CheckBreach(CheckTypeEnum breachType)
+        {
             if (!pluginHost.Database.IsOpen)
             {
                 MessageBox.Show("You must first open a database", Resources.MessageTitle);
                 return;
             }
 
-            var dialog = new CheckerPrompt("Site/Service Checker", CheckTypeEnum.SiteDomain);
+            var dialog = new CheckerPrompt(breachType);
 
             if (dialog.ShowDialog() == DialogResult.OK)
             {
                 progressForm = new StatusProgressForm();
                 var progressIndicator = new Progress<ProgressItem>(ReportProgress);
-                progressForm.InitEx("Checking Breaches", false, true, pluginHost.MainWindow);
+                progressForm.InitEx("Checking Breaches", false, breachType == CheckTypeEnum.SiteDomain, pluginHost.MainWindow);
                 progressForm.Show();
                 progressForm.SetProgress(0);
                 List<BreachedEntry> result = new List<BreachedEntry>();
-                if(dialog.CheckAllBreaches)
+                if (dialog.CheckAllBreaches)
                 {
                     progressForm.Tag = new ProgressHelper(Enum.GetValues(typeof(BreachEnum)).Length);
-                    foreach(var breach in Enum.GetValues(typeof(BreachEnum)))
+                    foreach (var breach in Enum.GetValues(typeof(BreachEnum)))
                     {
                         var foundBreaches = await CheckBreaches(supportedBreachCheckers[(BreachEnum)breach](client, pluginHost),
                         dialog.ExpireEntries, dialog.OnlyCheckOldEntries, dialog.IgnoreDeletedEntries, progressIndicator);

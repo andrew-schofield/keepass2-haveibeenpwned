@@ -5,6 +5,14 @@ namespace HaveIBeenPwned.BreachCheckers.CloudbleedSite
     public class CloudbleedSiteEntry : IBreach
     {
         private readonly DateTime breachDate = new DateTime(2017, 02, 17);
+        private string username;
+        private string domain;
+
+        public CloudbleedSiteEntry(string username, string domain)
+        {
+            this.username = username;
+            this.domain = domain;
+        }
 
         public DateTime BreachDate
         {
@@ -19,6 +27,22 @@ namespace HaveIBeenPwned.BreachCheckers.CloudbleedSite
             get
             {
                 return "Cloudbleed";
+            }
+        }
+
+        public string Domain
+        {
+            get
+            {
+                return domain;
+            }
+        }
+
+        public string Username
+        {
+            get
+            {
+                return username;
             }
         }
 

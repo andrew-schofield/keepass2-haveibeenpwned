@@ -23,26 +23,28 @@ namespace HaveIBeenPwned.UI
 
         public void AddBreaches(IList<BreachedEntry> breaches)
         {
+            var missingEntryGroup = new ListViewGroup("* Entries not in database", HorizontalAlignment.Left);
             this.Text = string.Format(this.Text, breaches.Count, breaches.Count > 1 ? "Entries" : "Entry");
 
             breachedEntryList.Items.Clear();
             breachedEntryList.Groups.Clear();
             breachedEntryList.SmallImageList = new ImageList();
-            var groupNames = breaches.Select(b => b.Entry.ParentGroup.GetFullPath(" - ", false)).Distinct();
+            var groupNames = breaches.Where(b => b.Entry != null).Select(b => b.Entry.ParentGroup.GetFullPath(" - ", false)).Distinct();
             foreach(var group in groupNames)
             {
                 breachedEntryList.Groups.Add(new ListViewGroup(group, HorizontalAlignment.Left));
             }
+            breachedEntryList.Groups.Add(missingEntryGroup);
             breachedEntryList.ShowGroups = true;
             foreach (var breach in breaches)
             {
-                breachedEntryList.SmallImageList.Images.Add(breach.Entry.GetIcon(pluginHost));
+                breachedEntryList.SmallImageList.Images.Add(breach.Entry != null ? breach.Entry.GetIcon(pluginHost) : Resources.hibp.ToBitmap());
                 var newItem = new ListViewItem(new[]
                 {
-                    breach.Entry.Strings.ReadSafe(PwDefs.TitleField),
-                    breach.Entry.Strings.ReadSafe(PwDefs.UserNameField),
-                    breach.Entry.Strings.ReadSafe(PwDefs.UrlField),
-                    breach.Entry.GetPasswordLastModified().ToShortDateString(),
+                    breach.Entry != null ? breach.Entry.Strings.ReadSafe(PwDefs.TitleField) : breach.BreachName,
+                    breach.Entry != null ? breach.Entry.Strings.ReadSafe(PwDefs.UserNameField) : breach.BreachUsername,
+                    breach.Entry != null ? breach.Entry.Strings.ReadSafe(PwDefs.UrlField) : breach.BreachUrl,
+                    breach.Entry != null ? breach.Entry.GetPasswordLastModified().ToShortDateString() : null,
                     breach.BreachName,
                     breach.BreachDate.ToShortDateString()
                 })
@@ -51,13 +53,21 @@ namespace HaveIBeenPwned.UI
                     ImageIndex = breachedEntryList.SmallImageList.Images.Count - 1
                 };
 
-                foreach(ListViewGroup group in breachedEntryList.Groups)
+                if (breach.Entry != null)
                 {
-                    if (group.Header == breach.Entry.ParentGroup.GetFullPath(" - ", false))
+                    foreach (ListViewGroup group in breachedEntryList.Groups)
                     {
-                        newItem.Group = group;
+                        if (group.Header == breach.Entry.ParentGroup.GetFullPath(" - ", false))
+                        {
+                            newItem.Group = group;
+                        }
                     }
                 }
+                else
+                {
+                    newItem.Group = missingEntryGroup;
+                }
+
                 breachedEntryList.Items.Add(newItem);
             }            
         }
@@ -68,29 +78,33 @@ namespace HaveIBeenPwned.UI
             if(breachedEntryList.SelectedItems != null && breachedEntryList.SelectedItems.Count == 1)
             {
                 var entry = ((PwEntry)breachedEntryList.SelectedItems[0].Tag);
-                var pwForm = new KeePass.Forms.PwEntryForm();
-                pwForm.InitEx(entry, KeePass.Forms.PwEditMode.EditExistingEntry, pluginHost.Database, pluginHost.MainWindow.ClientIcons, false, false);
-                var thread = new Thread(() => {
-                    if (pwForm.ShowDialog() == DialogResult.OK)
+                if (entry != null)
+                {
+                    var pwForm = new KeePass.Forms.PwEntryForm();
+                    pwForm.InitEx(entry, KeePass.Forms.PwEditMode.EditExistingEntry, pluginHost.Database, pluginHost.MainWindow.ClientIcons, false, false);
+                    var thread = new Thread(() =>
                     {
-                        bool bUpdImg = pluginHost.Database.UINeedsIconUpdate;
-                        pluginHost.MainWindow.RefreshEntriesList(); // Update entry
+                        if (pwForm.ShowDialog() == DialogResult.OK)
+                        {
+                            bool bUpdImg = pluginHost.Database.UINeedsIconUpdate;
+                            pluginHost.MainWindow.RefreshEntriesList(); // Update entry
                         pluginHost.MainWindow.UpdateUI(false, null, bUpdImg, null, false, null, pwForm.HasModifiedEntry);
-                        breachedEntryList.SelectedItems[0].SubItems[0] = new ListViewItem.ListViewSubItem(breachedEntryList.SelectedItems[0], entry.Strings.ReadSafe(PwDefs.TitleField));
-                        breachedEntryList.SelectedItems[0].SubItems[1] = new ListViewItem.ListViewSubItem(breachedEntryList.SelectedItems[0], entry.Strings.ReadSafe(PwDefs.UserNameField));
-                        breachedEntryList.SelectedItems[0].SubItems[2] = new ListViewItem.ListViewSubItem(breachedEntryList.SelectedItems[0], entry.Strings.ReadSafe(PwDefs.UrlField));
-                        breachedEntryList.SelectedItems[0].SubItems[3] = new ListViewItem.ListViewSubItem(breachedEntryList.SelectedItems[0], entry.GetPasswordLastModified().ToShortDateString());
-                    }
-                    else
-                    {
-                        bool bUpdImg = pluginHost.Database.UINeedsIconUpdate;
-                        pluginHost.MainWindow.RefreshEntriesList(); // Update last access time
+                            breachedEntryList.SelectedItems[0].SubItems[0] = new ListViewItem.ListViewSubItem(breachedEntryList.SelectedItems[0], entry.Strings.ReadSafe(PwDefs.TitleField));
+                            breachedEntryList.SelectedItems[0].SubItems[1] = new ListViewItem.ListViewSubItem(breachedEntryList.SelectedItems[0], entry.Strings.ReadSafe(PwDefs.UserNameField));
+                            breachedEntryList.SelectedItems[0].SubItems[2] = new ListViewItem.ListViewSubItem(breachedEntryList.SelectedItems[0], entry.Strings.ReadSafe(PwDefs.UrlField));
+                            breachedEntryList.SelectedItems[0].SubItems[3] = new ListViewItem.ListViewSubItem(breachedEntryList.SelectedItems[0], entry.GetPasswordLastModified().ToShortDateString());
+                        }
+                        else
+                        {
+                            bool bUpdImg = pluginHost.Database.UINeedsIconUpdate;
+                            pluginHost.MainWindow.RefreshEntriesList(); // Update last access time
                         pluginHost.MainWindow.UpdateUI(false, null, bUpdImg, null, false, null, false);
-                    }
-                });
-                thread.SetApartmentState(ApartmentState.STA);
-                thread.IsBackground = true;
-                thread.Start();
+                        }
+                    });
+                    thread.SetApartmentState(ApartmentState.STA);
+                    thread.IsBackground = true;
+                    thread.Start();
+                }
             }
         }
     }

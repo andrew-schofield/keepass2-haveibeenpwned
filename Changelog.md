@@ -1,5 +1,9 @@
 # keepass2-haveibeenpwned Changelog
 
+### v1.1.0 - 2017-09-14
+* Add new check method to allow searching for breaches based on entry username
+* Moved menu item into submenu to allow for new username checking option
+
 ### v1.0 - 2017-06-23
 * v1 release.
 * Moved password entry extensions into a separate library
