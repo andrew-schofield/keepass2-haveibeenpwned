@@ -9,6 +9,9 @@
         CloudBleedSite,
 
         [CheckerType(Name = "Have I Been Pwned", Type = CheckTypeEnum.Username)]
-        HIBPUsername
+        HIBPUsername,
+
+        [CheckerType(Name = "Have I Been Pwned", Type = CheckTypeEnum.Password)]
+        HIBPPassword
     }
 }

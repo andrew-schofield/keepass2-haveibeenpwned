@@ -10,12 +10,13 @@ using System.Threading.Tasks;
 using System.Drawing;
 using KeePassExtensions;
 using System.Threading;
+using System.Security.Cryptography;
 
-namespace HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedUsername
+namespace HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedPassword
 {
-    public class HaveIBeenPwnedUsernameChecker : BaseChecker
+    public class HaveIBeenPwnedPasswordChecker : BaseChecker
     {
-        public HaveIBeenPwnedUsernameChecker(HttpClient httpClient, IPluginHost pluginHost)
+        public HaveIBeenPwnedPasswordChecker(HttpClient httpClient, IPluginHost pluginHost)
             : base(httpClient, pluginHost)
         {
         }
@@ -34,23 +35,16 @@ namespace HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedUsername
         {
             progressIndicator.Report(new ProgressItem(0, "Getting HaveIBeenPwned breach list..."));
             var entries = passwordDatabase.RootGroup.GetEntries(true).Where(e => !ignoreDeleted || !e.IsDeleted(pluginHost));
-            var usernames = entries.Select(e => e.Strings.ReadSafe(PwDefs.UserNameField)).Distinct();
-            var breaches = await GetBreaches(progressIndicator, usernames);
+            var breaches = await GetBreaches(progressIndicator, entries);
             var breachedEntries = new List<BreachedEntry>();
             
             await Task.Run(() =>
             {
                 foreach (var breach in breaches)
                 {
-                    var pwEntry = entries.FirstOrDefault(e => e.GetUrlDomain() == breach.Domain);
+                    var pwEntry = breach.Entry;
                     if(pwEntry != null)
                     {
-                        var lastModified = pwEntry.GetPasswordLastModified();
-                        if (oldEntriesOnly && lastModified >= breach.BreachDate)
-                        {
-                            continue;
-                        }
-
                         if (expireEntries)
                         {
                             ExpireEntry(pwEntry);
@@ -64,20 +58,20 @@ namespace HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedUsername
             return breachedEntries;
         }
 
-        private async Task<List<HaveIBeenPwnedUsernameEntry>> GetBreaches(IProgress<ProgressItem> progressIndicator, IEnumerable<string> usernames)
+        private async Task<List<HaveIBeenPwnedPasswordEntry>> GetBreaches(IProgress<ProgressItem> progressIndicator, IEnumerable<PwEntry> entries)
         {
-            List<HaveIBeenPwnedUsernameEntry> allBreaches = new List<HaveIBeenPwnedUsernameEntry>();
-            var filteredUsernames = usernames.Where(u => !string.IsNullOrWhiteSpace(u) && !u.StartsWith("{REF:"));
+            List<HaveIBeenPwnedPasswordEntry> allBreaches = new List<HaveIBeenPwnedPasswordEntry>();
             int counter = 0;
-            foreach (var username in filteredUsernames)
+            SHA1 sha = new SHA1CryptoServiceProvider();
+            foreach (var entry in entries)
             {
                 counter++;
-                progressIndicator.Report(new ProgressItem((uint)((double)counter / filteredUsernames.Count() * 100), string.Format("Checking \"{0}\" for breaches", username)));
-                List<HaveIBeenPwnedUsernameEntry> breaches = null;
+                progressIndicator.Report(new ProgressItem((uint)((double)counter / entries.Count() * 100), string.Format("Checking \"{0}\" for breaches", entry.Strings.ReadSafe(PwDefs.TitleField))));
+                if(entry.Strings.Get(PwDefs.PasswordField) == null || string.IsNullOrWhiteSpace(entry.Strings.ReadSafe(PwDefs.PasswordField)) || entry.Strings.ReadSafe(PwDefs.PasswordField).StartsWith("{REF:")) continue;
                 HttpResponseMessage response = null;
                 try
                 {
-                    response = await client.GetAsync(new Uri("https://haveibeenpwned.com/api/v2/breachedaccount/" + username));
+                    response = await client.GetAsync(new Uri("https://haveibeenpwned.com/api/v2/pwnedpassword/" + string.Join("", sha.ComputeHash(entry.Strings.Get(PwDefs.PasswordField).ReadUtf8()).Select(x => x.ToString("x2")).ToArray())));
                 }
                 catch (Exception ex)
                 {
@@ -86,17 +80,11 @@ namespace HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedUsername
 
                 if (response.IsSuccessStatusCode)
                 {
-                    var jsonString = await response.Content.ReadAsStringAsync();
-                    breaches = JsonConvert.DeserializeObject<List<HaveIBeenPwnedUsernameEntry>>(jsonString);
-                    breaches.ForEach(b => b.Username = username);
+                    allBreaches.Add(new HaveIBeenPwnedPasswordEntry(entry.Strings.ReadSafe(PwDefs.UserNameField), entry.GetUrlDomain(), entry));
                 }
                 else if (response.StatusCode != System.Net.HttpStatusCode.NotFound)
                 {
                     MessageBox.Show(string.Format("Unable to check haveibeenpwned.com (returned Status: {0})", response.StatusCode), Resources.MessageTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-                if (breaches != null)
-                {
-                    allBreaches.AddRange(breaches);
                 }
                 // hibp has a rate limit of 1500ms
                 await Task.Delay(1600);

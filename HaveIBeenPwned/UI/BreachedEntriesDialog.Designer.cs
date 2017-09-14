@@ -124,7 +124,6 @@
             this.Controls.Add(this.breachedEntryList);
             this.MinimizeBox = false;
             this.Name = "BreachedEntriesDialog";
-            this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Breached Entries - {0} {1} Found";
             this.ResumeLayout(false);

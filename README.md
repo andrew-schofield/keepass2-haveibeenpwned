@@ -15,6 +15,9 @@
 ### Username based
 * [Have I Been Pwned (HIBP)](https://haveibeenpwned.com/) - Checks the usernames of any entries against the Have I Been Pwned? list curated by Troy Hunt
 
+### Password based
+* [Have I Been Pwned (HIBP)](https://haveibeenpwned.com/) - Checks the passwords of any entries against the Have I Been Pwned? list curated by Troy Hunt
+
 ## Usage
 
 * Install the plugin into KeePass, this will add an entry to the Tools menu for "Have I Been Pwned?"
@@ -29,7 +32,7 @@
 * HaveIBeenPwned breach data is downloaded every time the check is run as the data file is small.
 * Cloudbleed data is only downloaded once and then cached here: `%PROGRAMDATA%\KeePass\cloudbleed.txt` (Windows) or `%LOCALAPPDATA%\KeePass\cloudbleed.txt` (Linux) as this is currently a ~70MB download. If you wish to refresh the cache, simply delete this file.
 * As KeePass doesn't have a native method for determining when an entry's password was last changed, keepass2-haveibeenpwned will use the history entries if any exist and compare their passwords.
-* Username checking could take a while to complete as HIBP applies a rate limit on requests, which means we can only check one username every 1.6s
+* Username/password checking could take a while to complete as HIBP applies a rate limit on requests, which means we can only check one username/password every 1.6s
 * Common usernames (such as admin & root) are not removed from the check and will likely result in false positives in your results, however these should be immediately obvious.
 
 ## Donate
