@@ -152,7 +152,7 @@ namespace HaveIBeenPwned
                 return;
             }
 
-            var dialog = new CheckerPrompt(breachType);
+            var dialog = new CheckerPrompt(breachType, breachType != CheckTypeEnum.Password);
 
             if (dialog.ShowDialog() == DialogResult.OK)
             {
