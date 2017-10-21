@@ -1,5 +1,8 @@
 # keepass2-haveibeenpwned Changelog
 
+### v1.2.2 - 2017-10-21
+* Alter the way developer extensions are referenced to prevent dependency on a specific version of KeePass
+
 ### v1.2.1 - 2017-09-23
 * Disable the check entries not changed option when checking for breach passwords as this is not relevant for that breach type
 

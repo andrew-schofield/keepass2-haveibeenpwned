@@ -88,7 +88,7 @@ namespace HaveIBeenPwned.UI
                         {
                             bool bUpdImg = pluginHost.Database.UINeedsIconUpdate;
                             pluginHost.MainWindow.RefreshEntriesList(); // Update entry
-                        pluginHost.MainWindow.UpdateUI(false, null, bUpdImg, null, false, null, pwForm.HasModifiedEntry);
+                            pluginHost.MainWindow.UpdateUI(false, null, bUpdImg, null, false, null, pwForm.HasModifiedEntry);
                             breachedEntryList.SelectedItems[0].SubItems[0] = new ListViewItem.ListViewSubItem(breachedEntryList.SelectedItems[0], entry.Strings.ReadSafe(PwDefs.TitleField));
                             breachedEntryList.SelectedItems[0].SubItems[1] = new ListViewItem.ListViewSubItem(breachedEntryList.SelectedItems[0], entry.Strings.ReadSafe(PwDefs.UserNameField));
                             breachedEntryList.SelectedItems[0].SubItems[2] = new ListViewItem.ListViewSubItem(breachedEntryList.SelectedItems[0], entry.Strings.ReadSafe(PwDefs.UrlField));

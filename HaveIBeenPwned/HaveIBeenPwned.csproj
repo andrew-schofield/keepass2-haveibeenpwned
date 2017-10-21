@@ -54,9 +54,9 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="KeePass, Version=2.35.0.36675, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="KeePass, Version=2.34.0.15991, Culture=neutral, PublicKeyToken=fed2ed7716aecf5c, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Desktop\KeePass 2.34\KeePass.exe</HintPath>
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\Program Files (x86)\KeePass Password Safe 2\KeePass.exe</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -75,6 +75,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\keepass2-developerextensions\keepass2-developerextensions\EnumExtensions.cs" />
+    <Compile Include="..\keepass2-developerextensions\keepass2-developerextensions\ProtectedStringExtensions.cs" />
+    <Compile Include="..\keepass2-developerextensions\keepass2-developerextensions\PwEntryExtensions.cs" />
     <Compile Include="BreachCheckers\BaseChecker.cs" />
     <Compile Include="BreachCheckers\HaveIBeenPwnedPassword\HaveIBeenPwnedPasswordChecker.cs" />
     <Compile Include="BreachCheckers\HaveIBeenPwnedPassword\HaveIBeenPwnedPasswordEntry.cs" />
@@ -124,13 +127,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\keepass2-developerextensions\keepass2-developerextensions\keepass2-developerextensions.csproj">
-      <Project>{5f46d79a-c383-41f0-9c77-49381d4eb002}</Project>
-      <Name>keepass2-developerextensions</Name>
-      <PlgxReference>..\keepass2-developerextensions\keepass2-developerextensions\bin\ReleasePlgx\keepass2-developerextensions.dll</PlgxReference>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
