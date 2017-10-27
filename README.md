@@ -16,7 +16,9 @@
 * [Have I Been Pwned (HIBP)](https://haveibeenpwned.com/) - Checks the usernames of any entries against the Have I Been Pwned? list curated by Troy Hunt
 
 ### Password based
-* [Have I Been Pwned (HIBP)](https://haveibeenpwned.com/) - Checks the passwords of any entries against the Have I Been Pwned? list curated by Troy Hunt
+~~[Have I Been Pwned (HIBP)](https://haveibeenpwned.com/) - Checks the passwords of any entries against the Have I Been Pwned? list curated by Troy Hunt~~
+
+**This checker is disabled in the current version of the plugin** as the HIBP password checking API requires passwords to only weakly-hashed. Although these hashes are encrypted in transit, this is still an insecure way of checking password breaches. A future updates should enable offline password breach checking. See https://github.com/andrew-schofield/keepass2-haveibeenpwned/issues/33 for reference.
 
 ## Usage
 
