@@ -61,36 +61,15 @@ namespace HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedPassword
         private async Task<List<HaveIBeenPwnedPasswordEntry>> GetBreaches(IProgress<ProgressItem> progressIndicator, IEnumerable<PwEntry> entries)
         {
             List<HaveIBeenPwnedPasswordEntry> allBreaches = new List<HaveIBeenPwnedPasswordEntry>();
-            int counter = 0;
+            /*int counter = 0;
             SHA1 sha = new SHA1CryptoServiceProvider();
             foreach (var entry in entries)
             {
                 counter++;
                 progressIndicator.Report(new ProgressItem((uint)((double)counter / entries.Count() * 100), string.Format("Checking \"{0}\" for breaches", entry.Strings.ReadSafe(PwDefs.TitleField))));
                 if(entry.Strings.Get(PwDefs.PasswordField) == null || string.IsNullOrWhiteSpace(entry.Strings.ReadSafe(PwDefs.PasswordField)) || entry.Strings.ReadSafe(PwDefs.PasswordField).StartsWith("{REF:")) continue;
-                HttpResponseMessage response = null;
-                try
-                {
-                    response = await client.GetAsync(new Uri("https://haveibeenpwned.com/api/v2/pwnedpassword/" + string.Join("", sha.ComputeHash(entry.Strings.Get(PwDefs.PasswordField).ReadUtf8()).Select(x => x.ToString("x2")).ToArray())));
-                }
-                catch (Exception ex)
-                {
-                    throw ex;
-                }
-
-                if (response.IsSuccessStatusCode)
-                {
-                    allBreaches.Add(new HaveIBeenPwnedPasswordEntry(entry.Strings.ReadSafe(PwDefs.UserNameField), entry.GetUrlDomain(), entry));
-                }
-                else if (response.StatusCode != System.Net.HttpStatusCode.NotFound)
-                {
-                    MessageBox.Show(string.Format("Unable to check haveibeenpwned.com (returned Status: {0})", response.StatusCode), Resources.MessageTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-                // hibp has a rate limit of 1500ms
-                await Task.Delay(1600);
-            }
-            
-                        
+                var passwordHash = sha.ComputeHash(entry.Strings.Get(PwDefs.PasswordField).ReadUtf8()).Select(x => x.ToString("x2")).ToArray();
+            } */    
             return allBreaches;
         }
     }

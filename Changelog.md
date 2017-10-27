@@ -1,5 +1,8 @@
 # keepass2-haveibeenpwned Changelog
 
+### v1.2.3 - 2017-10-27
+* Temporarily disable the password check mode as it sends weakly hashed passwords (although encrypted) to HIBP.
+
 ### v1.2.2 - 2017-10-21
 * Alter the way developer extensions are referenced to prevent dependency on a specific version of KeePass
 
