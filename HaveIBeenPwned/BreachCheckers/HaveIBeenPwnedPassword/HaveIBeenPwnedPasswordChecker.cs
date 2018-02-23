@@ -11,11 +11,14 @@ using System.Drawing;
 using KeePassExtensions;
 using System.Threading;
 using System.Security.Cryptography;
+using System.IO;
 
 namespace HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedPassword
 {
     public class HaveIBeenPwnedPasswordChecker : BaseChecker
     {
+        private const string API_URL = "https://api.pwnedpasswords.com/range/{0}";
+
         public HaveIBeenPwnedPasswordChecker(HttpClient httpClient, IPluginHost pluginHost)
             : base(httpClient, pluginHost)
         {
@@ -61,15 +64,39 @@ namespace HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedPassword
         private async Task<List<HaveIBeenPwnedPasswordEntry>> GetBreaches(IProgress<ProgressItem> progressIndicator, IEnumerable<PwEntry> entries)
         {
             List<HaveIBeenPwnedPasswordEntry> allBreaches = new List<HaveIBeenPwnedPasswordEntry>();
-            /*int counter = 0;
+            int counter = 0;
             SHA1 sha = new SHA1CryptoServiceProvider();
+            var client = new HttpClient();
+            
             foreach (var entry in entries)
             {
                 counter++;
                 progressIndicator.Report(new ProgressItem((uint)((double)counter / entries.Count() * 100), string.Format("Checking \"{0}\" for breaches", entry.Strings.ReadSafe(PwDefs.TitleField))));
                 if(entry.Strings.Get(PwDefs.PasswordField) == null || string.IsNullOrWhiteSpace(entry.Strings.ReadSafe(PwDefs.PasswordField)) || entry.Strings.ReadSafe(PwDefs.PasswordField).StartsWith("{REF:")) continue;
-                var passwordHash = sha.ComputeHash(entry.Strings.Get(PwDefs.PasswordField).ReadUtf8()).Select(x => x.ToString("x2")).ToArray();
-            } */    
+                var passwordHash = string.Join("", sha.ComputeHash(entry.Strings.Get(PwDefs.PasswordField).ReadUtf8()).Select(x => x.ToString("x2")));
+                var prefix = passwordHash.Substring(0, 5);
+                using (var response = await client.GetAsync(string.Format(API_URL, prefix)))
+                {
+                    if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                    {
+                        var stream = await response.Content.ReadAsStreamAsync();
+                        using (var reader = new StreamReader(stream))
+                        {
+                            string line;
+                            while ((line = await reader.ReadLineAsync()) != null)
+                            {
+                                var parts = line.Split(':');
+                                var suffix = parts[0];
+                                var count = int.Parse(parts[1]);
+                                if (prefix + suffix == passwordHash)
+                                {
+                                    allBreaches.Add(new HaveIBeenPwnedPasswordEntry(entry.Strings.ReadSafe(PwDefs.UserNameField), entry.GetUrlDomain(), entry));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
             return allBreaches;
         }
     }
