@@ -66,14 +66,13 @@ namespace HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedPassword
             List<HaveIBeenPwnedPasswordEntry> allBreaches = new List<HaveIBeenPwnedPasswordEntry>();
             int counter = 0;
             SHA1 sha = new SHA1CryptoServiceProvider();
-            var client = new HttpClient();
             
             foreach (var entry in entries)
             {
                 counter++;
                 progressIndicator.Report(new ProgressItem((uint)((double)counter / entries.Count() * 100), string.Format("Checking \"{0}\" for breaches", entry.Strings.ReadSafe(PwDefs.TitleField))));
                 if(entry.Strings.Get(PwDefs.PasswordField) == null || string.IsNullOrWhiteSpace(entry.Strings.ReadSafe(PwDefs.PasswordField)) || entry.Strings.ReadSafe(PwDefs.PasswordField).StartsWith("{REF:")) continue;
-                var passwordHash = string.Join("", sha.ComputeHash(entry.Strings.Get(PwDefs.PasswordField).ReadUtf8()).Select(x => x.ToString("x2")));
+                var passwordHash = string.Join("", sha.ComputeHash(entry.Strings.Get(PwDefs.PasswordField).ReadUtf8()).Select(x => x.ToString("x2"))).ToUpperInvariant();
                 var prefix = passwordHash.Substring(0, 5);
                 using (var response = await client.GetAsync(string.Format(API_URL, prefix)))
                 {

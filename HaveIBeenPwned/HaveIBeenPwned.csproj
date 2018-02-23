@@ -55,7 +55,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="KeePass, Version=2.34.0.15991, Culture=neutral, PublicKeyToken=fed2ed7716aecf5c, processorArchitecture=MSIL">
-      <HintPath>..\..\..\Desktop\KeePass 2.34\KeePass.exe</HintPath>
+      <HintPath>$(USERPROFILE)\Desktop\KeePass-2.34\KeePass.exe</HintPath>
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>

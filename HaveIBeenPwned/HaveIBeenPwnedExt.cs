@@ -77,11 +77,11 @@ namespace HaveIBeenPwned
             haveIBeenPwnedUsernameMenuItem.Click += this.CheckHaveIBeenPwnedUsernames;
             haveIBeenPwnedMenuItem.DropDown.Items.Add(haveIBeenPwnedUsernameMenuItem);
 
-            /*haveIBeenPwnedPasswordMenuItem = new ToolStripMenuItem();
+            haveIBeenPwnedPasswordMenuItem = new ToolStripMenuItem();
             haveIBeenPwnedPasswordMenuItem.Text = "Check for breaches based on password";
             haveIBeenPwnedPasswordMenuItem.Image = Resources.hibp.ToBitmap();
             haveIBeenPwnedPasswordMenuItem.Click += this.CheckHaveIBeenPwnedPasswords;
-            haveIBeenPwnedMenuItem.DropDown.Items.Add(haveIBeenPwnedPasswordMenuItem);*/
+            haveIBeenPwnedMenuItem.DropDown.Items.Add(haveIBeenPwnedPasswordMenuItem);
 
             tsMenu.Add(haveIBeenPwnedMenuItem);
 
@@ -94,10 +94,10 @@ namespace HaveIBeenPwned
             ToolStripItemCollection tsMenu = pluginHost.MainWindow.ToolsMenu.DropDownItems;
             haveIBeenPwnedServiceMenuItem.Click -= this.CheckHaveIBeenPwnedSites;
             haveIBeenPwnedUsernameMenuItem.Click -= this.CheckHaveIBeenPwnedUsernames;
-            /*haveIBeenPwnedPasswordMenuItem.Click -= this.CheckHaveIBeenPwnedPasswords;*/
+            haveIBeenPwnedPasswordMenuItem.Click -= this.CheckHaveIBeenPwnedPasswords;
             haveIBeenPwnedMenuItem.DropDown.Items.Remove(haveIBeenPwnedServiceMenuItem);
             haveIBeenPwnedMenuItem.DropDown.Items.Remove(haveIBeenPwnedUsernameMenuItem);
-            /*haveIBeenPwnedMenuItem.DropDown.Items.Remove(haveIBeenPwnedPasswordMenuItem);*/
+            haveIBeenPwnedMenuItem.DropDown.Items.Remove(haveIBeenPwnedPasswordMenuItem);
             tsMenu.Remove(haveIBeenPwnedMenuItem);
             tsMenu.Remove(toolStripSeperator);
         }
