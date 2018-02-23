@@ -7,5 +7,7 @@ namespace HaveIBeenPwned
         public string Name { get; set; }
 
         public CheckTypeEnum Type { get; set; }
+
+        public string Description { get; set; }
     }
 }

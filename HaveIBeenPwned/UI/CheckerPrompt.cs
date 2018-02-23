@@ -18,6 +18,18 @@ namespace HaveIBeenPwned.UI
             checkOldEntries.Checked = enableOldEntries;
 
             checkAllBreaches.CheckedChanged += CheckAllBreachesCheckedChanged;
+            supportedBreachList.SelectedIndexChanged += SupportedBreachListSelectedIndexChanged;
+            SetBreachDescription();
+        }
+
+        private void SupportedBreachListSelectedIndexChanged(object sender, EventArgs e)
+        {
+            SetBreachDescription();
+        }
+
+        private void SetBreachDescription()
+        {
+            breachDescription.Text = SelectedBreach.GetAttribute<CheckerTypeAttribute>().Description;
         }
 
         private void CheckAllBreachesCheckedChanged(object sender, EventArgs e)
