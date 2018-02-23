@@ -1,5 +1,9 @@
 # keepass2-haveibeenpwned Changelog
 
+### v1.2.4 - 2018-02-23
+* Enable password check mode using the new HIBP v2 password API. Thanks to Matt Schneeberger.
+* Add breach description to checker dialog
+
 ### v1.2.3 - 2017-10-27
 * Temporarily disable the password check mode as it sends weakly hashed passwords (although encrypted) to HIBP.
 
