@@ -167,6 +167,8 @@ namespace HaveIBeenPwned
                     progressForm.Tag = new ProgressHelper(Enum.GetValues(typeof(BreachEnum)).Length);
                     foreach (var breach in Enum.GetValues(typeof(BreachEnum)))
                     {
+                        var foundBreaches = await CheckBreaches(supportedBreachCheckers[(BreachEnum)breach](client, pluginHost),
+                        dialog.ExpireEntries, dialog.OnlyCheckOldEntries, dialog.IgnoreDeletedEntries, dialog.IgnoreExpiredEntries, progressIndicator);
                         result.AddRange(foundBreaches);
                         ((ProgressHelper)progressForm.Tag).CurrentBreach++;
                     }
@@ -175,7 +177,7 @@ namespace HaveIBeenPwned
                 {
                     progressForm.Tag = new ProgressHelper(1);
                     var foundBreaches = await CheckBreaches(supportedBreachCheckers[dialog.SelectedBreach](client, pluginHost),
-                        dialog.ExpireEntries, dialog.OnlyCheckOldEntries, dialog.IgnoreDeletedEntries, dialog.IgnoreExpiredEntries, dialog.IgnoreExpiredEntries, progressIndicator);
+                        dialog.ExpireEntries, dialog.OnlyCheckOldEntries, dialog.IgnoreDeletedEntries, dialog.IgnoreExpiredEntries, progressIndicator);
                     result.AddRange(foundBreaches);
                 }
                 progressForm.Close();
