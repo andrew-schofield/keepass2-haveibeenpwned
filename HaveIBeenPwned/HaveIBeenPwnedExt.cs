@@ -167,8 +167,6 @@ namespace HaveIBeenPwned
                     progressForm.Tag = new ProgressHelper(Enum.GetValues(typeof(BreachEnum)).Length);
                     foreach (var breach in Enum.GetValues(typeof(BreachEnum)))
                     {
-                        var foundBreaches = await CheckBreaches(supportedBreachCheckers[(BreachEnum)breach](client, pluginHost),
-                        dialog.ExpireEntries, dialog.OnlyCheckOldEntries, dialog.IgnoreDeletedEntries, progressIndicator);
                         result.AddRange(foundBreaches);
                         ((ProgressHelper)progressForm.Tag).CurrentBreach++;
                     }
@@ -177,7 +175,7 @@ namespace HaveIBeenPwned
                 {
                     progressForm.Tag = new ProgressHelper(1);
                     var foundBreaches = await CheckBreaches(supportedBreachCheckers[dialog.SelectedBreach](client, pluginHost),
-                        dialog.ExpireEntries, dialog.OnlyCheckOldEntries, dialog.IgnoreDeletedEntries, progressIndicator);
+                        dialog.ExpireEntries, dialog.OnlyCheckOldEntries, dialog.IgnoreDeletedEntries, dialog.IgnoreExpiredEntries, dialog.IgnoreExpiredEntries, progressIndicator);
                     result.AddRange(foundBreaches);
                 }
                 progressForm.Close();
@@ -202,9 +200,10 @@ namespace HaveIBeenPwned
             bool expireEntries,
             bool oldEntriesOnly,
             bool ignoreDeleted,
+            bool ignoreExpired,
             IProgress<ProgressItem> progressIndicator)
         {
-           return await breachChecker.CheckDatabase(expireEntries, oldEntriesOnly, ignoreDeleted, progressIndicator);
+           return await breachChecker.CheckDatabase(expireEntries, oldEntriesOnly, ignoreDeleted, ignoreExpired, progressIndicator);
         }
     }
 }

@@ -21,7 +21,7 @@ namespace HaveIBeenPwned.BreachCheckers
             this.pluginHost = pluginHost;
         }
 
-        public abstract Task<List<BreachedEntry>> CheckDatabase(bool expireEntries, bool oldEntriesOnly, bool ignoreDeleted, IProgress<ProgressItem> progressIndicator);
+        public abstract Task<List<BreachedEntry>> CheckDatabase(bool expireEntries, bool oldEntriesOnly, bool ignoreDeleted, bool ignoreExpired, IProgress<ProgressItem> progressIndicator);
 
         public abstract Image BreachLogo { get; }
 
