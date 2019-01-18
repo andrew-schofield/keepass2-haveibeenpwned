@@ -19,7 +19,7 @@ namespace HaveIBeenPwned {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -77,6 +77,42 @@ namespace HaveIBeenPwned {
             get {
                 object obj = ResourceManager.GetObject("hibp", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Check for breaches based on password.
+        /// </summary>
+        internal static string MenuItemPasswordTitle {
+            get {
+                return ResourceManager.GetString("MenuItemPasswordTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Check for breaches based on site/service.
+        /// </summary>
+        internal static string MenuItemSiteTitle {
+            get {
+                return ResourceManager.GetString("MenuItemSiteTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Check for breaches based on username.
+        /// </summary>
+        internal static string MenuItemUsernameTitle {
+            get {
+                return ResourceManager.GetString("MenuItemUsernameTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Have I Been Pwned?.
+        /// </summary>
+        internal static string MenuTitle {
+            get {
+                return ResourceManager.GetString("MenuTitle", resourceCulture);
             }
         }
         
