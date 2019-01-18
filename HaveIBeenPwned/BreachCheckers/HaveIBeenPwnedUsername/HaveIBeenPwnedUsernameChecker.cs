@@ -92,7 +92,12 @@ namespace HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedUsername
                 }
                 else if (response.StatusCode != System.Net.HttpStatusCode.NotFound)
                 {
-                    MessageBox.Show(string.Format("Unable to check haveibeenpwned.com (returned Status: {0})", response.StatusCode), Resources.MessageTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    DialogResult dialogButton = MessageBox.Show(string.Format("Unable to check haveibeenpwned.com (returned Status: {0})", response.StatusCode), 
+                                                                Resources.MessageTitle, MessageBoxButtons.OKCancel, MessageBoxIcon.Error);
+                    if (dialogButton == DialogResult.Cancel)
+                    {
+                        break;
+                    }
                 }
                 if (breaches != null)
                 {
