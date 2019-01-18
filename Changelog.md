@@ -1,5 +1,8 @@
 # keepass2-haveibeenpwned Changelog
 
+### v1.3.0
+* Prevent every breach type being checked when "check all breaches" is selected
+
 ### v1.2.4 - 2018-02-23
 * Enable password check mode using the new HIBP v2 password API. Thanks to Matt Schneeberger.
 * Add breach description to checker dialog
