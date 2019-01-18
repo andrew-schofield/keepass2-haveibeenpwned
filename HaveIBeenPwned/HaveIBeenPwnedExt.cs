@@ -15,6 +15,7 @@ using HaveIBeenPwned.BreachCheckers.CloudbleedSite;
 using HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedUsername;
 using HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedPassword;
 using HaveIBeenPwned.UI;
+using KeePassExtensions;
 
 namespace HaveIBeenPwned
 {
@@ -167,10 +168,14 @@ namespace HaveIBeenPwned
                     progressForm.Tag = new ProgressHelper(Enum.GetValues(typeof(BreachEnum)).Length);
                     foreach (var breach in Enum.GetValues(typeof(BreachEnum)))
                     {
-                        var foundBreaches = await CheckBreaches(supportedBreachCheckers[(BreachEnum)breach](client, pluginHost),
-                        dialog.ExpireEntries, dialog.OnlyCheckOldEntries, dialog.IgnoreDeletedEntries, progressIndicator);
-                        result.AddRange(foundBreaches);
-                        ((ProgressHelper)progressForm.Tag).CurrentBreach++;
+                        // only continue if the breach type of the breach matches the one selected
+                        if (((BreachEnum)breach).GetAttribute<CheckerTypeAttribute>().Type == breachType)
+                        {
+                            var foundBreaches = await CheckBreaches(supportedBreachCheckers[(BreachEnum)breach](client, pluginHost),
+                            dialog.ExpireEntries, dialog.OnlyCheckOldEntries, dialog.IgnoreDeletedEntries, progressIndicator);
+                            result.AddRange(foundBreaches);
+                            ((ProgressHelper)progressForm.Tag).CurrentBreach++;
+                        }
                     }
                 }
                 else
