@@ -25,11 +25,25 @@ namespace HaveIBeenPwned
     public sealed class HaveIBeenPwnedExt : Plugin
     {
         private IPluginHost pluginHost = null;
-        private ToolStripSeparator toolStripSeperator = null;
-        private ToolStripMenuItem haveIBeenPwnedMenuItem = null;
-        private ToolStripMenuItem haveIBeenPwnedServiceMenuItem = null;
-        private ToolStripMenuItem haveIBeenPwnedUsernameMenuItem = null;
-        private ToolStripMenuItem haveIBeenPwnedPasswordMenuItem = null;
+
+        private ToolStripSeparator toolStripSeperatorGlobal = null;
+        private ToolStripMenuItem haveIBeenPwnedGlobalMenuItem = null;
+        private ToolStripMenuItem haveIBeenPwnedGlobalServiceMenuItem = null;
+        private ToolStripMenuItem haveIBeenPwnedGlobalUsernameMenuItem = null;
+        private ToolStripMenuItem haveIBeenPwnedGlobalPasswordMenuItem = null;
+
+        private ToolStripSeparator toolStripSeperatorGroup = null;
+        private ToolStripMenuItem haveIBeenPwnedGroupMenuItem = null;
+        private ToolStripMenuItem haveIBeenPwnedGroupServiceMenuItem = null;
+        private ToolStripMenuItem haveIBeenPwnedGroupUsernameMenuItem = null;
+        private ToolStripMenuItem haveIBeenPwnedGroupPasswordMenuItem = null;
+
+        private ToolStripSeparator toolStripSeperatorEntry = null;
+        private ToolStripMenuItem haveIBeenPwnedEntryMenuItem = null;
+        private ToolStripMenuItem haveIBeenPwnedEntryServiceMenuItem = null;
+        private ToolStripMenuItem haveIBeenPwnedEntryUsernameMenuItem = null;
+        private ToolStripMenuItem haveIBeenPwnedEntryPasswordMenuItem = null;
+
         private static HttpClient client;
         private StatusProgressForm progressForm;
 
@@ -92,35 +106,91 @@ namespace HaveIBeenPwned
 
             // Get a reference to the 'Tools' menu item container
             ToolStripItemCollection tsMenu = pluginHost.MainWindow.ToolsMenu.DropDownItems;
+            var groupContextMenu = pluginHost.MainWindow.GroupContextMenu.Items;
+            var entryContextMenu = pluginHost.MainWindow.EntryContextMenu.Items;
 
             // Add a separator at the bottom
-            toolStripSeperator = new ToolStripSeparator();
-            tsMenu.Add(toolStripSeperator);
+            toolStripSeperatorGlobal = new ToolStripSeparator();
+            tsMenu.Add(toolStripSeperatorGlobal);
+            toolStripSeperatorGroup = new ToolStripSeparator();
+            groupContextMenu.Add(toolStripSeperatorGroup);
+            toolStripSeperatorEntry = new ToolStripSeparator();
+            entryContextMenu.Add(toolStripSeperatorEntry);
 
-            // Add menu item 'Have I Been Pwned?'
-            haveIBeenPwnedMenuItem = new ToolStripMenuItem();
-            haveIBeenPwnedMenuItem.Text = "Have I Been Pwned?";
-            haveIBeenPwnedMenuItem.Image = Resources.hibp.ToBitmap();
+            // Add global menu item 'Have I Been Pwned?' for all database entries
+            haveIBeenPwnedGlobalMenuItem = new ToolStripMenuItem();
+            haveIBeenPwnedGlobalMenuItem.Text = Resources.MenuTitle;
+            haveIBeenPwnedGlobalMenuItem.Image = Resources.hibp.ToBitmap();
 
-            haveIBeenPwnedServiceMenuItem = new ToolStripMenuItem();
-            haveIBeenPwnedServiceMenuItem.Text = "Check for breaches based on site/service";
-            haveIBeenPwnedServiceMenuItem.Image = Resources.hibp.ToBitmap();
-            haveIBeenPwnedServiceMenuItem.Click += this.CheckHaveIBeenPwnedSites;
-            haveIBeenPwnedMenuItem.DropDown.Items.Add(haveIBeenPwnedServiceMenuItem);
+            haveIBeenPwnedGlobalServiceMenuItem = new ToolStripMenuItem();
+            haveIBeenPwnedGlobalServiceMenuItem.Text = Resources.MenuItemSiteTitle;
+            haveIBeenPwnedGlobalServiceMenuItem.Image = Resources.hibp.ToBitmap();
+            haveIBeenPwnedGlobalServiceMenuItem.Click += this.Database_CheckHaveIBeenPwnedSites;
+            haveIBeenPwnedGlobalMenuItem.DropDown.Items.Add(haveIBeenPwnedGlobalServiceMenuItem);
 
-            haveIBeenPwnedUsernameMenuItem = new ToolStripMenuItem();
-            haveIBeenPwnedUsernameMenuItem.Text = "Check for breaches based on username";
-            haveIBeenPwnedUsernameMenuItem.Image = Resources.hibp.ToBitmap();
-            haveIBeenPwnedUsernameMenuItem.Click += this.CheckHaveIBeenPwnedUsernames;
-            haveIBeenPwnedMenuItem.DropDown.Items.Add(haveIBeenPwnedUsernameMenuItem);
+            haveIBeenPwnedGlobalUsernameMenuItem = new ToolStripMenuItem();
+            haveIBeenPwnedGlobalUsernameMenuItem.Text = Resources.MenuItemUsernameTitle;
+            haveIBeenPwnedGlobalUsernameMenuItem.Image = Resources.hibp.ToBitmap();
+            haveIBeenPwnedGlobalUsernameMenuItem.Click += this.Database_CheckHaveIBeenPwnedUsernames;
+            haveIBeenPwnedGlobalMenuItem.DropDown.Items.Add(haveIBeenPwnedGlobalUsernameMenuItem);
 
-            haveIBeenPwnedPasswordMenuItem = new ToolStripMenuItem();
-            haveIBeenPwnedPasswordMenuItem.Text = "Check for breaches based on password";
-            haveIBeenPwnedPasswordMenuItem.Image = Resources.hibp.ToBitmap();
-            haveIBeenPwnedPasswordMenuItem.Click += this.CheckHaveIBeenPwnedPasswords;
-            haveIBeenPwnedMenuItem.DropDown.Items.Add(haveIBeenPwnedPasswordMenuItem);
+            haveIBeenPwnedGlobalPasswordMenuItem = new ToolStripMenuItem();
+            haveIBeenPwnedGlobalPasswordMenuItem.Text = Resources.MenuItemPasswordTitle;
+            haveIBeenPwnedGlobalPasswordMenuItem.Image = Resources.hibp.ToBitmap();
+            haveIBeenPwnedGlobalPasswordMenuItem.Click += this.Database_CheckHaveIBeenPwnedPasswords;
+            haveIBeenPwnedGlobalMenuItem.DropDown.Items.Add(haveIBeenPwnedGlobalPasswordMenuItem);
 
-            tsMenu.Add(haveIBeenPwnedMenuItem);
+            tsMenu.Add(haveIBeenPwnedGlobalMenuItem);
+
+            // Add group context menu item for the selected group
+            haveIBeenPwnedGroupMenuItem = new ToolStripMenuItem();
+            haveIBeenPwnedGroupMenuItem.Text = Resources.MenuTitle;
+            haveIBeenPwnedGroupMenuItem.Image = Resources.hibp.ToBitmap();
+
+            haveIBeenPwnedGroupServiceMenuItem = new ToolStripMenuItem();
+            haveIBeenPwnedGroupServiceMenuItem.Text = Resources.MenuItemSiteTitle;
+            haveIBeenPwnedGroupServiceMenuItem.Image = Resources.hibp.ToBitmap();
+            haveIBeenPwnedGroupServiceMenuItem.Click += this.Group_CheckHaveIBeenPwnedSites;
+            haveIBeenPwnedGroupMenuItem.DropDown.Items.Add(haveIBeenPwnedGroupServiceMenuItem);
+
+            haveIBeenPwnedGroupUsernameMenuItem = new ToolStripMenuItem();
+            haveIBeenPwnedGroupUsernameMenuItem.Text = Resources.MenuItemUsernameTitle;
+            haveIBeenPwnedGroupUsernameMenuItem.Image = Resources.hibp.ToBitmap();
+            haveIBeenPwnedGroupUsernameMenuItem.Click += this.Group_CheckHaveIBeenPwnedUsernames;
+            haveIBeenPwnedGroupMenuItem.DropDown.Items.Add(haveIBeenPwnedGroupUsernameMenuItem);
+
+            haveIBeenPwnedGroupPasswordMenuItem = new ToolStripMenuItem();
+            haveIBeenPwnedGroupPasswordMenuItem.Text = Resources.MenuItemPasswordTitle;
+            haveIBeenPwnedGroupPasswordMenuItem.Image = Resources.hibp.ToBitmap();
+            haveIBeenPwnedGroupPasswordMenuItem.Click += this.Group_CheckHaveIBeenPwnedPasswords;
+            haveIBeenPwnedGroupMenuItem.DropDown.Items.Add(haveIBeenPwnedGroupPasswordMenuItem);
+
+            groupContextMenu.Add(haveIBeenPwnedGroupMenuItem);
+
+            // Add entry context menu item for the selected entries
+            haveIBeenPwnedEntryMenuItem = new ToolStripMenuItem();
+            haveIBeenPwnedEntryMenuItem.Text = Resources.MenuTitle;
+            haveIBeenPwnedEntryMenuItem.Image = Resources.hibp.ToBitmap();
+
+            haveIBeenPwnedEntryServiceMenuItem = new ToolStripMenuItem();
+            haveIBeenPwnedEntryServiceMenuItem.Text = Resources.MenuItemSiteTitle;
+            haveIBeenPwnedEntryServiceMenuItem.Image = Resources.hibp.ToBitmap();
+            haveIBeenPwnedEntryServiceMenuItem.Click += this.Entries_CheckHaveIBeenPwnedSites;
+            haveIBeenPwnedEntryMenuItem.DropDown.Items.Add(haveIBeenPwnedEntryServiceMenuItem);
+
+            haveIBeenPwnedEntryUsernameMenuItem = new ToolStripMenuItem();
+            haveIBeenPwnedEntryUsernameMenuItem.Text = Resources.MenuItemUsernameTitle;
+            haveIBeenPwnedEntryUsernameMenuItem.Image = Resources.hibp.ToBitmap();
+            haveIBeenPwnedEntryUsernameMenuItem.Click += this.Entries_CheckHaveIBeenPwnedUsernames;
+            haveIBeenPwnedEntryMenuItem.DropDown.Items.Add(haveIBeenPwnedEntryUsernameMenuItem);
+
+            haveIBeenPwnedEntryPasswordMenuItem = new ToolStripMenuItem();
+            haveIBeenPwnedEntryPasswordMenuItem.Text = Resources.MenuItemPasswordTitle;
+            haveIBeenPwnedEntryPasswordMenuItem.Image = Resources.hibp.ToBitmap();
+            haveIBeenPwnedEntryPasswordMenuItem.Click += this.Entries_CheckHaveIBeenPwnedPasswords;
+            haveIBeenPwnedEntryMenuItem.DropDown.Items.Add(haveIBeenPwnedEntryPasswordMenuItem);
+
+            entryContextMenu.Add(haveIBeenPwnedEntryMenuItem);
 
             return true;
         }
@@ -129,14 +199,34 @@ namespace HaveIBeenPwned
         {
             // Remove all of our menu items
             ToolStripItemCollection tsMenu = pluginHost.MainWindow.ToolsMenu.DropDownItems;
-            haveIBeenPwnedServiceMenuItem.Click -= this.CheckHaveIBeenPwnedSites;
-            haveIBeenPwnedUsernameMenuItem.Click -= this.CheckHaveIBeenPwnedUsernames;
-            haveIBeenPwnedPasswordMenuItem.Click -= this.CheckHaveIBeenPwnedPasswords;
-            haveIBeenPwnedMenuItem.DropDown.Items.Remove(haveIBeenPwnedServiceMenuItem);
-            haveIBeenPwnedMenuItem.DropDown.Items.Remove(haveIBeenPwnedUsernameMenuItem);
-            haveIBeenPwnedMenuItem.DropDown.Items.Remove(haveIBeenPwnedPasswordMenuItem);
-            tsMenu.Remove(haveIBeenPwnedMenuItem);
-            tsMenu.Remove(toolStripSeperator);
+            haveIBeenPwnedGlobalServiceMenuItem.Click -= this.Database_CheckHaveIBeenPwnedSites;
+            haveIBeenPwnedGlobalUsernameMenuItem.Click -= this.Database_CheckHaveIBeenPwnedUsernames;
+            haveIBeenPwnedGlobalPasswordMenuItem.Click -= this.Database_CheckHaveIBeenPwnedPasswords;
+            haveIBeenPwnedGlobalMenuItem.DropDown.Items.Remove(haveIBeenPwnedGlobalServiceMenuItem);
+            haveIBeenPwnedGlobalMenuItem.DropDown.Items.Remove(haveIBeenPwnedGlobalUsernameMenuItem);
+            haveIBeenPwnedGlobalMenuItem.DropDown.Items.Remove(haveIBeenPwnedGlobalPasswordMenuItem);
+            tsMenu.Remove(haveIBeenPwnedGlobalMenuItem);
+            tsMenu.Remove(toolStripSeperatorGlobal);
+
+            var groupContextMenu = pluginHost.MainWindow.GroupContextMenu.Items;
+            haveIBeenPwnedGroupServiceMenuItem.Click -= this.Group_CheckHaveIBeenPwnedSites;
+            haveIBeenPwnedGroupUsernameMenuItem.Click -= this.Group_CheckHaveIBeenPwnedUsernames;
+            haveIBeenPwnedGroupPasswordMenuItem.Click -= this.Group_CheckHaveIBeenPwnedPasswords;
+            haveIBeenPwnedGroupMenuItem.DropDown.Items.Remove(haveIBeenPwnedGroupServiceMenuItem);
+            haveIBeenPwnedGroupMenuItem.DropDown.Items.Remove(haveIBeenPwnedGroupUsernameMenuItem);
+            haveIBeenPwnedGroupMenuItem.DropDown.Items.Remove(haveIBeenPwnedGroupPasswordMenuItem);
+            groupContextMenu.Remove(haveIBeenPwnedGroupMenuItem);
+            groupContextMenu.Remove(toolStripSeperatorGroup);
+
+            var entryContextMenu = pluginHost.MainWindow.EntryContextMenu.Items;
+            haveIBeenPwnedEntryServiceMenuItem.Click -= this.Entries_CheckHaveIBeenPwnedSites;
+            haveIBeenPwnedEntryUsernameMenuItem.Click -= this.Entries_CheckHaveIBeenPwnedUsernames;
+            haveIBeenPwnedEntryPasswordMenuItem.Click -= this.Entries_CheckHaveIBeenPwnedPasswords;
+            haveIBeenPwnedEntryMenuItem.DropDown.Items.Remove(haveIBeenPwnedEntryServiceMenuItem);
+            haveIBeenPwnedEntryMenuItem.DropDown.Items.Remove(haveIBeenPwnedEntryUsernameMenuItem);
+            haveIBeenPwnedEntryMenuItem.DropDown.Items.Remove(haveIBeenPwnedEntryPasswordMenuItem);
+            entryContextMenu.Remove(haveIBeenPwnedEntryMenuItem);
+            entryContextMenu.Remove(toolStripSeperatorEntry);
         }
 
         public override string UpdateUrl
@@ -166,29 +256,62 @@ namespace HaveIBeenPwned
             }
         }
 
-        private async void CheckHaveIBeenPwnedSites(object sender, EventArgs e)
+        private async void Database_CheckHaveIBeenPwnedSites(object sender, EventArgs e)
         {
-            await CheckBreach(CheckTypeEnum.SiteDomain);
+            if (!AssertDatabaseOpen()) return;
+            await CheckBreach(CheckTypeEnum.SiteDomain, pluginHost.Database.RootGroup);
         }
 
-        private async void CheckHaveIBeenPwnedUsernames(object sender, EventArgs e)
+        private async void Database_CheckHaveIBeenPwnedUsernames(object sender, EventArgs e)
         {
-            await CheckBreach(CheckTypeEnum.Username);
+            if (!AssertDatabaseOpen()) return;
+            await CheckBreach(CheckTypeEnum.Username, pluginHost.Database.RootGroup);
         }
 
-        private async void CheckHaveIBeenPwnedPasswords(object sender, EventArgs e)
+        private async void Database_CheckHaveIBeenPwnedPasswords(object sender, EventArgs e)
         {
-            await CheckBreach(CheckTypeEnum.Password);
+            if (!AssertDatabaseOpen()) return;
+            await CheckBreach(CheckTypeEnum.Password, pluginHost.Database.RootGroup);
         }
 
-        private async Task CheckBreach(CheckTypeEnum breachType)
+        private async void Group_CheckHaveIBeenPwnedSites(object sender, EventArgs e)
         {
-            if (!pluginHost.Database.IsOpen)
-            {
-                MessageBox.Show("You must first open a database", Resources.MessageTitle);
-                return;
-            }
+            if (!AssertDatabaseOpen()) return;
+            await CheckBreach(CheckTypeEnum.SiteDomain, pluginHost.MainWindow.GetSelectedGroup());
+        }
 
+        private async void Group_CheckHaveIBeenPwnedUsernames(object sender, EventArgs e)
+        {
+            if (!AssertDatabaseOpen()) return;
+            await CheckBreach(CheckTypeEnum.Username, pluginHost.MainWindow.GetSelectedGroup());
+        }
+
+        private async void Group_CheckHaveIBeenPwnedPasswords(object sender, EventArgs e)
+        {
+            if (!AssertDatabaseOpen()) return;
+            await CheckBreach(CheckTypeEnum.Password, pluginHost.MainWindow.GetSelectedGroup());
+        }
+
+        private async void Entries_CheckHaveIBeenPwnedSites(object sender, EventArgs e)
+        {
+            if (!AssertDatabaseOpen()) return;
+            await CheckBreach(CheckTypeEnum.SiteDomain, pluginHost.MainWindow.GetSelectedEntriesAsGroup());
+        }
+
+        private async void Entries_CheckHaveIBeenPwnedUsernames(object sender, EventArgs e)
+        {
+            if (!AssertDatabaseOpen()) return;
+            await CheckBreach(CheckTypeEnum.Username, pluginHost.MainWindow.GetSelectedEntriesAsGroup());
+        }
+
+        private async void Entries_CheckHaveIBeenPwnedPasswords(object sender, EventArgs e)
+        {
+            if (!AssertDatabaseOpen()) return;
+            await CheckBreach(CheckTypeEnum.Password, pluginHost.MainWindow.GetSelectedEntriesAsGroup());
+        }
+
+        private async Task CheckBreach(CheckTypeEnum breachType, PwGroup group)
+        {
             var dialog = new CheckerPrompt(breachType, breachType != CheckTypeEnum.Password);
 
             if (dialog.ShowDialog() == DialogResult.OK)
@@ -199,39 +322,50 @@ namespace HaveIBeenPwned
                 progressForm.Show();
                 progressForm.SetProgress(0);
                 List<BreachedEntry> result = new List<BreachedEntry>();
-                if (dialog.CheckAllBreaches)
+                try
                 {
-                    progressForm.Tag = new ProgressHelper(Enum.GetValues(typeof(BreachEnum)).Length);
-                    foreach (var breach in Enum.GetValues(typeof(BreachEnum)))
+                    if (dialog.CheckAllBreaches)
                     {
-                        // only continue if the breach type of the breach matches the one selected
-                        if (((BreachEnum)breach).GetAttribute<CheckerTypeAttribute>().Type == breachType)
+                        var breaches = Enum.GetValues(typeof(BreachEnum)).Cast<BreachEnum>().Where(b => b.GetAttribute<CheckerTypeAttribute>().Type == breachType);
+                        progressForm.Tag = new ProgressHelper(breaches.Count());
+                        foreach (var breach in breaches)
                         {
                             var foundBreaches = await CheckBreaches(supportedBreachCheckers[(BreachEnum)breach](client, pluginHost),
-                            dialog.ExpireEntries, dialog.OnlyCheckOldEntries, dialog.IgnoreDeletedEntries, dialog.IgnoreExpiredEntries, progressIndicator);
+                            group, dialog.ExpireEntries, dialog.OnlyCheckOldEntries, dialog.IgnoreDeletedEntries, dialog.IgnoreExpiredEntries, progressIndicator);
                             result.AddRange(foundBreaches);
                             ((ProgressHelper)progressForm.Tag).CurrentBreach++;
                         }
                     }
+                    else
+                    {
+                        progressForm.Tag = new ProgressHelper(1);
+                        var foundBreaches = await CheckBreaches(supportedBreachCheckers[dialog.SelectedBreach](client, pluginHost),
+                            group, dialog.ExpireEntries, dialog.OnlyCheckOldEntries, dialog.IgnoreDeletedEntries, dialog.IgnoreExpiredEntries, progressIndicator);
+                        result.AddRange(foundBreaches);
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    progressForm.Tag = new ProgressHelper(1);
-                    var foundBreaches = await CheckBreaches(supportedBreachCheckers[dialog.SelectedBreach](client, pluginHost),
-                        dialog.ExpireEntries, dialog.OnlyCheckOldEntries, dialog.IgnoreDeletedEntries, dialog.IgnoreExpiredEntries, progressIndicator);
-                    result.AddRange(foundBreaches);
+                    result = null;
+                    MessageBox.Show(pluginHost.MainWindow, ex.Message, Resources.MessageTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
-                progressForm.Close();
+                finally
+                {
+                    progressForm.Close();
+                }
 
-                if (!result.Any())
+                if (result != null)
                 {
-                    MessageBox.Show("No breached entries found.", Resources.MessageTitle, MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-                else
-                {
-                    var breachedEntriesDialog = new BreachedEntriesDialog(pluginHost);
-                    breachedEntriesDialog.AddBreaches(result);
-                    breachedEntriesDialog.Show();
+                    if (!result.Any())
+                    {
+                        MessageBox.Show(pluginHost.MainWindow, "No breached entries found.", Resources.MessageTitle, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        var breachedEntriesDialog = new BreachedEntriesDialog(pluginHost);
+                        breachedEntriesDialog.AddBreaches(result);
+                        breachedEntriesDialog.ShowDialog();
+                    }
                 }
             }
 
@@ -240,13 +374,24 @@ namespace HaveIBeenPwned
 
         private async Task<IList<BreachedEntry>> CheckBreaches(
             BaseChecker breachChecker,
+            PwGroup group,
             bool expireEntries,
             bool oldEntriesOnly,
             bool ignoreDeleted,
             bool ignoreExpired,
             IProgress<ProgressItem> progressIndicator)
         {
-           return await breachChecker.CheckDatabase(expireEntries, oldEntriesOnly, ignoreDeleted, ignoreExpired, progressIndicator);
+           return await breachChecker.CheckGroup(group, expireEntries, oldEntriesOnly, ignoreDeleted, ignoreExpired, progressIndicator);
+        }
+
+        private bool AssertDatabaseOpen()
+        {
+            if (!pluginHost.Database.IsOpen)
+            {
+                MessageBox.Show("You must first open a database", Resources.MessageTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+            return true;
         }
     }
 }
