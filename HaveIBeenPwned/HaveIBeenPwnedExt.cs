@@ -15,8 +15,10 @@ using HaveIBeenPwned.BreachCheckers.CloudbleedSite;
 using HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedUsername;
 using HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedPassword;
 using HaveIBeenPwned.UI;
+
 using KeePassLib;
 using System.Text;
+using KeePassExtensions;
 
 namespace HaveIBeenPwned
 {
@@ -202,17 +204,21 @@ namespace HaveIBeenPwned
                     progressForm.Tag = new ProgressHelper(Enum.GetValues(typeof(BreachEnum)).Length);
                     foreach (var breach in Enum.GetValues(typeof(BreachEnum)))
                     {
-                        var foundBreaches = await CheckBreaches(supportedBreachCheckers[(BreachEnum)breach](client, pluginHost),
-                        dialog.ExpireEntries, dialog.OnlyCheckOldEntries, dialog.IgnoreDeletedEntries, progressIndicator);
-                        result.AddRange(foundBreaches);
-                        ((ProgressHelper)progressForm.Tag).CurrentBreach++;
+                        // only continue if the breach type of the breach matches the one selected
+                        if (((BreachEnum)breach).GetAttribute<CheckerTypeAttribute>().Type == breachType)
+                        {
+                            var foundBreaches = await CheckBreaches(supportedBreachCheckers[(BreachEnum)breach](client, pluginHost),
+                            dialog.ExpireEntries, dialog.OnlyCheckOldEntries, dialog.IgnoreDeletedEntries, dialog.IgnoreExpiredEntries, progressIndicator);
+                            result.AddRange(foundBreaches);
+                            ((ProgressHelper)progressForm.Tag).CurrentBreach++;
+                        }
                     }
                 }
                 else
                 {
                     progressForm.Tag = new ProgressHelper(1);
                     var foundBreaches = await CheckBreaches(supportedBreachCheckers[dialog.SelectedBreach](client, pluginHost),
-                        dialog.ExpireEntries, dialog.OnlyCheckOldEntries, dialog.IgnoreDeletedEntries, progressIndicator);
+                        dialog.ExpireEntries, dialog.OnlyCheckOldEntries, dialog.IgnoreDeletedEntries, dialog.IgnoreExpiredEntries, progressIndicator);
                     result.AddRange(foundBreaches);
                 }
                 progressForm.Close();
@@ -225,7 +231,7 @@ namespace HaveIBeenPwned
                 {
                     var breachedEntriesDialog = new BreachedEntriesDialog(pluginHost);
                     breachedEntriesDialog.AddBreaches(result);
-                    breachedEntriesDialog.ShowDialog();
+                    breachedEntriesDialog.Show();
                 }
             }
 
@@ -237,9 +243,10 @@ namespace HaveIBeenPwned
             bool expireEntries,
             bool oldEntriesOnly,
             bool ignoreDeleted,
+            bool ignoreExpired,
             IProgress<ProgressItem> progressIndicator)
         {
-           return await breachChecker.CheckDatabase(expireEntries, oldEntriesOnly, ignoreDeleted, progressIndicator);
+           return await breachChecker.CheckDatabase(expireEntries, oldEntriesOnly, ignoreDeleted, ignoreExpired, progressIndicator);
         }
     }
 }

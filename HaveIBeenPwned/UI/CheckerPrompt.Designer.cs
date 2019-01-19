@@ -35,7 +35,6 @@ namespace HaveIBeenPwned.UI
             this.okButton = new System.Windows.Forms.Button();
             this.cancelButton = new System.Windows.Forms.Button();
             this.checkOldEntries = new System.Windows.Forms.CheckBox();
-            this.expireEntries = new System.Windows.Forms.CheckBox();
             this.ignoreDeletedEntries = new System.Windows.Forms.CheckBox();
             this.checkAllBreaches = new System.Windows.Forms.CheckBox();
             this.supportedBreachList = new System.Windows.Forms.ComboBox();
@@ -43,6 +42,8 @@ namespace HaveIBeenPwned.UI
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.breachDescription = new System.Windows.Forms.Label();
+            this.expireEntries = new System.Windows.Forms.CheckBox();
+            this.ignoreExpiredEntries = new System.Windows.Forms.CheckBox();
             this.tableLayoutPanel1.SuspendLayout();
             this.flowLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
@@ -51,7 +52,7 @@ namespace HaveIBeenPwned.UI
             // 
             this.okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.okButton.Location = new System.Drawing.Point(181, 197);
+            this.okButton.Location = new System.Drawing.Point(181, 222);
             this.okButton.Name = "okButton";
             this.okButton.Size = new System.Drawing.Size(75, 23);
             this.okButton.TabIndex = 0;
@@ -62,7 +63,7 @@ namespace HaveIBeenPwned.UI
             // 
             this.cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.cancelButton.Location = new System.Drawing.Point(262, 197);
+            this.cancelButton.Location = new System.Drawing.Point(262, 222);
             this.cancelButton.Name = "cancelButton";
             this.cancelButton.Size = new System.Drawing.Size(75, 23);
             this.cancelButton.TabIndex = 1;
@@ -81,17 +82,6 @@ namespace HaveIBeenPwned.UI
             this.checkOldEntries.TabIndex = 2;
             this.checkOldEntries.Text = "Only check entries that have not changed since the breach date";
             this.checkOldEntries.UseVisualStyleBackColor = true;
-            // 
-            // expireEntries
-            // 
-            this.expireEntries.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.expireEntries.AutoSize = true;
-            this.expireEntries.Location = new System.Drawing.Point(3, 76);
-            this.expireEntries.Name = "expireEntries";
-            this.expireEntries.Size = new System.Drawing.Size(253, 17);
-            this.expireEntries.TabIndex = 3;
-            this.expireEntries.Text = "Expire any entries that are found to be breached";
-            this.expireEntries.UseVisualStyleBackColor = true;
             // 
             // ignoreDeletedEntries
             // 
@@ -141,18 +131,21 @@ namespace HaveIBeenPwned.UI
             // 
             this.tableLayoutPanel1.ColumnCount = 1;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel1.Controls.Add(this.ignoreExpiredEntries, 0, 3);
+            this.tableLayoutPanel1.Controls.Add(this.expireEntries, 0, 4);
             this.tableLayoutPanel1.Controls.Add(this.checkAllBreaches, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.checkOldEntries, 0, 1);
             this.tableLayoutPanel1.Controls.Add(this.ignoreDeletedEntries, 0, 2);
-            this.tableLayoutPanel1.Controls.Add(this.expireEntries, 0, 3);
             this.tableLayoutPanel1.Location = new System.Drawing.Point(3, 29);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 4;
+            this.tableLayoutPanel1.RowCount = 5;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 24F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 24F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 24F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 24F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(322, 96);
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 24F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(322, 120);
             this.tableLayoutPanel1.TabIndex = 9;
             // 
             // flowLayoutPanel1
@@ -162,7 +155,7 @@ namespace HaveIBeenPwned.UI
             this.flowLayoutPanel1.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.flowLayoutPanel1.Location = new System.Drawing.Point(12, 36);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(325, 155);
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(325, 180);
             this.flowLayoutPanel1.TabIndex = 10;
             // 
             // breachDescription
@@ -178,11 +171,35 @@ namespace HaveIBeenPwned.UI
             this.breachDescription.TabIndex = 10;
             this.breachDescription.Text = "A description that provides pertinent information about the breach checker";
             // 
+            // expireEntries
+            // 
+            this.expireEntries.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.expireEntries.AutoSize = true;
+            this.expireEntries.Location = new System.Drawing.Point(3, 100);
+            this.expireEntries.Name = "expireEntries";
+            this.expireEntries.Size = new System.Drawing.Size(253, 17);
+            this.expireEntries.TabIndex = 7;
+            this.expireEntries.Text = "Expire any entries that are found to be breached";
+            this.expireEntries.UseVisualStyleBackColor = true;
+            // 
+            // ignoreExpiredEntries
+            // 
+            this.ignoreExpiredEntries.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.ignoreExpiredEntries.AutoSize = true;
+            this.ignoreExpiredEntries.Checked = true;
+            this.ignoreExpiredEntries.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.ignoreExpiredEntries.Location = new System.Drawing.Point(3, 76);
+            this.ignoreExpiredEntries.Name = "ignoreExpiredEntries";
+            this.ignoreExpiredEntries.Size = new System.Drawing.Size(127, 17);
+            this.ignoreExpiredEntries.TabIndex = 10;
+            this.ignoreExpiredEntries.Text = "Ignore expired entries";
+            this.ignoreExpiredEntries.UseVisualStyleBackColor = true;
+            // 
             // CheckerPrompt
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(349, 232);
+            this.ClientSize = new System.Drawing.Size(349, 257);
             this.Controls.Add(this.flowLayoutPanel1);
             this.Controls.Add(this.checkAllBreachLabel);
             this.Controls.Add(this.supportedBreachList);
@@ -209,7 +226,6 @@ namespace HaveIBeenPwned.UI
         private System.Windows.Forms.Button okButton;
         private System.Windows.Forms.Button cancelButton;
         private System.Windows.Forms.CheckBox checkOldEntries;
-        private System.Windows.Forms.CheckBox expireEntries;
         private System.Windows.Forms.CheckBox ignoreDeletedEntries;
         private System.Windows.Forms.CheckBox checkAllBreaches;
         private System.Windows.Forms.ComboBox supportedBreachList;
@@ -217,5 +233,7 @@ namespace HaveIBeenPwned.UI
         private TableLayoutPanel tableLayoutPanel1;
         private FlowLayoutPanel flowLayoutPanel1;
         private Label breachDescription;
+        private CheckBox ignoreExpiredEntries;
+        private CheckBox expireEntries;
     }
 }

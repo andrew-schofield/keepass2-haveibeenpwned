@@ -34,10 +34,10 @@ namespace HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedPassword
             get { return "Have I Been Pwned"; }
         }
 
-        public async override Task<List<BreachedEntry>> CheckDatabase(bool expireEntries, bool oldEntriesOnly, bool ignoreDeleted, IProgress<ProgressItem> progressIndicator)
+        public async override Task<List<BreachedEntry>> CheckDatabase(bool expireEntries, bool oldEntriesOnly, bool ignoreDeleted, bool ignoreExpired, IProgress<ProgressItem> progressIndicator)
         {
             progressIndicator.Report(new ProgressItem(0, "Getting HaveIBeenPwned breach list..."));
-            var entries = passwordDatabase.RootGroup.GetEntries(true).Where(e => !ignoreDeleted || !e.IsDeleted(pluginHost));
+            var entries = passwordDatabase.RootGroup.GetEntries(true).Where(e => (!ignoreDeleted || !e.IsDeleted(pluginHost)) && (!ignoreExpired || !e.Expires));
             var breaches = await GetBreaches(progressIndicator, entries);
             var breachedEntries = new List<BreachedEntry>();
             
@@ -66,18 +66,29 @@ namespace HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedPassword
             List<HaveIBeenPwnedPasswordEntry> allBreaches = new List<HaveIBeenPwnedPasswordEntry>();
             int counter = 0;
             SHA1 sha = new SHA1CryptoServiceProvider();
-            
+
+            Dictionary<string, bool> cache = new Dictionary<string, bool>();
+
             foreach (var entry in entries)
             {
                 counter++;
                 progressIndicator.Report(new ProgressItem((uint)((double)counter / entries.Count() * 100), string.Format("Checking \"{0}\" for breaches", entry.Strings.ReadSafe(PwDefs.TitleField))));
                 if(entry.Strings.Get(PwDefs.PasswordField) == null || string.IsNullOrWhiteSpace(entry.Strings.ReadSafe(PwDefs.PasswordField)) || entry.Strings.ReadSafe(PwDefs.PasswordField).StartsWith("{REF:")) continue;
                 var passwordHash = string.Join("", sha.ComputeHash(entry.Strings.Get(PwDefs.PasswordField).ReadUtf8()).Select(x => x.ToString("x2"))).ToUpperInvariant();
+                if (cache.ContainsKey(passwordHash))
+                {
+                    if (cache[passwordHash])
+                    {
+                        allBreaches.Add(new HaveIBeenPwnedPasswordEntry(entry.Strings.ReadSafe(PwDefs.UserNameField), entry.GetUrlDomain(), entry));
+                    }
+                    continue;
+                }
                 var prefix = passwordHash.Substring(0, 5);
                 using (var response = await client.GetAsync(string.Format(API_URL, prefix)))
                 {
                     if (response.StatusCode == System.Net.HttpStatusCode.OK)
                     {
+                        cache[passwordHash] = false;
                         var stream = await response.Content.ReadAsStreamAsync();
                         using (var reader = new StreamReader(stream))
                         {
@@ -90,6 +101,7 @@ namespace HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedPassword
                                 if (prefix + suffix == passwordHash)
                                 {
                                     allBreaches.Add(new HaveIBeenPwnedPasswordEntry(entry.Strings.ReadSafe(PwDefs.UserNameField), entry.GetUrlDomain(), entry));
+                                    cache[passwordHash] = true;
                                 }
                             }
                         }
