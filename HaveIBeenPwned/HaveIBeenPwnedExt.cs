@@ -15,6 +15,9 @@ using HaveIBeenPwned.BreachCheckers.CloudbleedSite;
 using HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedUsername;
 using HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedPassword;
 using HaveIBeenPwned.UI;
+
+using KeePassLib;
+using System.Text;
 using KeePassExtensions;
 
 namespace HaveIBeenPwned
@@ -27,7 +30,7 @@ namespace HaveIBeenPwned
         private ToolStripMenuItem haveIBeenPwnedServiceMenuItem = null;
         private ToolStripMenuItem haveIBeenPwnedUsernameMenuItem = null;
         private ToolStripMenuItem haveIBeenPwnedPasswordMenuItem = null;
-        private static HttpClient client = new HttpClient();
+        private static HttpClient client;
         private StatusProgressForm progressForm;
 
         private Dictionary<BreachEnum, Func<HttpClient, IPluginHost, BaseChecker>> supportedBreachCheckers =
@@ -41,6 +44,39 @@ namespace HaveIBeenPwned
 
         public HaveIBeenPwnedExt()
         {
+            // proxy (updated only on app restart)
+            var proxyType = KeePass.Program.Config.Integration.ProxyType;
+            var proxyAddress = KeePass.Program.Config.Integration.ProxyAddress;
+            var proxyPort = KeePass.Program.Config.Integration.ProxyPort;
+            var proxyAuth = KeePass.Program.Config.Integration.ProxyAuthType;
+            var proxyUsername = KeePass.Program.Config.Integration.ProxyUserName;
+            var proxyPassword = KeePass.Program.Config.Integration.ProxyPassword;
+
+            if (proxyType == ProxyServerType.Manual) {
+                HttpClientHandler handler;
+                if (proxyAuth == ProxyAuthType.Manual)
+                {
+                    handler = new HttpClientHandler()
+                    {
+                        Proxy = new WebProxy(String.Format("{0}:{1}", proxyAddress, proxyPort), false, null, new NetworkCredential(proxyUsername, proxyPassword)),
+                        UseProxy = true,
+                    };
+                }
+                else
+                {
+                    handler = new HttpClientHandler()
+                    {
+                        Proxy = new WebProxy(String.Format("{0}:{1}", proxyAddress, proxyPort)),
+                        UseProxy = true,
+                    };
+                }
+                client = new HttpClient(handler);
+            }
+            else
+            {
+                client = new HttpClient();
+            }
+
             // we need to force the security protocol to use Tls first, as HIBP only accepts this as a valid secure protocol
             ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
