@@ -6,6 +6,8 @@
 * Add a cancel button to the message box if an error occurs during checks. Thanks to strayge.
 * Cache password hashes while checking to prevent identical passwords needing an online check. Thanks to strayge.
 * Fix to keepass2-developer extensions to correctly check recycle bin entries. Thanks to strayge.
+* Allow ignoring of expired entries. Thanks to strayge.
+* Follow KeePass proxy settings. Requires restart on proxy change. Thanks to strayge.
 
 ### v1.2.4 - 2018-02-23
 * Enable password check mode using the new HIBP v2 password API. Thanks to Matt Schneeberger.

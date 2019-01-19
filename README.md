@@ -47,3 +47,4 @@ keepass2-haveibeenpwned is developed entirely in my own time. If you wish to sup
 
 * **Andrew Schofield**
 * **Matt Schneeberger**
+* **strayge**
