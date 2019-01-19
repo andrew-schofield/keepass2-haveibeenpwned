@@ -53,6 +53,11 @@ namespace HaveIBeenPwned.UI
             get { return ignoreDeletedEntries.Checked; }
         }
 
+        public bool IgnoreExpiredEntries
+        {
+            get { return ignoreExpiredEntries.Checked; }
+        }
+
         public BreachEnum SelectedBreach
         {
             get { return (BreachEnum)((ListViewItem)supportedBreachList.SelectedItem).Tag; }
