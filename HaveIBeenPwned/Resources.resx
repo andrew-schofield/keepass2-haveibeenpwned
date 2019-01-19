@@ -2111,4 +2111,16 @@
         bVKJ7awAAAAASUVORK5CYII=
 </value>
   </data>
+  <data name="MenuItemPasswordTitle" xml:space="preserve">
+    <value>Check for breaches based on password</value>
+  </data>
+  <data name="MenuItemSiteTitle" xml:space="preserve">
+    <value>Check for breaches based on site/service</value>
+  </data>
+  <data name="MenuItemUsernameTitle" xml:space="preserve">
+    <value>Check for breaches based on username</value>
+  </data>
+  <data name="MenuTitle" xml:space="preserve">
+    <value>Have I Been Pwned?</value>
+  </data>
 </root>
