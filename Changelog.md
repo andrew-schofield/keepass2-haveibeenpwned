@@ -8,6 +8,7 @@
 * Fix to keepass2-developer extensions to correctly check recycle bin entries. Thanks to strayge.
 * Allow ignoring of expired entries. Thanks to strayge.
 * Follow KeePass proxy settings. Requires restart on proxy change. Thanks to strayge.
+* Allow running HIBP on groups, or individual entries. Thanks to Matt Schneeberger.
 
 ### v1.2.4 - 2018-02-23
 * Enable password check mode using the new HIBP v2 password API. Thanks to Matt Schneeberger.

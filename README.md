@@ -27,6 +27,7 @@
 * Clicking these entries will open a prompt asking which breach to check, or all, whether to check only entries that have not been modified since the breach date. You also have the option of auto-expiring any breached entries and including any deleted entries.
 * Running the check will result in a dialog listing all the breached entries, and from which breach they originated (entries can appear multiple times if they appear in multiple breach lists). These can then be modified directly from the list.
 * In the case of username breaches the dialog will also list accounts that have been breached but are not stored in the database
+* Right clicking on entries, or groups in the KeePass interfaces will also show the "Have I Been Pwned?" menu items, to allow the checks to be run on more specific sets of entries.
 
 
 ## Notes
