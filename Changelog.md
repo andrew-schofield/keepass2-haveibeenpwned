@@ -1,6 +1,6 @@
 # keepass2-haveibeenpwned Changelog
 
-### v1.3.0
+### v1.3.0 - 2019-01-19
 * Prevent every breach type being checked when "check all breaches" is selected
 * Allow users to continue working while the breach results are shown. Thanks to strayge.
 * Add a cancel button to the message box if an error occurs during checks. Thanks to strayge.
