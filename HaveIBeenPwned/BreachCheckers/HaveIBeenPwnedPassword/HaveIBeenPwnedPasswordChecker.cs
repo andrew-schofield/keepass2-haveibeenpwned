@@ -34,11 +34,11 @@ namespace HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedPassword
             get { return "Have I Been Pwned"; }
         }
 
-        public async override Task<List<BreachedEntry>> CheckGroup(PwGroup group, bool expireEntries, bool oldEntriesOnly, bool ignoreDeleted, bool ignoreExpired, IProgress<ProgressItem> progressIndicator)
+        public async override Task<List<BreachedEntry>> CheckGroup(PwGroup group, bool expireEntries, bool oldEntriesOnly, bool ignoreDeleted, bool ignoreExpired, IProgress<ProgressItem> progressIndicator, Func<bool> canContinue)
         {
             progressIndicator.Report(new ProgressItem(0, "Getting HaveIBeenPwned breach list..."));
             var entries = group.GetEntries(true).Where(e => (!ignoreDeleted || !e.IsDeleted(pluginHost)) && (!ignoreExpired || !e.Expires));
-            var breaches = await GetBreaches(progressIndicator, entries);
+            var breaches = await GetBreaches(progressIndicator, entries, canContinue);
             var breachedEntries = new List<BreachedEntry>();
             
             await Task.Run(() =>
@@ -61,7 +61,7 @@ namespace HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedPassword
             return breachedEntries;
         }
 
-        private async Task<List<HaveIBeenPwnedPasswordEntry>> GetBreaches(IProgress<ProgressItem> progressIndicator, IEnumerable<PwEntry> entries)
+        private async Task<List<HaveIBeenPwnedPasswordEntry>> GetBreaches(IProgress<ProgressItem> progressIndicator, IEnumerable<PwEntry> entries, Func<bool> canContinue)
         {
             List<HaveIBeenPwnedPasswordEntry> allBreaches = new List<HaveIBeenPwnedPasswordEntry>();
             int counter = 0;
@@ -71,6 +71,11 @@ namespace HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedPassword
 
             foreach (var entry in entries)
             {
+                if (!canContinue())
+                {
+                    break;
+                }
+
                 counter++;
                 progressIndicator.Report(new ProgressItem((uint)((double)counter / entries.Count() * 100), string.Format("Checking \"{0}\" for breaches", entry.Strings.ReadSafe(PwDefs.TitleField))));
                 if(entry.Strings.Get(PwDefs.PasswordField) == null || string.IsNullOrWhiteSpace(entry.Strings.ReadSafe(PwDefs.PasswordField)) || entry.Strings.ReadSafe(PwDefs.PasswordField).StartsWith("{REF:")) continue;

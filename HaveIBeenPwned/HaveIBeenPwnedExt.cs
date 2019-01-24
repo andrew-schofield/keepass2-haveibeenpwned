@@ -318,7 +318,7 @@ namespace HaveIBeenPwned
             {
                 progressForm = new StatusProgressForm();
                 var progressIndicator = new Progress<ProgressItem>(ReportProgress);
-                progressForm.InitEx("Checking Breaches", false, breachType == CheckTypeEnum.SiteDomain, pluginHost.MainWindow);
+                progressForm.InitEx("Checking Breaches", true, breachType == CheckTypeEnum.SiteDomain, pluginHost.MainWindow);
                 progressForm.Show();
                 progressForm.SetProgress(0);
                 List<BreachedEntry> result = new List<BreachedEntry>();
@@ -331,7 +331,7 @@ namespace HaveIBeenPwned
                         foreach (var breach in breaches)
                         {
                             var foundBreaches = await CheckBreaches(supportedBreachCheckers[(BreachEnum)breach](client, pluginHost),
-                            group, dialog.ExpireEntries, dialog.OnlyCheckOldEntries, dialog.IgnoreDeletedEntries, dialog.IgnoreExpiredEntries, progressIndicator);
+                            group, dialog.ExpireEntries, dialog.OnlyCheckOldEntries, dialog.IgnoreDeletedEntries, dialog.IgnoreExpiredEntries, progressIndicator, () => progressForm.ContinueWork());
                             result.AddRange(foundBreaches);
                             ((ProgressHelper)progressForm.Tag).CurrentBreach++;
                         }
@@ -340,7 +340,7 @@ namespace HaveIBeenPwned
                     {
                         progressForm.Tag = new ProgressHelper(1);
                         var foundBreaches = await CheckBreaches(supportedBreachCheckers[dialog.SelectedBreach](client, pluginHost),
-                            group, dialog.ExpireEntries, dialog.OnlyCheckOldEntries, dialog.IgnoreDeletedEntries, dialog.IgnoreExpiredEntries, progressIndicator);
+                            group, dialog.ExpireEntries, dialog.OnlyCheckOldEntries, dialog.IgnoreDeletedEntries, dialog.IgnoreExpiredEntries, progressIndicator, () => progressForm.ContinueWork());
                         result.AddRange(foundBreaches);
                     }
                 }
@@ -379,9 +379,10 @@ namespace HaveIBeenPwned
             bool oldEntriesOnly,
             bool ignoreDeleted,
             bool ignoreExpired,
-            IProgress<ProgressItem> progressIndicator)
+            IProgress<ProgressItem> progressIndicator,
+            Func<bool> canContinue)
         {
-           return await breachChecker.CheckGroup(group, expireEntries, oldEntriesOnly, ignoreDeleted, ignoreExpired, progressIndicator);
+           return await breachChecker.CheckGroup(group, expireEntries, oldEntriesOnly, ignoreDeleted, ignoreExpired, progressIndicator, canContinue);
         }
 
         private bool AssertDatabaseOpen()

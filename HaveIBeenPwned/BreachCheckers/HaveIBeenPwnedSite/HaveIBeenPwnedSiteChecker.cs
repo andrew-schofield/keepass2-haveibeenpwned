@@ -29,7 +29,7 @@ namespace HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedSite
             get { return "Have I Been Pwned"; }
         }
 
-        public async override Task<List<BreachedEntry>> CheckGroup(PwGroup group, bool expireEntries, bool oldEntriesOnly, bool ignoreDeleted, bool ignoreExpired, IProgress<ProgressItem> progressIndicator)
+        public async override Task<List<BreachedEntry>> CheckGroup(PwGroup group, bool expireEntries, bool oldEntriesOnly, bool ignoreDeleted, bool ignoreExpired, IProgress<ProgressItem> progressIndicator, Func<bool> canContinue)
         {
             progressIndicator.Report(new ProgressItem(0, "Getting HaveIBeenPwned breach list..."));
             var breaches = await GetBreaches(progressIndicator);
@@ -42,6 +42,11 @@ namespace HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedSite
             {
                 foreach (var entry in entries)
                 {
+                    if(!canContinue())
+                    {
+                        break;
+                    }
+
                     var url = entry.GetUrlDomain();
 
                     var userName = entry.Strings.ReadSafe(PwDefs.UserNameField);
