@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             System.Windows.Forms.ColumnHeader titleHeader;
-            this.breachedEntryList = new KeePass.UI.CustomListViewEx();
+            this.breachedEntryList = new HaveIBeenPwned.UI.SortableListView();
             this.usernameHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.urlHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.lastModifiedHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -37,6 +37,8 @@
             this.breachedHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.closeButton = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
+            this.chkHidePassword = new System.Windows.Forms.CheckBox();
+            this.passwordHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             titleHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.SuspendLayout();
             // 
@@ -53,12 +55,12 @@
             this.breachedEntryList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             titleHeader,
             this.usernameHeader,
+            this.passwordHeader,
             this.urlHeader,
             this.lastModifiedHeader,
             this.breachName,
             this.breachedHeader});
             this.breachedEntryList.FullRowSelect = true;
-            this.breachedEntryList.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             this.breachedEntryList.Location = new System.Drawing.Point(12, 12);
             this.breachedEntryList.Name = "breachedEntryList";
             this.breachedEntryList.ShowGroups = false;
@@ -100,7 +102,7 @@
             this.closeButton.Location = new System.Drawing.Point(656, 286);
             this.closeButton.Name = "closeButton";
             this.closeButton.Size = new System.Drawing.Size(75, 23);
-            this.closeButton.TabIndex = 1;
+            this.closeButton.TabIndex = 2;
             this.closeButton.Text = "Close";
             this.closeButton.UseVisualStyleBackColor = true;
             this.closeButton.Click += new System.EventHandler(this.closeButton_Click);
@@ -109,17 +111,37 @@
             // 
             this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 291);
+            this.label1.Location = new System.Drawing.Point(315, 291);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(180, 13);
-            this.label1.TabIndex = 2;
+            this.label1.TabIndex = 3;
             this.label1.Text = "Double-click to edit breached entries";
+            // 
+            // chkHidePassword
+            // 
+            this.chkHidePassword.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.chkHidePassword.AutoSize = true;
+            this.chkHidePassword.Checked = true;
+            this.chkHidePassword.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkHidePassword.Location = new System.Drawing.Point(12, 290);
+            this.chkHidePassword.Name = "chkHidePassword";
+            this.chkHidePassword.Size = new System.Drawing.Size(168, 17);
+            this.chkHidePassword.TabIndex = 1;
+            this.chkHidePassword.Text = "Hide passwords using asterisk";
+            this.chkHidePassword.UseVisualStyleBackColor = true;
+            this.chkHidePassword.CheckedChanged += new System.EventHandler(this.chkHidePassword_CheckedChanged);
+            // 
+            // passwordHeader
+            // 
+            this.passwordHeader.Text = "Password";
+            this.passwordHeader.Width = 136;
             // 
             // BreachedEntriesDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(743, 317);
+            this.Controls.Add(this.chkHidePassword);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.closeButton);
             this.Controls.Add(this.breachedEntryList);
@@ -134,7 +156,7 @@
 
         #endregion
 
-        private KeePass.UI.CustomListViewEx breachedEntryList;
+        private HaveIBeenPwned.UI.SortableListView breachedEntryList;
         private System.Windows.Forms.ColumnHeader usernameHeader;
         private System.Windows.Forms.ColumnHeader urlHeader;
         private System.Windows.Forms.ColumnHeader lastModifiedHeader;
@@ -142,5 +164,7 @@
         private System.Windows.Forms.Button closeButton;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ColumnHeader breachName;
+        private System.Windows.Forms.CheckBox chkHidePassword;
+        private System.Windows.Forms.ColumnHeader passwordHeader;
     }
 }
