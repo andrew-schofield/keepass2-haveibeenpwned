@@ -273,11 +273,23 @@ namespace HaveIBeenPwned.UI {
                     case Keys.C:
                         if(this.SelectedItems.Count != 0) {
                             StringBuilder sb = new StringBuilder();
+
+                            // Add column headers
+                            if(this.Groups.Count != 0)
+                                sb.Append("Group\t");
+                            foreach(ColumnHeader hdr in this.Columns)
+                                sb.Append(hdr.Text + "\t");
+                            sb.AppendLine();
+
+                            // Add rows
                             foreach(ListViewItem item in this.SelectedItems) {
+                                if(this.Groups.Count != 0)
+                                    sb.Append((item.Group != null ? item.Group.Header : string.Empty) + "\t");
                                 foreach(ListViewItem.ListViewSubItem sub in item.SubItems)
                                     sb.Append(sub.Text + "\t");
                                 sb.AppendLine();
                             }
+
                             Clipboard.SetText(sb.ToString());
                         }
                         break;
