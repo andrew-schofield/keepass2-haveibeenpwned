@@ -33,8 +33,8 @@ namespace HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedUsername
         public async override Task<List<BreachedEntry>> CheckGroup(PwGroup group, bool expireEntries, bool oldEntriesOnly, bool ignoreDeleted, bool ignoreExpired, IProgress<ProgressItem> progressIndicator, Func<bool> canContinue)
         {
             progressIndicator.Report(new ProgressItem(0, "Getting HaveIBeenPwned breach list..."));
-            var usernames = entries.Select(e => e.Strings.ReadSafe(PwDefs.UserNameField)).Distinct();
             var entries = group.GetEntries(true).Where(e => (!ignoreDeleted || !e.IsDeleted(pluginHost)) && (!ignoreExpired || !e.Expires)).ToArray();
+            var usernames = entries.Select(e => e.Strings.ReadSafe(PwDefs.UserNameField).Trim().ToLower()).Distinct();
             var breaches = await GetBreaches(progressIndicator, usernames, canContinue);
             var breachedEntries = new List<BreachedEntry>();
 
