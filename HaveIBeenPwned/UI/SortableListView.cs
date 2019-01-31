@@ -300,8 +300,8 @@ namespace HaveIBeenPwned.UI {
         protected override void OnColumnClick(ColumnClickEventArgs e) {
             base.OnColumnClick(e);
 
-            // Multiple sort colums with Ctrl-Key only
-            if(!ModifierKeys.HasFlag(Keys.Control)) {
+            // Multiple sort colums with Shift-Key only
+            if(!ModifierKeys.HasFlag(Keys.Shift)) {
                 foreach(int iCol in _dic.Keys.ToList())
                     if(iCol != e.Column) {
                         SetSortIcon(iCol, SortOrder.None);
