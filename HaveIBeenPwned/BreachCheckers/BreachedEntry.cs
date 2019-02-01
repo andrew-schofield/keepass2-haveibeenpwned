@@ -41,6 +41,22 @@ namespace HaveIBeenPwned.BreachCheckers
             }
         }
 
+        public string Description
+        {
+            get
+            {
+                return breach.Description;
+            }
+        }
+        
+        public string[] DataClasses
+        {
+            get
+            {
+                return breach.DataClasses;
+            }
+        }
+
         public BreachedEntry(PwEntry entry, IBreach breach)
         {
             Entry = entry;

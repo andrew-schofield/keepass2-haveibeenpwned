@@ -12,6 +12,9 @@
         HIBPUsername,
 
         [CheckerType(Name = "Have I Been Pwned", Type = CheckTypeEnum.Password, Description = "This checker will send a partial hash of the password for each entry to the Have I Been Pwned password checker. Your passwords or complete hashes are not disclosed to this service.")]
-        HIBPPassword
+        HIBPPassword,
+
+        [CheckerType(Name = "CheckAll", Type = CheckTypeEnum.CheckAll, Description = "This checker will return all results from all other checkers.")]
+        CheckAll
     }
 }

@@ -22,6 +22,22 @@ namespace HaveIBeenPwned.BreachCheckers.CloudbleedSite
             }
         }
 
+        public string[] DataClasses
+        {
+            get
+            {
+                return new[] { "Potential Private Data Leak" };
+            }
+        }
+
+        public string Description
+        {
+            get
+            {
+                return "Cloudbleed is a security bug discovered affecting Cloudflare's reverse proxies which could leak private information such as HTTP cookies, authentication tokens, HTTP POST bodies, and other sensitive data.";
+            }
+        }
+
         public string Title
         {
             get

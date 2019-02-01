@@ -8,8 +8,12 @@ namespace HaveIBeenPwned.BreachCheckers
 
         DateTime BreachDate { get; }
 
+        string[] DataClasses { get; }
+
         string Domain { get; }
 
         string Username { get; }
+
+        string Description { get; }
     }
 }
