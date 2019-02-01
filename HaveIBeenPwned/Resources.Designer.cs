@@ -81,6 +81,15 @@ namespace HaveIBeenPwned {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Check all breach types.
+        /// </summary>
+        internal static string MenuItemCheckAllTitle {
+            get {
+                return ResourceManager.GetString("MenuItemCheckAllTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Check for breaches based on password.
         /// </summary>
         internal static string MenuItemPasswordTitle {
