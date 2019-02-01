@@ -42,7 +42,9 @@ namespace HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedUsername
             {
                 foreach (var breach in breaches)
                 {
-                    var pwEntry = entries.FirstOrDefault(e => e.GetUrlDomain() == breach.Domain);
+                    var pwEntry =
+                        string.IsNullOrWhiteSpace(breach.Domain) ? null :
+                        entries.FirstOrDefault(e => e.GetUrlDomain() == breach.Domain && breach.Username == e.Strings.ReadSafe(PwDefs.UserNameField).Trim().ToLower());
                     if (pwEntry != null)
                     {
                         var lastModified = pwEntry.GetPasswordLastModified();
