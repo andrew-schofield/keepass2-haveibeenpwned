@@ -9,6 +9,9 @@
         Username,
 
         [Display(Name = "Password Checker")]
-        Password
+        Password,
+
+        [Display(Name = "Check All")]
+        CheckAll
     }
 }
