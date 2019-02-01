@@ -40,26 +40,37 @@ namespace HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedUsername
 
             await Task.Run(() =>
             {
-                foreach (var breach in breaches)
+                foreach (var breachGrp in breaches.GroupBy(x => x.Username))
                 {
-                    var pwEntry =
-                        string.IsNullOrWhiteSpace(breach.Domain) ? null :
-                        entries.FirstOrDefault(e => e.GetUrlDomain() == breach.Domain && breach.Username == e.Strings.ReadSafe(PwDefs.UserNameField).Trim().ToLower());
-                    if (pwEntry != null)
+                    var username = breachGrp.Key;
+                    var oldestUpdate = entries.Min(e => e.GetPasswordLastModified());
+                    
+                    foreach (var breach in breachGrp)
                     {
-                        var lastModified = pwEntry.GetPasswordLastModified();
-                        if (oldEntriesOnly && lastModified >= breach.BreachDate)
+                        if (oldEntriesOnly && oldestUpdate >= breach.BreachDate)
                         {
                             continue;
                         }
 
-                        if (expireEntries)
+                        var pwEntry =
+                            string.IsNullOrWhiteSpace(breach.Domain) ? null :
+                            entries.FirstOrDefault(e => e.GetUrlDomain() == breach.Domain && breach.Username == e.Strings.ReadSafe(PwDefs.UserNameField).Trim().ToLower());
+                        if (pwEntry != null)
                         {
-                            ExpireEntry(pwEntry);
-                        }
-                    }
+                            var lastModified = pwEntry.GetPasswordLastModified();
+                            if (oldEntriesOnly && lastModified >= breach.BreachDate)
+                            {
+                                continue;
+                            }
 
-                    breachedEntries.Add(new BreachedEntry(pwEntry, breach));
+                            if (expireEntries)
+                            {
+                                ExpireEntry(pwEntry);
+                            }
+                        }
+
+                        breachedEntries.Add(new BreachedEntry(pwEntry, breach));
+                    }
                 }
             });
 
