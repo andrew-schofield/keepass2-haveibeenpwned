@@ -31,18 +31,21 @@ namespace HaveIBeenPwned
         private ToolStripMenuItem haveIBeenPwnedGlobalServiceMenuItem = null;
         private ToolStripMenuItem haveIBeenPwnedGlobalUsernameMenuItem = null;
         private ToolStripMenuItem haveIBeenPwnedGlobalPasswordMenuItem = null;
+        private ToolStripMenuItem checkAllGlobalMenuItem = null;
 
         private ToolStripSeparator toolStripSeperatorGroup = null;
         private ToolStripMenuItem haveIBeenPwnedGroupMenuItem = null;
         private ToolStripMenuItem haveIBeenPwnedGroupServiceMenuItem = null;
         private ToolStripMenuItem haveIBeenPwnedGroupUsernameMenuItem = null;
         private ToolStripMenuItem haveIBeenPwnedGroupPasswordMenuItem = null;
+        private ToolStripMenuItem checkAllGroupMenuItem = null;
 
         private ToolStripSeparator toolStripSeperatorEntry = null;
         private ToolStripMenuItem haveIBeenPwnedEntryMenuItem = null;
         private ToolStripMenuItem haveIBeenPwnedEntryServiceMenuItem = null;
         private ToolStripMenuItem haveIBeenPwnedEntryUsernameMenuItem = null;
         private ToolStripMenuItem haveIBeenPwnedEntryPasswordMenuItem = null;
+        private ToolStripMenuItem checkAllEntryMenuItem = null;
 
         private static HttpClient client;
         private StatusProgressForm progressForm;
@@ -53,7 +56,8 @@ namespace HaveIBeenPwned
             { BreachEnum.HIBPSite, (h,p) => new HaveIBeenPwnedSiteChecker(h, p) },
             { BreachEnum.CloudBleedSite, (h,p) => new CloudbleedSiteChecker(h, p) },
             { BreachEnum.HIBPUsername, (h, p) => new HaveIBeenPwnedUsernameChecker(h, p) },
-            { BreachEnum.HIBPPassword, (h, p) => new HaveIBeenPwnedPasswordChecker(h, p) }
+            { BreachEnum.HIBPPassword, (h, p) => new HaveIBeenPwnedPasswordChecker(h, p) },
+            { BreachEnum.CheckAll, (h, p) => new CombinedChecker(h, p) }
         };
 
         public HaveIBeenPwnedExt()
@@ -140,6 +144,12 @@ namespace HaveIBeenPwned
             haveIBeenPwnedGlobalPasswordMenuItem.Click += this.Database_CheckHaveIBeenPwnedPasswords;
             haveIBeenPwnedGlobalMenuItem.DropDown.Items.Add(haveIBeenPwnedGlobalPasswordMenuItem);
 
+            checkAllGlobalMenuItem = new ToolStripMenuItem();
+            checkAllGlobalMenuItem.Text = Resources.MenuItemCheckAllTitle;
+            checkAllGlobalMenuItem.Image = Resources.hibp.ToBitmap();
+            checkAllGlobalMenuItem.Click += this.Database_CheckAll;
+            haveIBeenPwnedGlobalMenuItem.DropDown.Items.Add(checkAllGlobalMenuItem);
+
             tsMenu.Add(haveIBeenPwnedGlobalMenuItem);
 
             // Add group context menu item for the selected group
@@ -164,6 +174,12 @@ namespace HaveIBeenPwned
             haveIBeenPwnedGroupPasswordMenuItem.Image = Resources.hibp.ToBitmap();
             haveIBeenPwnedGroupPasswordMenuItem.Click += this.Group_CheckHaveIBeenPwnedPasswords;
             haveIBeenPwnedGroupMenuItem.DropDown.Items.Add(haveIBeenPwnedGroupPasswordMenuItem);
+            
+            checkAllGroupMenuItem = new ToolStripMenuItem();
+            checkAllGroupMenuItem.Text = Resources.MenuItemCheckAllTitle;
+            checkAllGroupMenuItem.Image = Resources.hibp.ToBitmap();
+            checkAllGroupMenuItem.Click += this.Group_CheckAll;
+            haveIBeenPwnedGroupMenuItem.DropDown.Items.Add(checkAllGroupMenuItem);
 
             groupContextMenu.Add(haveIBeenPwnedGroupMenuItem);
 
@@ -190,6 +206,12 @@ namespace HaveIBeenPwned
             haveIBeenPwnedEntryPasswordMenuItem.Click += this.Entries_CheckHaveIBeenPwnedPasswords;
             haveIBeenPwnedEntryMenuItem.DropDown.Items.Add(haveIBeenPwnedEntryPasswordMenuItem);
 
+            checkAllEntryMenuItem = new ToolStripMenuItem();
+            checkAllEntryMenuItem.Text = Resources.MenuItemCheckAllTitle;
+            checkAllEntryMenuItem.Image = Resources.hibp.ToBitmap();
+            checkAllEntryMenuItem.Click += this.Entries_CheckAll;
+            haveIBeenPwnedEntryMenuItem.DropDown.Items.Add(checkAllEntryMenuItem);
+
             entryContextMenu.Add(haveIBeenPwnedEntryMenuItem);
 
             return true;
@@ -202,9 +224,11 @@ namespace HaveIBeenPwned
             haveIBeenPwnedGlobalServiceMenuItem.Click -= this.Database_CheckHaveIBeenPwnedSites;
             haveIBeenPwnedGlobalUsernameMenuItem.Click -= this.Database_CheckHaveIBeenPwnedUsernames;
             haveIBeenPwnedGlobalPasswordMenuItem.Click -= this.Database_CheckHaveIBeenPwnedPasswords;
+            checkAllGlobalMenuItem.Click -= this.Database_CheckAll;
             haveIBeenPwnedGlobalMenuItem.DropDown.Items.Remove(haveIBeenPwnedGlobalServiceMenuItem);
             haveIBeenPwnedGlobalMenuItem.DropDown.Items.Remove(haveIBeenPwnedGlobalUsernameMenuItem);
             haveIBeenPwnedGlobalMenuItem.DropDown.Items.Remove(haveIBeenPwnedGlobalPasswordMenuItem);
+            haveIBeenPwnedGlobalMenuItem.DropDown.Items.Remove(checkAllGlobalMenuItem);
             tsMenu.Remove(haveIBeenPwnedGlobalMenuItem);
             tsMenu.Remove(toolStripSeperatorGlobal);
 
@@ -212,9 +236,11 @@ namespace HaveIBeenPwned
             haveIBeenPwnedGroupServiceMenuItem.Click -= this.Group_CheckHaveIBeenPwnedSites;
             haveIBeenPwnedGroupUsernameMenuItem.Click -= this.Group_CheckHaveIBeenPwnedUsernames;
             haveIBeenPwnedGroupPasswordMenuItem.Click -= this.Group_CheckHaveIBeenPwnedPasswords;
+            checkAllGroupMenuItem.Click -= this.Group_CheckAll;
             haveIBeenPwnedGroupMenuItem.DropDown.Items.Remove(haveIBeenPwnedGroupServiceMenuItem);
             haveIBeenPwnedGroupMenuItem.DropDown.Items.Remove(haveIBeenPwnedGroupUsernameMenuItem);
             haveIBeenPwnedGroupMenuItem.DropDown.Items.Remove(haveIBeenPwnedGroupPasswordMenuItem);
+            haveIBeenPwnedGroupMenuItem.DropDown.Items.Remove(checkAllGroupMenuItem);
             groupContextMenu.Remove(haveIBeenPwnedGroupMenuItem);
             groupContextMenu.Remove(toolStripSeperatorGroup);
 
@@ -222,9 +248,11 @@ namespace HaveIBeenPwned
             haveIBeenPwnedEntryServiceMenuItem.Click -= this.Entries_CheckHaveIBeenPwnedSites;
             haveIBeenPwnedEntryUsernameMenuItem.Click -= this.Entries_CheckHaveIBeenPwnedUsernames;
             haveIBeenPwnedEntryPasswordMenuItem.Click -= this.Entries_CheckHaveIBeenPwnedPasswords;
+            checkAllEntryMenuItem.Click -= this.Entries_CheckAll;
             haveIBeenPwnedEntryMenuItem.DropDown.Items.Remove(haveIBeenPwnedEntryServiceMenuItem);
             haveIBeenPwnedEntryMenuItem.DropDown.Items.Remove(haveIBeenPwnedEntryUsernameMenuItem);
             haveIBeenPwnedEntryMenuItem.DropDown.Items.Remove(haveIBeenPwnedEntryPasswordMenuItem);
+            haveIBeenPwnedEntryMenuItem.DropDown.Items.Remove(checkAllEntryMenuItem);
             entryContextMenu.Remove(haveIBeenPwnedEntryMenuItem);
             entryContextMenu.Remove(toolStripSeperatorEntry);
         }
@@ -274,6 +302,12 @@ namespace HaveIBeenPwned
             await CheckBreach(CheckTypeEnum.Password, pluginHost.Database.RootGroup);
         }
 
+        private async void Database_CheckAll(object sender, EventArgs e)
+        {
+            if (!AssertDatabaseOpen()) return;
+            await CheckBreach(CheckTypeEnum.CheckAll, pluginHost.Database.RootGroup);
+        }
+
         private async void Group_CheckHaveIBeenPwnedSites(object sender, EventArgs e)
         {
             if (!AssertDatabaseOpen()) return;
@@ -292,6 +326,12 @@ namespace HaveIBeenPwned
             await CheckBreach(CheckTypeEnum.Password, pluginHost.MainWindow.GetSelectedGroup());
         }
 
+        private async void Group_CheckAll(object sender, EventArgs e)
+        {
+            if (!AssertDatabaseOpen()) return;
+            await CheckBreach(CheckTypeEnum.CheckAll, pluginHost.MainWindow.GetSelectedGroup());
+        }
+
         private async void Entries_CheckHaveIBeenPwnedSites(object sender, EventArgs e)
         {
             if (!AssertDatabaseOpen()) return;
@@ -308,6 +348,12 @@ namespace HaveIBeenPwned
         {
             if (!AssertDatabaseOpen()) return;
             await CheckBreach(CheckTypeEnum.Password, pluginHost.MainWindow.GetSelectedEntriesAsGroup());
+        }
+
+        private async void Entries_CheckAll(object sender, EventArgs e)
+        {
+            if (!AssertDatabaseOpen()) return;
+            await CheckBreach(CheckTypeEnum.CheckAll, pluginHost.MainWindow.GetSelectedEntriesAsGroup());
         }
 
         private async Task CheckBreach(CheckTypeEnum breachType, PwGroup group)

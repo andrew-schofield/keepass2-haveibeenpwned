@@ -66,6 +66,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -81,6 +82,7 @@
     <Compile Include="BreachCheckers\BaseChecker.cs" />
     <Compile Include="BreachCheckers\HaveIBeenPwnedPassword\HaveIBeenPwnedPasswordChecker.cs" />
     <Compile Include="BreachCheckers\HaveIBeenPwnedPassword\HaveIBeenPwnedPasswordEntry.cs" />
+    <Compile Include="BreachCheckers\CombinedChecker.cs" />
     <Compile Include="BreachCheckers\HaveIBeenPwnedUsername\HaveIBeenPwnedUsernameChecker.cs" />
     <Compile Include="BreachCheckers\HaveIBeenPwnedUsername\HaveIBeenPwnedUsernameEntry.cs" />
     <Compile Include="DisplayAttribute.cs" />

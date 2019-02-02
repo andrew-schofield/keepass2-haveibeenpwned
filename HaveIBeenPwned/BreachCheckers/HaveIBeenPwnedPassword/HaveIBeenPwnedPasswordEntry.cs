@@ -22,6 +22,22 @@ namespace HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedPassword
             }
         }
 
+        public string[] DataClasses
+        {
+            get
+            {
+                return new[] { "Known Leaked Password" };
+            }
+        }
+
+        public string Description
+        {
+            get
+            {
+                return "haveibeenpwned.com indicates that the password used has been exposed in a data breach.";
+            }
+        }
+
         public DateTime BreachDate {
             get
             {

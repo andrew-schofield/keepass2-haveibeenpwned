@@ -2111,6 +2111,9 @@
         bVKJ7awAAAAASUVORK5CYII=
 </value>
   </data>
+  <data name="MenuItemCheckAllTitle" xml:space="preserve">
+    <value>Check all breach types</value>
+  </data>
   <data name="MenuItemPasswordTitle" xml:space="preserve">
     <value>Check for breaches based on password</value>
   </data>
