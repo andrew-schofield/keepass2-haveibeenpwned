@@ -10,10 +10,8 @@ using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 
-namespace HaveIBeenPwned.UI
-{
-    public partial class BreachedEntriesDialog : Form
-    {
+namespace HaveIBeenPwned.UI {
+    public partial class BreachedEntriesDialog : Form {
         private IPluginHost pluginHost;
         private IList<BreachedEntry> _breaches;
 
@@ -42,8 +40,7 @@ namespace HaveIBeenPwned.UI
                     breach.BreachName,
                     breach.BreachDate.ToShortDateString(),
                     string.Join(", ", breach.DataClasses)
-                })
-                {
+                }) {
                     Tag = new ItemData { Entity = breach.Entry, Breach = breach },
                     ImageIndex = breachedEntryList.SmallImageList.Images.Count - 1
                 };
@@ -70,20 +67,16 @@ namespace HaveIBeenPwned.UI
             RefreshBreaches();
         }
 
-        private class ItemData
-        {
+        private class ItemData {
             public PwEntry Entity { get; set; }
             public BreachedEntry Breach { get; set; }
         }
 
         [STAThread]
-        private void breachedEntryList_MouseDoubleClick(object sender, MouseEventArgs e)
-        {
-            if(breachedEntryList.SelectedItems != null && breachedEntryList.SelectedItems.Count == 1)
-            {
+        private void breachedEntryList_MouseDoubleClick(object sender, MouseEventArgs e) {
+            if(breachedEntryList.SelectedItems != null && breachedEntryList.SelectedItems.Count == 1) {
                 var entry = ((PwEntry)breachedEntryList.SelectedItems[0].Tag);
-                if (entry != null)
-                {
+                if(entry != null) {
                     var pwForm = new KeePass.Forms.PwEntryForm();
                     pwForm.InitEx(entry, KeePass.Forms.PwEditMode.EditExistingEntry, pluginHost.Database, pluginHost.MainWindow.ClientIcons, false, false);
                     var thread = new Thread(() => {
@@ -114,16 +107,13 @@ namespace HaveIBeenPwned.UI
         }
 
         [STAThread]
-        private void breachedEntryList_MouseClick(object sender, MouseEventArgs e)
-        {
-            if (breachedEntryList.SelectedItems != null && breachedEntryList.SelectedItems.Count == 1)
-            {
+        private void breachedEntryList_MouseClick(object sender, MouseEventArgs e) {
+            if(breachedEntryList.SelectedItems != null && breachedEntryList.SelectedItems.Count == 1) {
                 var tag = ((ItemData)breachedEntryList.SelectedItems[0].Tag);
                 var entry = tag.Entity;
                 var breach = tag.Breach;
 
-                if (breach != null)
-                {
+                if(breach != null) {
                     var txt = breach.Description;
 
                     // "The description may include markup such as emphasis and strong tags as well as hyperlinks"
@@ -132,7 +122,7 @@ namespace HaveIBeenPwned.UI
 
                     var regexMarkup = new Regex(@"<.*?>");
                     txt = regexMarkup.Replace(txt, string.Empty);
-                    
+
                     // now unencode any html encoded stuff.
                     txt = System.Web.HttpUtility.HtmlDecode(txt);
 
@@ -141,8 +131,7 @@ namespace HaveIBeenPwned.UI
             }
         }
 
-        private void closeButton_Click(object sender, EventArgs e)
-        {
+        private void closeButton_Click(object sender, EventArgs e) {
             this.Close();
         }
     }
