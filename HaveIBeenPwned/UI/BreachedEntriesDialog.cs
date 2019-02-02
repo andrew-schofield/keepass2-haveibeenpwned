@@ -5,6 +5,7 @@ using KeePassLib;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
@@ -39,9 +40,11 @@ namespace HaveIBeenPwned.UI
                     breach.Entry != null ? breach.Entry.Strings.ReadSafe(PwDefs.UrlField) : breach.BreachUrl,
                     breach.Entry != null ? breach.Entry.GetPasswordLastModified().ToShortDateString() : null,
                     breach.BreachName,
-                    breach.BreachDate.ToShortDateString()
-                }) {
-                    Tag = breach.Entry,
+                    breach.BreachDate.ToShortDateString(),
+                    string.Join(", ", breach.DataClasses)
+                })
+                {
+                    Tag = new ItemData { Entity = breach.Entry, Breach = breach },
                     ImageIndex = breachedEntryList.SmallImageList.Images.Count - 1
                 };
 
@@ -67,11 +70,20 @@ namespace HaveIBeenPwned.UI
             RefreshBreaches();
         }
 
+        private class ItemData
+        {
+            public PwEntry Entity { get; set; }
+            public BreachedEntry Breach { get; set; }
+        }
+
         [STAThread]
-        private void breachedEntryList_MouseDoubleClick(object sender, MouseEventArgs e) {
-            if(breachedEntryList.SelectedItems != null && breachedEntryList.SelectedItems.Count == 1) {
+        private void breachedEntryList_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            if(breachedEntryList.SelectedItems != null && breachedEntryList.SelectedItems.Count == 1)
+            {
                 var entry = ((PwEntry)breachedEntryList.SelectedItems[0].Tag);
-                if(entry != null) {
+                if (entry != null)
+                {
                     var pwForm = new KeePass.Forms.PwEntryForm();
                     pwForm.InitEx(entry, KeePass.Forms.PwEditMode.EditExistingEntry, pluginHost.Database, pluginHost.MainWindow.ClientIcons, false, false);
                     var thread = new Thread(() => {
@@ -99,6 +111,34 @@ namespace HaveIBeenPwned.UI
 
         private void chkHidePassword_CheckedChanged(object sender, EventArgs e) {
             RefreshBreaches();
+        }
+
+        [STAThread]
+        private void breachedEntryList_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (breachedEntryList.SelectedItems != null && breachedEntryList.SelectedItems.Count == 1)
+            {
+                var tag = ((ItemData)breachedEntryList.SelectedItems[0].Tag);
+                var entry = tag.Entity;
+                var breach = tag.Breach;
+
+                if (breach != null)
+                {
+                    var txt = breach.Description;
+
+                    // "The description may include markup such as emphasis and strong tags as well as hyperlinks"
+                    var regexNewLineHtml = new Regex(@"<\s*br.*?>|<\s*p.*?>");
+                    txt = regexNewLineHtml.Replace(txt, Environment.NewLine);
+
+                    var regexMarkup = new Regex(@"<.*?>");
+                    txt = regexMarkup.Replace(txt, string.Empty);
+                    
+                    // now unencode any html encoded stuff.
+                    txt = System.Web.HttpUtility.HtmlDecode(txt);
+
+                    this.breachDescriptionText.Text = txt;
+                }
+            }
         }
 
         private void closeButton_Click(object sender, EventArgs e)

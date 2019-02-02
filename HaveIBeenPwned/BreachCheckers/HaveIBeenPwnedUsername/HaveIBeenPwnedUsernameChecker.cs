@@ -33,31 +33,44 @@ namespace HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedUsername
         public async override Task<List<BreachedEntry>> CheckGroup(PwGroup group, bool expireEntries, bool oldEntriesOnly, bool ignoreDeleted, bool ignoreExpired, IProgress<ProgressItem> progressIndicator, Func<bool> canContinue)
         {
             progressIndicator.Report(new ProgressItem(0, "Getting HaveIBeenPwned breach list..."));
-            var entries = group.GetEntries(true).Where(e => (!ignoreDeleted || !e.IsDeleted(pluginHost)) && (!ignoreExpired || !e.Expires));
-            var usernames = entries.Select(e => e.Strings.ReadSafe(PwDefs.UserNameField)).Distinct();
+            var entries = group.GetEntries(true).Where(e => (!ignoreDeleted || !e.IsDeleted(pluginHost)) && (!ignoreExpired || !e.Expires)).ToArray();
+            var usernames = entries.Select(e => e.Strings.ReadSafe(PwDefs.UserNameField).Trim().ToLower()).Distinct();
             var breaches = await GetBreaches(progressIndicator, usernames, canContinue);
             var breachedEntries = new List<BreachedEntry>();
 
             await Task.Run(() =>
             {
-                foreach (var breach in breaches)
+                foreach (var breachGrp in breaches.GroupBy(x => x.Username))
                 {
-                    var pwEntry = entries.FirstOrDefault(e => e.GetUrlDomain() == breach.Domain);
-                    if (pwEntry != null)
+                    var username = breachGrp.Key;
+                    var oldestUpdate = entries.Min(e => e.GetPasswordLastModified());
+                    
+                    foreach (var breach in breachGrp)
                     {
-                        var lastModified = pwEntry.GetPasswordLastModified();
-                        if (oldEntriesOnly && lastModified >= breach.BreachDate)
+                        if (oldEntriesOnly && oldestUpdate >= breach.BreachDate)
                         {
                             continue;
                         }
 
-                        if (expireEntries)
+                        var pwEntry =
+                            string.IsNullOrWhiteSpace(breach.Domain) ? null :
+                            entries.FirstOrDefault(e => e.GetUrlDomain() == breach.Domain && breach.Username == e.Strings.ReadSafe(PwDefs.UserNameField).Trim().ToLower());
+                        if (pwEntry != null)
                         {
-                            ExpireEntry(pwEntry);
-                        }
-                    }
+                            var lastModified = pwEntry.GetPasswordLastModified();
+                            if (oldEntriesOnly && lastModified >= breach.BreachDate)
+                            {
+                                continue;
+                            }
 
-                    breachedEntries.Add(new BreachedEntry(pwEntry, breach));
+                            if (expireEntries)
+                            {
+                                ExpireEntry(pwEntry);
+                            }
+                        }
+
+                        breachedEntries.Add(new BreachedEntry(pwEntry, breach));
+                    }
                 }
             });
 

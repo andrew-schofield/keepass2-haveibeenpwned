@@ -35,8 +35,10 @@
             this.lastModifiedHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.breachName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.breachedHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.breachedClasses = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.closeButton = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
+            this.breachDescriptionText = new System.Windows.Forms.RichTextBox();
             this.chkHidePassword = new System.Windows.Forms.CheckBox();
             this.passwordHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             titleHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -59,21 +61,23 @@
             this.urlHeader,
             this.lastModifiedHeader,
             this.breachName,
-            this.breachedHeader});
+            this.breachedHeader,
+            this.breachedClasses});
             this.breachedEntryList.FullRowSelect = true;
             this.breachedEntryList.Location = new System.Drawing.Point(12, 12);
             this.breachedEntryList.Name = "breachedEntryList";
             this.breachedEntryList.ShowGroups = false;
-            this.breachedEntryList.Size = new System.Drawing.Size(719, 268);
+            this.breachedEntryList.Size = new System.Drawing.Size(1068, 361);
             this.breachedEntryList.TabIndex = 0;
             this.breachedEntryList.UseCompatibleStateImageBehavior = false;
             this.breachedEntryList.View = System.Windows.Forms.View.Details;
+            this.breachedEntryList.MouseClick += new System.Windows.Forms.MouseEventHandler(this.breachedEntryList_MouseClick);
             this.breachedEntryList.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.breachedEntryList_MouseDoubleClick);
             // 
             // usernameHeader
             // 
             this.usernameHeader.Text = "Username";
-            this.usernameHeader.Width = 136;
+            this.usernameHeader.Width = 211;
             // 
             // urlHeader
             // 
@@ -95,11 +99,16 @@
             this.breachedHeader.Text = "Breach Date";
             this.breachedHeader.Width = 80;
             // 
+            // breachedClasses
+            // 
+            this.breachedClasses.Text = "Breach Classes";
+            this.breachedClasses.Width = 696;
+            // 
             // closeButton
             // 
             this.closeButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.closeButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.closeButton.Location = new System.Drawing.Point(656, 286);
+            this.closeButton.Location = new System.Drawing.Point(1005, 481);
             this.closeButton.Name = "closeButton";
             this.closeButton.Size = new System.Drawing.Size(75, 23);
             this.closeButton.TabIndex = 2;
@@ -111,11 +120,21 @@
             // 
             this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(315, 291);
+            this.label1.Location = new System.Drawing.Point(12, 486);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(180, 13);
-            this.label1.TabIndex = 3;
-            this.label1.Text = "Double-click to edit breached entries";
+            this.label1.Size = new System.Drawing.Size(315, 13);
+            this.label1.TabIndex = 2;
+            this.label1.Text = "Click to view breach details. Double-click to edit breached entries";
+            // 
+            // breachDescriptionText
+            // 
+            this.breachDescriptionText.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.breachDescriptionText.Location = new System.Drawing.Point(12, 380);
+            this.breachDescriptionText.Name = "breachDescriptionText";
+            this.breachDescriptionText.Size = new System.Drawing.Size(1068, 95);
+            this.breachDescriptionText.TabIndex = 3;
+            this.breachDescriptionText.Text = "";
             // 
             // chkHidePassword
             // 
@@ -140,8 +159,8 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(743, 317);
-            this.Controls.Add(this.chkHidePassword);
+            this.ClientSize = new System.Drawing.Size(1092, 512);
+            this.Controls.Add(this.breachDescriptionText);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.closeButton);
             this.Controls.Add(this.breachedEntryList);
@@ -161,9 +180,11 @@
         private System.Windows.Forms.ColumnHeader urlHeader;
         private System.Windows.Forms.ColumnHeader lastModifiedHeader;
         private System.Windows.Forms.ColumnHeader breachedHeader;
+        private System.Windows.Forms.ColumnHeader breachedClasses;
         private System.Windows.Forms.Button closeButton;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ColumnHeader breachName;
+        private System.Windows.Forms.RichTextBox breachDescriptionText;
         private System.Windows.Forms.CheckBox chkHidePassword;
         private System.Windows.Forms.ColumnHeader passwordHeader;
     }

@@ -33,11 +33,11 @@ namespace HaveIBeenPwned.BreachCheckers.CloudbleedSite
         {
             progressIndicator.Report(new ProgressItem(0, "Getting Cloudbleed breach list..."));
             var breaches = await GetBreaches(progressIndicator);
-            var entries = group.GetEntries(true).Where(e => (!ignoreDeleted || !e.IsDeleted(pluginHost)) && (!ignoreExpired || !e.Expires));
+            var entries = group.GetEntries(true).Where(e => (!ignoreDeleted || !e.IsDeleted(pluginHost)) && (!ignoreExpired || !e.Expires)).ToArray();
             var breachedEntries = new List<BreachedEntry>();
 
             uint counter = 0;
-            var entryCount = entries.Count();
+            var entryCount = entries.Length;
             await Task.Run(() =>
             {
                 foreach (var entry in entries)

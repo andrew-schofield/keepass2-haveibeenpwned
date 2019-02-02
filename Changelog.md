@@ -1,5 +1,11 @@
 # keepass2-haveibeenpwned Changelog
 
+### v1.3.1 - 2019-02-01
+* Allow cancelling a running breach check.
+* Performance improvements. Thanks to SlightlyMadGargoyle.
+* Add option to check all breach types at once. Thanks to SlightlyMadGargoyle.
+* Show more details about the breach in the results list. Thanks to SlightlyMadGargoyle.
+
 ### v1.3.0 - 2019-01-19
 * Prevent every breach type being checked when "check all breaches" is selected
 * Allow users to continue working while the breach results are shown. Thanks to strayge.
