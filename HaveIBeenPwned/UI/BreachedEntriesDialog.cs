@@ -75,7 +75,7 @@ namespace HaveIBeenPwned.UI {
         [STAThread]
         private void breachedEntryList_MouseDoubleClick(object sender, MouseEventArgs e) {
             if(breachedEntryList.SelectedItems != null && breachedEntryList.SelectedItems.Count == 1) {
-                var entry = ((PwEntry)breachedEntryList.SelectedItems[0].Tag);
+                var entry = ((ItemData)breachedEntryList.SelectedItems[0].Tag).Entity;
                 if(entry != null) {
                     var pwForm = new KeePass.Forms.PwEntryForm();
                     pwForm.InitEx(entry, KeePass.Forms.PwEditMode.EditExistingEntry, pluginHost.Database, pluginHost.MainWindow.ClientIcons, false, false);
