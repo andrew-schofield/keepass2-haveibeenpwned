@@ -12,7 +12,7 @@ namespace HaveIBeenPwned.UI {
     /// <summary>
     /// A ListViewControl with multi column sort and clipboard support.
     /// </summary>
-    public class SortableListView: ListView {
+    public class SortableListView : ListView {
 
         #region Private Types
 
@@ -54,11 +54,6 @@ namespace HaveIBeenPwned.UI {
         /// ListViewComparer for the SortableListView with number, DateTime and string comparison for multiple columns.
         /// </summary>
         private class SortableListViewComparer : System.Collections.IComparer {
-
-            /// <summary>
-            /// Dictionary with column indices as key and their sort order as value
-            /// </summary>
-            Dictionary<int, SortOrder> _dic = new Dictionary<int, SortOrder>();
 
             /// <summary>
             /// Compares two numeric values. One of them might be empty, but then the other one must be a numeric value.
@@ -130,9 +125,41 @@ namespace HaveIBeenPwned.UI {
                 }
             }
 
-            public SortableListViewComparer(Dictionary<int, SortOrder> dic) {
-                _dic = dic;
+            /// <summary>
+            /// Compares two ListViewItems in an unoreded ListView.
+            /// </summary>
+            /// <param name="lvi1">First ListViewItem</param>
+            /// <param name="lvi2">Second ListViewItem</param>
+            /// <returns>
+            /// A negative value if the first ListViewItem is smaller than the second one, 
+            /// zero if both are equal and a positive value if the first ListViewItem is larger
+            /// than the second one.
+            /// If one or both ListViewItem do not exist in the unordered list they are sorted into 
+            /// the end of the list.
+            /// </returns>
+            private int CompareUnordered(ListViewItem lvi1, ListViewItem lvi2) {
+                int i1 = this.Unordered.IndexOf(lvi1);
+                int i2 = this.Unordered.IndexOf(lvi2);
+
+                if(i1 == -1) {
+                    if(i2 == -1)
+                        return 0;
+                    else
+                        return 1;
+                } else if(i2 == -1)
+                    return -1;
+                else
+                    return i1.CompareTo(i2);
             }
+
+            public SortableListViewComparer() {
+                this.SortOrders = new Dictionary<int, SortOrder>();
+            }
+
+            /// <summary>
+            /// Dictionary with column indices as key and their sort order as value
+            /// </summary>
+            public Dictionary<int, SortOrder> SortOrders { get; private set; }
 
             /// <summary>
             /// Order of ListViewItems without sorting
@@ -151,26 +178,22 @@ namespace HaveIBeenPwned.UI {
                 ListViewItem lvi1 = obj1 as ListViewItem;
                 ListViewItem lvi2 = obj2 as ListViewItem;
 
-                if(_dic.Count == 0 && this.Unordered != null) {
-                    return this.Unordered.IndexOf(lvi1).CompareTo(this.Unordered.IndexOf(lvi2));
-                } else {
-                    foreach(int iCol in _dic.Keys) {
-                        string s1 = iCol < lvi1.SubItems.Count ? s1 = lvi1.SubItems[iCol].Text : s1 = string.Empty;
-                        string s2 = iCol < lvi2.SubItems.Count ? s2 = lvi2.SubItems[iCol].Text : s2 = string.Empty;
-                        if(CompareDouble(s1, s2, out iRes)) {                               // Compare strings as numbers
-                            if(iRes != 0)
-                                return _dic[iCol] == SortOrder.Ascending ? iRes : -iRes;
-                        } else if(CompareDateTime(s1, s2, out iRes)) {                      // Compare strings as DateTime
-                            if(iRes != 0)
-                                return _dic[iCol] == SortOrder.Ascending ? iRes : -iRes;
-                        } else {                                                            // Compare strings
-                            iRes = s1.CompareTo(s2);
-                            if(iRes != 0)
-                                return _dic[iCol] == SortOrder.Ascending ? iRes : -iRes;
-                        }
+                foreach(int iCol in this.SortOrders.Keys) {
+                    string s1 = iCol < lvi1.SubItems.Count ? s1 = lvi1.SubItems[iCol].Text : s1 = string.Empty;
+                    string s2 = iCol < lvi2.SubItems.Count ? s2 = lvi2.SubItems[iCol].Text : s2 = string.Empty;
+                    if(CompareDouble(s1, s2, out iRes)) {                               // Compare strings as numbers
+                        if(iRes != 0)
+                            return this.SortOrders[iCol] == SortOrder.Ascending ? iRes : -iRes;
+                    } else if(CompareDateTime(s1, s2, out iRes)) {                      // Compare strings as DateTime
+                        if(iRes != 0)
+                            return this.SortOrders[iCol] == SortOrder.Ascending ? iRes : -iRes;
+                    } else {                                                            // Compare strings
+                        iRes = s1.CompareTo(s2);
+                        if(iRes != 0)
+                            return this.SortOrders[iCol] == SortOrder.Ascending ? iRes : -iRes;
                     }
-                    return 0;
                 }
+                return this.Unordered != null ? CompareUnordered(lvi1, lvi2) : 0;       // Return unordered order
             }
         }
 
@@ -184,8 +207,8 @@ namespace HaveIBeenPwned.UI {
         private const int HDM_FIRST = 0x1200;
         private const int HDM_GETITEM = HDM_FIRST + 11;
         private const int HDM_SETITEM = HDM_FIRST + 12;
-        
-        #endregion 
+
+        #endregion
 
         #region Private Declarations
 
@@ -198,11 +221,6 @@ namespace HaveIBeenPwned.UI {
         #endregion
 
         #region Private Variables
-
-        /// <summary>
-        /// Dictionary with column indices as key and their sort order as value
-        /// </summary>
-        Dictionary<int, SortOrder> _dic = new Dictionary<int, SortOrder>();
 
         /// <summary>
         /// Switch for hiding groups on sort
@@ -224,23 +242,25 @@ namespace HaveIBeenPwned.UI {
             IntPtr columnPtr = new IntPtr(columnIndex);
             HDITEM item = new HDITEM { mask = HDITEM.Mask.Format };
 
-            if(SendMessage(columnHeader, HDM_GETITEM, columnPtr, ref item) == IntPtr.Zero) throw new Win32Exception();
+            if(SendMessage(columnHeader, HDM_GETITEM, columnPtr, ref item) == IntPtr.Zero)
+                throw new Win32Exception();
 
             switch(order) {
-                    case SortOrder.Ascending:
-                        item.fmt &= ~HDITEM.Format.SortDown;
-                        item.fmt |= HDITEM.Format.SortUp;
-                        break;
-                    case SortOrder.Descending:
-                        item.fmt &= ~HDITEM.Format.SortUp;
-                        item.fmt |= HDITEM.Format.SortDown;
-                        break;
-                    case SortOrder.None:
+                case SortOrder.Ascending:
+                    item.fmt &= ~HDITEM.Format.SortDown;
+                    item.fmt |= HDITEM.Format.SortUp;
+                    break;
+                case SortOrder.Descending:
+                    item.fmt &= ~HDITEM.Format.SortUp;
+                    item.fmt |= HDITEM.Format.SortDown;
+                    break;
+                case SortOrder.None:
                     item.fmt &= ~HDITEM.Format.SortDown & ~HDITEM.Format.SortUp;
-                        break;
-                }
+                    break;
+            }
 
-            if(SendMessage(columnHeader, HDM_SETITEM, columnPtr, ref item) == IntPtr.Zero) throw new Win32Exception();
+            if(SendMessage(columnHeader, HDM_SETITEM, columnPtr, ref item) == IntPtr.Zero)
+                throw new Win32Exception();
         }
 
         #endregion
@@ -248,7 +268,7 @@ namespace HaveIBeenPwned.UI {
         #region Constructors & Destructors
 
         public SortableListView() {
-            this.ListViewItemSorter = new SortableListViewComparer(_dic);
+            this.ListViewItemSorter = new SortableListViewComparer();
         }
 
         #endregion
@@ -302,31 +322,31 @@ namespace HaveIBeenPwned.UI {
 
             // Multiple sort colums with Shift-Key only
             if(!ModifierKeys.HasFlag(Keys.Shift)) {
-                foreach(int iCol in _dic.Keys.ToList())
+                foreach(int iCol in this.SortOrders.Keys.ToList())
                     if(iCol != e.Column) {
                         SetSortIcon(iCol, SortOrder.None);
-                        _dic.Remove(iCol);
+                        this.SortOrders.Remove(iCol);
                     }
             }
 
             // Flip sort order of clicked column
-            if(_dic.ContainsKey(e.Column)) {
-                if(_dic[e.Column] == SortOrder.Ascending) {
-                    _dic[e.Column] = SortOrder.Descending;
+            if(this.SortOrders.ContainsKey(e.Column)) {
+                if(this.SortOrders[e.Column] == SortOrder.Ascending) {
+                    this.SortOrders[e.Column] = SortOrder.Descending;
                     SetSortIcon(e.Column, SortOrder.Descending);
                 } else {
-                    _dic.Remove(e.Column);
+                    this.SortOrders.Remove(e.Column);
                     SetSortIcon(e.Column, SortOrder.None);
                 }
             } else {
-                _dic[e.Column] = SortOrder.Ascending;
+                this.SortOrders.Add(e.Column, SortOrder.Ascending);
                 SetSortIcon(e.Column, SortOrder.Ascending);
             }
 
             // Store unsorted row order on the first sort
-            if(_dic.Count != 0) {
-                if(((SortableListViewComparer)this.ListViewItemSorter).Unordered == null) {
-                    ((SortableListViewComparer)this.ListViewItemSorter).Unordered = new List<ListViewItem>(this.Items.OfType<ListViewItem>());
+            if(this.SortOrders.Count != 0) {
+                if(this.Unordered == null) {
+                    this.Unordered = new List<ListViewItem>(this.Items.OfType<ListViewItem>());
                     _bShowGroups = this.ShowGroups;
                     if(_bHideGroupsOnSort)
                         this.ShowGroups = false;
@@ -336,11 +356,26 @@ namespace HaveIBeenPwned.UI {
                 if(_bHideGroupsOnSort)
                     this.ShowGroups = _bShowGroups;
                 Sort();
-                ((SortableListViewComparer)this.ListViewItemSorter).Unordered = null;
+                this.Unordered = null;                                                  // Dump unsorted row order after removing all sort orders                                                 
             }
         }
 
         #region Public Properties
+
+        /// <summary>
+        /// Dictionary with column indices as key and their sort order as value
+        /// </summary>
+        public Dictionary<int, SortOrder> SortOrders {
+            get { return ((SortableListViewComparer)this.ListViewItemSorter).SortOrders; }
+        }
+
+        /// <summary>
+        /// Order of ListViewItems without sorting
+        /// </summary>
+        public List<ListViewItem> Unordered {
+            get { return ((SortableListViewComparer)this.ListViewItemSorter).Unordered; }
+            set { ((SortableListViewComparer)this.ListViewItemSorter).Unordered = value; }
+        }
 
         /// <summary>
         /// True, if groups are hidden during sort, false if not.
@@ -350,9 +385,10 @@ namespace HaveIBeenPwned.UI {
         /// </remarks>
         public bool HideGroupsOnSort {
             get { return _bHideGroupsOnSort; }
-            set { if(_bHideGroupsOnSort != value) {
+            set {
+                if(_bHideGroupsOnSort != value) {
                     _bHideGroupsOnSort = value;
-                    if(_dic.Count != 0) {
+                    if(this.SortOrders.Count != 0) {
                         if(_bHideGroupsOnSort) {
                             _bShowGroups = this.ShowGroups;
                             if(this.ShowGroups) {
