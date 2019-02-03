@@ -408,8 +408,7 @@ namespace HaveIBeenPwned
                     }
                     else
                     {
-                        var breachedEntriesDialog = new BreachedEntriesDialog(pluginHost);
-                        breachedEntriesDialog.AddBreaches(result);
+                        var breachedEntriesDialog = new BreachedEntriesDialog(pluginHost, result);
                         breachedEntriesDialog.ShowDialog();
                     }
                 }
