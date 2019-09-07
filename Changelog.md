@@ -1,5 +1,8 @@
 # keepass2-haveibeenpwned Changelog
 
+### v1.3.3 - 2019-09-07
+* Fix issue with PLGX file size
+
 ### v1.3.2 - 2019-09-07
 * Upgrade to HIBP v3 Api and add support for api-keys (password of entry with title hibp-apikey). Thanks to Jakob Ledermann.
 
