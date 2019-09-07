@@ -112,6 +112,7 @@ namespace HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedUsername
                 {
                     DialogResult dialogButton = MessageBox.Show(string.Format("Unable to check haveibeenpwned.com (returned Status: {0})", response.StatusCode), 
                                                                 Resources.MessageTitle, MessageBoxButtons.OKCancel, MessageBoxIcon.Error);
+                    CloudFlareErrorProcessor.SendErrorMessage(response);
                     if (dialogButton == DialogResult.Cancel)
                     {
                         break;

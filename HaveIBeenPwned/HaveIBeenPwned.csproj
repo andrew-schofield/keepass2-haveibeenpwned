@@ -85,6 +85,7 @@
     <Compile Include="BreachCheckers\CombinedChecker.cs" />
     <Compile Include="BreachCheckers\HaveIBeenPwnedUsername\HaveIBeenPwnedUsernameChecker.cs" />
     <Compile Include="BreachCheckers\HaveIBeenPwnedUsername\HaveIBeenPwnedUsernameEntry.cs" />
+    <Compile Include="CloudFlareErrorProcessor.cs" />
     <Compile Include="DisplayAttribute.cs" />
     <Compile Include="UI\BreachedEntriesDialog.cs">
       <SubType>Form</SubType>

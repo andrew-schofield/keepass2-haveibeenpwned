@@ -93,6 +93,7 @@ namespace HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedSite
             else
             {
                 MessageBox.Show(string.Format("Unable to check haveibeenpwned.com (returned Status: {0})", response.StatusCode), Resources.MessageTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                CloudFlareErrorProcessor.SendErrorMessage(response);
             }
                         
             return breaches;
