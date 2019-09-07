@@ -1,5 +1,9 @@
 # keepass2-haveibeenpwned Changelog
 
+### v1.3.2-alpha.1+hibpv3 - 2019-08-24
+* Upgrade to HIBP v3 Api and add support for api-keys (password of entry with title hibp-apikey)
+  Not tested as registration of API-Keys https://haveibeenpwned.com/api/key is momentarily disabled.
+
 ### v1.3.1 - 2019-02-01
 * Allow cancelling a running breach check.
 * Performance improvements. Thanks to SlightlyMadGargoyle.
