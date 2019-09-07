@@ -10,14 +10,14 @@ Mono users may find they need to install their distro equivalent of `mono-comple
 ## Currently Supported Breach Lists
 
 ### Site/Domain based
-* [Have I Been Pwned (HIBP)](https://haveibeenpwned.com/) - Checks the domains of any entries against the Have I Been Pwned? list curated by Troy Hunt
+* [Have I Been Pwned (HIBP)](https://haveibeenpwned.com/) - Checks the domains of any entries against the Have I Been Pwned? list curated by Troy Hunt.
 * [Cloudbleed vulnerability list](https://github.com/pirate/sites-using-cloudflare) - Checks the domains of any entries that appear in the Cloudbleed vulnerability list. This has potential to produce false positives due to the way this list was produced.
 
 ### Username based
-* [Have I Been Pwned (HIBP)](https://haveibeenpwned.com/) - Checks the usernames of any entries against the Have I Been Pwned? list curated by Troy Hunt
+* [Have I Been Pwned (HIBP)](https://haveibeenpwned.com/) - Checks the usernames of any entries against the Have I Been Pwned? list curated by Troy Hunt.
 
 ### Password based
-* [Have I Been Pwned (HIBP)](https://haveibeenpwned.com/) - Checks the passwords of any entries against the Have I Been Pwned? list curated by Troy Hunt
+* [Have I Been Pwned (HIBP)](https://haveibeenpwned.com/) - Checks the passwords of any entries against the Have I Been Pwned? list curated by Troy Hunt. This service requires you to register for an API key via https://haveibeenpwned.com/API/Key
 
 **This checker sends a small portion of the password hash to HIBP and then checks the full hash locally against the list of hashes returned by HIBP. This service does not send your password, nor enough of the hash to expose your password to HIBP.**
 
@@ -50,3 +50,5 @@ keepass2-haveibeenpwned is developed entirely in my own time. If you wish to sup
 * **Andrew Schofield**
 * **Matt Schneeberger**
 * **strayge**
+* **SlightlyMadGargoyle**
+* **Jakob Ledermann**
