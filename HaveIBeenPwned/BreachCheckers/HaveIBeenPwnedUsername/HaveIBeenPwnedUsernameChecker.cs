@@ -9,10 +9,8 @@ using KeePass.Plugins;
 using System.Threading.Tasks;
 using System.Drawing;
 using System.Net;
-using System.Security.Policy;
 using System.Text.RegularExpressions;
 using KeePassExtensions;
-using System.Threading;
 using System.Web;
 using KeePassLib.Collections;
 
@@ -46,7 +44,7 @@ namespace HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedUsername
             try
             {
                 var apiKey = this.RetrieveApiKey();
-                this.client.DefaultRequestHeaders.Add("hipd-api-key", apiKey);
+                this.client.DefaultRequestHeaders.Add("hibp-api-key", apiKey);
             }
             catch (ApiKeyException e)
             {
@@ -244,8 +242,8 @@ namespace HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedUsername
             }
             else if (apiKeys.Any() == false)
             {
-                throw new ApiKeyException("Found no Api key. Please create an Entry \"hibp-apikey\" in your Database\n" +
-                                          "and set its password to the Api key optained from https://haveibeenpwned.com/API/Key");
+                throw new ApiKeyException("No API Key found. Please create an entry named \"hibp-apikey\" in your database\n" +
+                                          "and set its password to the API key obtained from https://haveibeenpwned.com/API/Key");
             }
             else
             {
