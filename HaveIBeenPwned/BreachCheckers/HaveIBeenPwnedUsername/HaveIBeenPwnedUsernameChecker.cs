@@ -20,6 +20,7 @@ namespace HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedUsername
     {
         // Number of attempts to retrieve the breaches/pastes API when the rate limit is hit repeatedly
         private const int DefaultRetries = 5;
+        private const string APIKEY = "hibp-api-key";
 
         public HaveIBeenPwnedUsernameChecker(HttpClient httpClient, IPluginHost pluginHost)
             : base(httpClient, pluginHost)
@@ -44,7 +45,8 @@ namespace HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedUsername
             try
             {
                 var apiKey = this.RetrieveApiKey();
-                this.client.DefaultRequestHeaders.Add("hibp-api-key", apiKey);
+                this.client.DefaultRequestHeaders.Remove(APIKEY);
+                this.client.DefaultRequestHeaders.Add(APIKEY, apiKey);
             }
             catch (ApiKeyException e)
             {
