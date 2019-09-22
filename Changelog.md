@@ -1,5 +1,9 @@
 # keepass2-haveibeenpwned Changelog
 
+### v1.3.4 - 2019-09-22
+* Fix API key issues
+* Improve certificate validation
+
 ### v1.3.3 - 2019-09-07
 * Fix issue with PLGX file size
 
