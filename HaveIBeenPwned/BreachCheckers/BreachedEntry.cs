@@ -53,7 +53,8 @@ namespace HaveIBeenPwned.BreachCheckers
         {
             get
             {
-                return breach.DataClasses;
+                return breach.DataClasses
+                       ?? new string[0];
             }
         }
 

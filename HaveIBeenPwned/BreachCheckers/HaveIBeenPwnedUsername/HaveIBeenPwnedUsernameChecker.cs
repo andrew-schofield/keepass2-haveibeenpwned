@@ -149,7 +149,7 @@ namespace HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedUsername
             try
             {
                 response = await client.GetAsync(
-                    new Uri("https://haveibeenpwned.com/api/v3/breachedaccount/" + username));
+                    new Uri("https://haveibeenpwned.com/api/v3/breachedaccount/" + username + "?truncateResponse=false"));
             }
             catch (Exception ex)
             {
@@ -162,7 +162,7 @@ namespace HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedUsername
                 breaches = JsonConvert.DeserializeObject<List<HaveIBeenPwnedUsernameEntry>>(jsonString);
                 foreach (var b in breaches)
                 {
-                    b.Username = username;
+                    b.Username = HttpUtility.UrlDecode(username);
                 }
             }
             else if ((int) response.StatusCode == 429) // The Rate limit of our API Key was exceeded
