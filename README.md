@@ -14,10 +14,11 @@ Mono users may find they need to install their distro equivalent of `mono-comple
 * [Cloudbleed vulnerability list](https://github.com/pirate/sites-using-cloudflare) - Checks the domains of any entries that appear in the Cloudbleed vulnerability list. This has potential to produce false positives due to the way this list was produced.
 
 ### Username based
-* [Have I Been Pwned (HIBP)](https://haveibeenpwned.com/) - Checks the usernames of any entries against the Have I Been Pwned? list curated by Troy Hunt.
+* [Have I Been Pwned (HIBP)](https://haveibeenpwned.com/) - Checks the usernames of any entries against the Have I Been Pwned? list curated by Troy Hunt. This service requires you to register for an API key via [https://haveibeenpwned.com/API/Key
+](https://haveibeenpwned.com/API/Key)
 
 ### Password based
-* [Have I Been Pwned (HIBP)](https://haveibeenpwned.com/) - Checks the passwords of any entries against the Have I Been Pwned? list curated by Troy Hunt. This service requires you to register for an API key via https://haveibeenpwned.com/API/Key
+* [Have I Been Pwned (HIBP)](https://haveibeenpwned.com/) - Checks the passwords of any entries against the Have I Been Pwned? list curated by Troy Hunt.
 
 **This checker sends a small portion of the password hash to HIBP and then checks the full hash locally against the list of hashes returned by HIBP. This service does not send your password, nor enough of the hash to expose your password to HIBP.**
 
@@ -29,6 +30,7 @@ Mono users may find they need to install their distro equivalent of `mono-comple
 * Running the check will result in a dialog listing all the breached entries, and from which breach they originated (entries can appear multiple times if they appear in multiple breach lists). These can then be modified directly from the list.
 * In the case of username breaches the dialog will also list accounts that have been breached but are not stored in the database
 * Right clicking on entries, or groups in the KeePass interfaces will also show the "Have I Been Pwned?" menu items, to allow the checks to be run on more specific sets of entries.
+* If you have an api key from [haveibeenpwned.com](https://haveibeenpwned.com/API/Key) you need to add it as a password to an entry called "hibp-apikey"
 
 
 ## Notes

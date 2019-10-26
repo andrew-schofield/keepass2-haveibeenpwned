@@ -1,5 +1,9 @@
 # keepass2-haveibeenpwned Changelog
 
+### v1.3.5 - 2019-10-26
+* Fix crash before username check results were displayed
+* Update readme to add instructions on how to use the api key.
+
 ### v1.3.4 - 2019-09-22
 * Fix API key issues
 * Improve certificate validation
