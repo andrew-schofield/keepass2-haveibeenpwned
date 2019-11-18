@@ -14,8 +14,8 @@ Mono users may find they need to install their distro equivalent of `mono-comple
 * [Cloudbleed vulnerability list](https://github.com/pirate/sites-using-cloudflare) - Checks the domains of any entries that appear in the Cloudbleed vulnerability list. This has potential to produce false positives due to the way this list was produced.
 
 ### Username based
-* [Have I Been Pwned (HIBP)](https://haveibeenpwned.com/) - Checks the usernames of any entries against the Have I Been Pwned? list curated by Troy Hunt. This service requires you to register for an API key via [https://haveibeenpwned.com/API/Key
-](https://haveibeenpwned.com/API/Key)
+* [Have I Been Pwned (HIBP)](https://haveibeenpwned.com/) - Checks the usernames of any entries against the Have I Been Pwned? list curated by (Troy Hunt)[https://www.troyhunt.com/]. This service requires you to register for an API key via [https://haveibeenpwned.com/API/Key
+](https://haveibeenpwned.com/API/Key). The cost of API key is $3.50 per month (Credit card required).
 
 ### Password based
 * [Have I Been Pwned (HIBP)](https://haveibeenpwned.com/) - Checks the passwords of any entries against the Have I Been Pwned? list curated by Troy Hunt.
