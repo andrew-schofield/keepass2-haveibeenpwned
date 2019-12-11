@@ -19,7 +19,7 @@ namespace HaveIBeenPwned {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -71,6 +71,15 @@ namespace HaveIBeenPwned {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to HaveIBeenPwned:IgnoreBreachs.
+        /// </summary>
+        internal static string FieldNameIgnoredBreachs {
+            get {
+                return ResourceManager.GetString("FieldNameIgnoredBreachs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
         internal static System.Drawing.Icon hibp {
@@ -86,6 +95,15 @@ namespace HaveIBeenPwned {
         internal static string MenuItemCheckAllTitle {
             get {
                 return ResourceManager.GetString("MenuItemCheckAllTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Clear all ignore lists.
+        /// </summary>
+        internal static string MenuItemClearIgnoreListTitle {
+            get {
+                return ResourceManager.GetString("MenuItemClearIgnoreListTitle", resourceCulture);
             }
         }
         
@@ -131,6 +149,15 @@ namespace HaveIBeenPwned {
         internal static string MessageTitle {
             get {
                 return ResourceManager.GetString("MessageTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to HIBP Password Breach.
+        /// </summary>
+        internal static string PasswordBreachTitle {
+            get {
+                return ResourceManager.GetString("PasswordBreachTitle", resourceCulture);
             }
         }
     }

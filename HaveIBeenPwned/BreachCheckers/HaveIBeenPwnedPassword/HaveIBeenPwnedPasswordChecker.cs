@@ -46,7 +46,14 @@ namespace HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedPassword
                 foreach (var breach in breaches)
                 {
                     var pwEntry = breach.Entry;
-                    if(pwEntry != null)
+                    var breachEntry = new BreachedEntry(pluginHost, pwEntry, breach);
+
+                    if (breachEntry.IsIgnored)
+                    {
+                        continue;
+                    }
+
+                    if (pwEntry != null)
                     {
                         if (expireEntries)
                         {
@@ -54,7 +61,7 @@ namespace HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedPassword
                         }
                     }
 
-                    breachedEntries.Add(new BreachedEntry(pwEntry, breach));
+                    breachedEntries.Add(breachEntry);
                 }
             });
 
@@ -75,10 +82,11 @@ namespace HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedPassword
                 {
                     break;
                 }
-
+                
                 counter++;
                 progressIndicator.Report(new ProgressItem((uint)((double)counter / entries.Count() * 100), string.Format("Checking \"{0}\" for breaches", entry.Strings.ReadSafe(PwDefs.TitleField))));
-                if(entry.Strings.Get(PwDefs.PasswordField) == null || string.IsNullOrWhiteSpace(entry.Strings.ReadSafe(PwDefs.PasswordField)) || entry.Strings.ReadSafe(PwDefs.PasswordField).StartsWith("{REF:")) continue;
+                
+                if (entry.Strings.Get(PwDefs.PasswordField) == null || string.IsNullOrWhiteSpace(entry.Strings.ReadSafe(PwDefs.PasswordField)) || entry.Strings.ReadSafe(PwDefs.PasswordField).StartsWith("{REF:")) continue;
                 var passwordHash = string.Join("", sha.ComputeHash(entry.Strings.Get(PwDefs.PasswordField).ReadUtf8()).Select(x => x.ToString("x2"))).ToUpperInvariant();
                 if (cache.ContainsKey(passwordHash))
                 {
@@ -113,6 +121,7 @@ namespace HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedPassword
                     }
                 }
             }
+
             return allBreaches;
         }
     }

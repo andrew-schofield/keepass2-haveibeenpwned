@@ -31,7 +31,7 @@ namespace HaveIBeenPwned.UI
             breachedEntryList.Groups.Clear();
             breachedEntryList.SmallImageList = new ImageList();
             var groupNames = breaches.Where(b => b.Entry != null).Select(b => b.Entry.ParentGroup.GetFullPath(" - ", false)).Distinct();
-            foreach(var group in groupNames)
+            foreach (var group in groupNames)
             {
                 breachedEntryList.Groups.Add(new ListViewGroup(group, HorizontalAlignment.Left));
             }
@@ -121,34 +121,95 @@ namespace HaveIBeenPwned.UI
         [STAThread]
         private void breachedEntryList_MouseClick(object sender, MouseEventArgs e)
         {
-            if (breachedEntryList.SelectedItems != null && breachedEntryList.SelectedItems.Count == 1)
+            if (breachedEntryList.SelectedItems == null || breachedEntryList.SelectedItems.Count != 1)
             {
-                var tag = ((ItemData)breachedEntryList.SelectedItems[0].Tag);
-                var entry = tag.Entity;
-                var breach = tag.Breach;
+                return;
+            }
 
-                if (breach != null)
-                {
-                    var txt = breach.Description;
+            if (!breachedEntryList.FocusedItem.Bounds.Contains(e.Location))
+            {
+                return;
+            }
 
-                    // "The description may include markup such as emphasis and strong tags as well as hyperlinks"
-                    var regexNewLineHtml = new Regex(@"<\s*br.*?>|<\s*p.*?>");
-                    txt = regexNewLineHtml.Replace(txt, Environment.NewLine);
-
-                    var regexMarkup = new Regex(@"<.*?>");
-                    txt = regexMarkup.Replace(txt, string.Empty);
-                    
-                    // now unencode any html encoded stuff.
-                    txt = System.Web.HttpUtility.HtmlDecode(txt);
-
-                    this.breachDescriptionText.Text = txt;
-                }
+            var tag = ((ItemData)breachedEntryList.SelectedItems[0].Tag);
+            var entry = tag.Entity;
+            var breach = tag.Breach;
+            
+            switch (e.Button)
+            {
+                case MouseButtons.Left:
+                    ShowDescription(breach);
+                    break;
+                case MouseButtons.Right:
+                    ShowContextMenu(entry, breach);
+                    break;
             }
         }
 
         private void closeButton_Click(object sender, EventArgs e)
         {
             this.Close();
+        }
+
+        private void ShowDescription(BreachedEntry breach)
+        {			
+			var txt = breach.Description;
+
+			// "The description may include markup such as emphasis and strong tags as well as hyperlinks"
+			var regexNewLineHtml = new Regex(@"<\s*br.*?>|<\s*p.*?>");
+			txt = regexNewLineHtml.Replace(txt, Environment.NewLine);
+
+			var regexMarkup = new Regex(@"<.*?>");
+			txt = regexMarkup.Replace(txt, string.Empty);
+
+			// now unencode any html encoded stuff.
+			txt = System.Web.HttpUtility.HtmlDecode(txt);
+
+			this.breachDescriptionText.Text = txt;
+        }
+
+        private void ShowContextMenu(PwEntry entry, BreachedEntry breach)
+        {
+            var mi = new List<MenuItem>();
+
+            if (entry == null)
+            {
+                var ignoredBreaches = breach.GetIgnoredBreachForUserName();
+
+                if (ignoredBreaches.Contains(breach.BreachName))
+                {
+                    mi.Add(new MenuItem("Clear Ignore list for '" + breach.BreachUsername+ "'", (object sender, EventArgs e) =>
+                    {
+                        breach.ClearUserIgnoreList();
+                    }));
+                }
+                else
+                {
+                    mi.Add(new MenuItem("Ignore '"+breach.BreachUsername+ "' for '" + breach.BreachName + "'", (object sender, EventArgs e) =>
+                    {
+                        breach.AddBreachToUserIgnoreList();
+                    }));
+                }
+            }
+            else
+            {
+                if (breach.IsIgnored)
+                {
+                    mi.Add(new MenuItem("Stop Ignoring '"+breach.BreachName+"' for this entry", (object sender, EventArgs e) =>
+                    {
+                        breach.StopIgnoringBreachForThisEntry();
+                    }));
+                }
+                else
+                {
+                    mi.Add(new MenuItem("Ignore '"+breach.BreachName+"' for this entry", (object sender, EventArgs e) =>
+                    {
+                        breach.IgnoreForThisEntry();
+                    }));
+                }
+            }
+
+            breachedEntryList.ContextMenu = new ContextMenu(mi.ToArray());
         }
     }
 }

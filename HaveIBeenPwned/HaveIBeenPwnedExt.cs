@@ -32,6 +32,7 @@ namespace HaveIBeenPwned
         private ToolStripMenuItem haveIBeenPwnedGlobalUsernameMenuItem = null;
         private ToolStripMenuItem haveIBeenPwnedGlobalPasswordMenuItem = null;
         private ToolStripMenuItem checkAllGlobalMenuItem = null;
+        private ToolStripMenuItem clearIgnoreListMenuItem = null;
 
         private ToolStripSeparator toolStripSeperatorGroup = null;
         private ToolStripMenuItem haveIBeenPwnedGroupMenuItem = null;
@@ -148,6 +149,12 @@ namespace HaveIBeenPwned
             checkAllGlobalMenuItem.Image = Resources.hibp.ToBitmap();
             checkAllGlobalMenuItem.Click += this.Database_CheckAll;
             haveIBeenPwnedGlobalMenuItem.DropDown.Items.Add(checkAllGlobalMenuItem);
+
+            clearIgnoreListMenuItem = new ToolStripMenuItem();
+            clearIgnoreListMenuItem.Text = Resources.MenuItemClearIgnoreListTitle;
+            clearIgnoreListMenuItem.Image = Resources.hibp.ToBitmap();
+            clearIgnoreListMenuItem.Click += this.Database_ClearIgnoreList;
+            haveIBeenPwnedGlobalMenuItem.DropDown.Items.Add(clearIgnoreListMenuItem);
 
             tsMenu.Add(haveIBeenPwnedGlobalMenuItem);
 
@@ -307,6 +314,26 @@ namespace HaveIBeenPwned
             await CheckBreach(CheckTypeEnum.CheckAll, pluginHost.Database.RootGroup);
         }
 
+        private  void Database_ClearIgnoreList(object sender, EventArgs e)
+        {
+            if (!AssertDatabaseOpen()) return;
+
+            foreach (var key in pluginHost.Database.RootGroup.CustomData.Select(x => x.Key).Where(x => x.StartsWith("HaveIBeenPwned:")).ToArray())
+            {
+                pluginHost.Database.RootGroup.CustomData.Remove(key);
+            }
+
+            foreach (var entry in pluginHost.Database.RootGroup.GetEntries(true))
+            {
+                foreach (var key in entry.CustomData.Select(x => x.Key).Where(x => x.StartsWith("HaveIBeenPwned:")).ToArray())
+                {
+                    entry.CustomData.Remove(key);
+                }
+            }
+
+            pluginHost.MarkAsModified();
+        }
+
         private async void Group_CheckHaveIBeenPwnedSites(object sender, EventArgs e)
         {
             if (!AssertDatabaseOpen()) return;
@@ -355,62 +382,87 @@ namespace HaveIBeenPwned
             await CheckBreach(CheckTypeEnum.CheckAll, pluginHost.MainWindow.GetSelectedEntriesAsGroup());
         }
 
-        private async Task CheckBreach(CheckTypeEnum breachType, PwGroup group)
+        private UserSelectedOptions GetUserSelection(CheckTypeEnum breachType)
         {
             var dialog = new CheckerPrompt(breachType, breachType != CheckTypeEnum.Password);
+            
+            return
+                dialog.ShowDialog() != DialogResult.OK ? null : 
+                    new UserSelectedOptions()
+                    {
+                        CheckAllBreaches = dialog.CheckAllBreaches,
+                        ExpireEntries = dialog.ExpireEntries,
+                        OnlyCheckOldEntries = dialog.OnlyCheckOldEntries,
+                        IgnoreDeletedEntries = dialog.IgnoreDeletedEntries,
+                        IgnoreExpiredEntries = dialog.IgnoreExpiredEntries,
+                        SelectedBreach = dialog.SelectedBreach
+                    };
+        }
 
-            if (dialog.ShowDialog() == DialogResult.OK)
+        private async Task CheckBreach(CheckTypeEnum breachType, PwGroup group)
+        {
+            var selectedOptions = GetUserSelection(breachType);
+            await CheckBreach(breachType, group, selectedOptions);
+        }
+
+        private async Task CheckBreach(CheckTypeEnum breachType, PwGroup group, UserSelectedOptions selectedOptions)
+        {
+            if (selectedOptions == null)
             {
-                progressForm = new StatusProgressForm();
-                var progressIndicator = new Progress<ProgressItem>(ReportProgress);
-                progressForm.InitEx("Checking Breaches", true, breachType == CheckTypeEnum.SiteDomain, pluginHost.MainWindow);
-                progressForm.Show();
-                progressForm.SetProgress(0);
-                List<BreachedEntry> result = new List<BreachedEntry>();
-                try
-                {
-                    if (dialog.CheckAllBreaches)
-                    {
-                        var breaches = Enum.GetValues(typeof(BreachEnum)).Cast<BreachEnum>().Where(b => b.GetAttribute<CheckerTypeAttribute>().Type == breachType);
-                        progressForm.Tag = new ProgressHelper(breaches.Count());
-                        foreach (var breach in breaches)
-                        {
-                            var foundBreaches = await CheckBreaches(supportedBreachCheckers[(BreachEnum)breach](client, pluginHost),
-                            group, dialog.ExpireEntries, dialog.OnlyCheckOldEntries, dialog.IgnoreDeletedEntries, dialog.IgnoreExpiredEntries, progressIndicator, () => progressForm.ContinueWork());
-                            result.AddRange(foundBreaches);
-                            ((ProgressHelper)progressForm.Tag).CurrentBreach++;
-                        }
-                    }
-                    else
-                    {
-                        progressForm.Tag = new ProgressHelper(1);
-                        var foundBreaches = await CheckBreaches(supportedBreachCheckers[dialog.SelectedBreach](client, pluginHost),
-                            group, dialog.ExpireEntries, dialog.OnlyCheckOldEntries, dialog.IgnoreDeletedEntries, dialog.IgnoreExpiredEntries, progressIndicator, () => progressForm.ContinueWork());
-                        result.AddRange(foundBreaches);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    result = null;
-                    MessageBox.Show(pluginHost.MainWindow, ex.Message, Resources.MessageTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-                finally
-                {
-                    progressForm.Close();
-                }
+                pluginHost.MainWindow.Show();
+                return;
+            }
 
-                if (result != null)
+            progressForm = new StatusProgressForm();
+            var progressIndicator = new Progress<ProgressItem>(ReportProgress);
+            progressForm.InitEx("Checking Breaches", true, breachType == CheckTypeEnum.SiteDomain, pluginHost.MainWindow);
+            progressForm.Show();
+            progressForm.SetProgress(0);
+            List<BreachedEntry> result = new List<BreachedEntry>();
+            try
+            {
+                if (selectedOptions.CheckAllBreaches)
                 {
-                    if (!result.Any())
+                    System.Windows.Forms.MessageBox.Show("IsCheckAllBreaches");
+                    var breaches = Enum.GetValues(typeof(BreachEnum)).Cast<BreachEnum>().Where(b => b.GetAttribute<CheckerTypeAttribute>().Type == breachType);
+                    progressForm.Tag = new ProgressHelper(breaches.Count());
+                    foreach (var breach in breaches)
                     {
-                        MessageBox.Show(pluginHost.MainWindow, "No breached entries found.", Resources.MessageTitle, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        var foundBreaches = await CheckBreaches(supportedBreachCheckers[(BreachEnum)breach](client, pluginHost),
+                        group, selectedOptions.ExpireEntries, selectedOptions.OnlyCheckOldEntries, selectedOptions.IgnoreDeletedEntries, selectedOptions.IgnoreExpiredEntries, progressIndicator, () => progressForm.ContinueWork());
+                        result.AddRange(foundBreaches);
+                        ((ProgressHelper)progressForm.Tag).CurrentBreach++;
                     }
-                    else
-                    {
-                        var breachedEntriesDialog = new BreachedEntriesDialog(pluginHost);
-                        breachedEntriesDialog.AddBreaches(result);
-                        breachedEntriesDialog.ShowDialog();
-                    }
+                }
+                else
+                {
+                    progressForm.Tag = new ProgressHelper(1);
+                    var foundBreaches = await CheckBreaches(supportedBreachCheckers[selectedOptions.SelectedBreach](client, pluginHost),
+                        group, selectedOptions.ExpireEntries, selectedOptions.OnlyCheckOldEntries, selectedOptions.IgnoreDeletedEntries, selectedOptions.IgnoreExpiredEntries, progressIndicator, () => progressForm.ContinueWork());
+                    result.AddRange(foundBreaches);
+                }
+            }
+            catch (Exception ex)
+            {
+                result = null;
+                MessageBox.Show(pluginHost.MainWindow, ex.Message, Resources.MessageTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                progressForm.Close();
+            }
+
+            if (result != null)
+            {
+                if (!result.Any())
+                {
+                    MessageBox.Show(pluginHost.MainWindow, "No breached entries found.", Resources.MessageTitle, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    var breachedEntriesDialog = new BreachedEntriesDialog(pluginHost);
+                    breachedEntriesDialog.AddBreaches(result);
+                    breachedEntriesDialog.ShowDialog(pluginHost.MainWindow);
                 }
             }
 
@@ -438,6 +490,16 @@ namespace HaveIBeenPwned
                 return false;
             }
             return true;
+        }
+
+        private class UserSelectedOptions
+        {
+            public bool CheckAllBreaches { get; set; }
+            public bool ExpireEntries { get; set; }
+            public bool OnlyCheckOldEntries { get; set; }
+            public bool IgnoreDeletedEntries { get; set; }
+            public bool IgnoreExpiredEntries { get; set; }
+            public BreachEnum SelectedBreach { get; set; }
         }
     }
 }

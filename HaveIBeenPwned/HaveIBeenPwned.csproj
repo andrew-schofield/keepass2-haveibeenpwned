@@ -88,6 +88,8 @@
     <Compile Include="BreachCheckers\HaveIBeenPwnedUsername\HaveIBeenPwnedUsernameChecker.cs" />
     <Compile Include="BreachCheckers\HaveIBeenPwnedUsername\HaveIBeenPwnedUsernameEntry.cs" />
     <Compile Include="DisplayAttribute.cs" />
+    <Compile Include="PwDatabaseExtensions.cs" />
+    <Compile Include="StringDictionaryExExtensions.cs" />
     <Compile Include="UI\BreachedEntriesDialog.cs">
       <SubType>Form</SubType>
     </Compile>

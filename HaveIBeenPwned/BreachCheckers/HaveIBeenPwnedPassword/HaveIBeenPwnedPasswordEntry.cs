@@ -18,7 +18,7 @@ namespace HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedPassword
         public string Title {
             get
             {
-                return "HIBP Password Breach";
+                return Resources.PasswordBreachTitle;
             }
         }
 

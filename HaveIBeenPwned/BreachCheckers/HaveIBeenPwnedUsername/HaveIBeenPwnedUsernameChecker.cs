@@ -56,13 +56,16 @@ namespace HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedUsername
 
             progressIndicator.Report(new ProgressItem(0, "Getting HaveIBeenPwned breach list..."));
             var entries = group.GetEntries(true)
-                .Where(e => (!ignoreDeleted || !e.IsDeleted(pluginHost)) && (!ignoreExpired || !e.Expires)).ToArray();
-            var usernames = entries.Select(e => e.Strings.ReadSafe(PwDefs.UserNameField).Trim().ToLower()).Distinct();
+                    .Where(e => (!ignoreDeleted || !e.IsDeleted(pluginHost)) && (!ignoreExpired || !e.Expires))
+                    .ToArray();
+            var usernames = 
+                    entries.Select(e => e.Strings.ReadSafe(PwDefs.UserNameField).Trim().ToLower())
+                    .Distinct();
             var breaches = await this.GetBreaches(progressIndicator, usernames, canContinue);
             var breachedEntries = new List<BreachedEntry>();
 
             await Task.Run(() =>
-            {
+            {   
                 foreach (var breachGrp in breaches.GroupBy(x => x.Username))
                 {
                     var username = breachGrp.Key;
@@ -74,17 +77,35 @@ namespace HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedUsername
                         {
                             continue;
                         }
+                        
+                        var pwEntries =
+                            string.IsNullOrWhiteSpace(breach.Domain) ? new PwEntry[] { } :
+                            entries
+                                .Where(e => e.GetUrlDomain() == breach.Domain && breach.Username == e.Strings.ReadSafe(PwDefs.UserNameField).Trim().ToLower())
+                                .ToArray();
 
-                        var pwEntry =
-                            string.IsNullOrWhiteSpace(breach.Domain)
-                                ? null
-                                : entries.FirstOrDefault(e =>
-                                    e.GetUrlDomain() == breach.Domain && breach.Username ==
-                                    e.Strings.ReadSafe(PwDefs.UserNameField).Trim().ToLower());
-                        if (pwEntry != null)
+                        if (pwEntries.Length == 0)
+                        {
+                            var item = new BreachedEntry(pluginHost, null, breach);
+                            if (item.IsIgnored)
+                            {
+                                continue;
+                            }
+
+                            breachedEntries.Add(item);
+                            continue;
+                        }
+
+                        foreach (var pwEntry in pwEntries)
                         {
                             var lastModified = pwEntry.GetPasswordLastModified();
                             if (oldEntriesOnly && lastModified >= breach.BreachDate)
+                            {
+                                continue;
+                            }
+
+                            var item = new BreachedEntry(pluginHost, pwEntry, breach);
+                            if (item.IsIgnored)
                             {
                                 continue;
                             }
@@ -93,9 +114,9 @@ namespace HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedUsername
                             {
                                 ExpireEntry(pwEntry);
                             }
-                        }
 
-                        breachedEntries.Add(new BreachedEntry(pwEntry, breach));
+                            breachedEntries.Add(item);
+                        }
                     }
                 }
             });
@@ -117,10 +138,10 @@ namespace HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedUsername
                 }
 
                 counter++;
-                progressIndicator.Report(new ProgressItem((uint) ((double) counter / filteredUsernames.Count() * 100),
+                progressIndicator.Report(new ProgressItem((uint)((double)counter / filteredUsernames.Count() * 100),
                     string.Format("Checking \"{0}\" for breaches", username)));
                 try
-                {            
+                {
                     var breaches = await GetBreachesForUserName(HttpUtility.UrlEncode(username), DefaultRetries);
                     if (breaches != null)
                     {
@@ -165,7 +186,7 @@ namespace HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedUsername
                     b.Username = HttpUtility.UrlDecode(username);
                 }
             }
-            else if ((int) response.StatusCode == 429) // The Rate limit of our API Key was exceeded
+            else if ((int)response.StatusCode == 429) // The Rate limit of our API Key was exceeded
             {
                 var whenToRetry = response.Headers.RetryAfter.Delta;
 

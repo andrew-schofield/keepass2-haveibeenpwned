@@ -2126,4 +2126,13 @@
   <data name="MenuTitle" xml:space="preserve">
     <value>Have I Been Pwned?</value>
   </data>
+  <data name="FieldNameIgnoredBreachs" xml:space="preserve">
+    <value>HaveIBeenPwned:IgnoreBreachs</value>
+  </data>
+  <data name="PasswordBreachTitle" xml:space="preserve">
+    <value>HIBP Password Breach</value>
+  </data>
+  <data name="MenuItemClearIgnoreListTitle" xml:space="preserve">
+    <value>Clear all ignore lists</value>
+  </data>
 </root>

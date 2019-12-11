@@ -54,13 +54,22 @@ namespace HaveIBeenPwned.BreachCheckers.HaveIBeenPwnedSite
                     if (!string.IsNullOrEmpty(url))
                     {
                         var domainBreaches = breaches.Where(b => !string.IsNullOrWhiteSpace(b.Domain) && url == b.Domain && (!oldEntriesOnly || lastModified < b.BreachDate)).OrderBy(b => b.BreachDate);
-                        if (domainBreaches.Any())
+
+                        if (!domainBreaches.Any())
                         {
-                            breachedEntries.Add(new BreachedEntry(entry, domainBreaches.Last()));
-                            if (expireEntries)
-                            {
-                                ExpireEntry(entry);
-                            }
+                            continue;
+                        }
+
+                        var breachEntry = new BreachedEntry(pluginHost, entry, domainBreaches.Last());
+
+                        if (!breachEntry.IsIgnored)
+                        {
+                            breachedEntries.Add(breachEntry);
+                        }
+
+                        if (expireEntries)
+                        {
+                            ExpireEntry(entry);
                         }
                     }
                     // this checker is so quick it probably doesn't need to report progress
