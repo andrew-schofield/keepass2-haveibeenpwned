@@ -55,7 +55,14 @@ namespace HaveIBeenPwned.BreachCheckers.CloudbleedSite
                         var domainBreaches = breaches.Where(b => url == b && (!oldEntriesOnly || lastModified < new DateTime(2017, 02, 17)));
                         if (domainBreaches.Any())
                         {
-                            breachedEntries.Add(new BreachedEntry(entry, new CloudbleedSiteEntry(string.Empty, entry.GetUrlDomain())));
+                            var item = new BreachedEntry(pluginHost, entry, new CloudbleedSiteEntry(string.Empty, entry.GetUrlDomain()));
+
+                            if (item.IsIgnored)
+                            {
+                                continue;
+                            }
+
+                            breachedEntries.Add(item);
                             if (expireEntries)
                             {
                                 ExpireEntry(entry);
