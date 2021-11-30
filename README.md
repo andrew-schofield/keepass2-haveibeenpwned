@@ -4,6 +4,19 @@
 
 **Download plgx from [here](https://github.com/andrew-schofield/keepass2-haveibeenpwned/raw/master/HaveIBeenPwned.plgx).**
 
+#### Chocolatey 📦 
+Or you can [use Chocolatey to install](https://community.chocolatey.org/packages/keepass-plugin-haveibeenpwned#install) it in a more automated manner:
+
+```
+choco install keepass-plugin-haveibeenpwned
+```
+
+To [upgrade KeePass Plugin Have I Been Pwned](https://community.chocolatey.org/packages/keepass-plugin-haveibeenpwned#upgrade) to the [latest release version](https://community.chocolatey.org/packages/keepass-plugin-haveibeenpwned#versionhistory) for enjoying the newest features, run the following command from the command line or from PowerShell:
+
+```
+choco upgrade keepass-plugin-haveibeenpwned
+```
+
 **Mono users can download the dlls from [here](https://github.com/andrew-schofield/keepass2-haveibeenpwned/tree/master/mono).**
 Mono users may find they need to install their distro equivalent of `mono-complete` for the plugin to work properly.
 
