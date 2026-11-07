@@ -76,9 +76,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\keepass2-developerextensions\keepass2-developerextensions\EnumExtensions.cs" />
-    <Compile Include="..\keepass2-developerextensions\keepass2-developerextensions\ProtectedStringExtensions.cs" />
-    <Compile Include="..\keepass2-developerextensions\keepass2-developerextensions\PwEntryExtensions.cs" />
+    <Compile Include="DeveloperExtensions\EnumExtensions.cs" />
+    <Compile Include="DeveloperExtensions\ProtectedStringExtensions.cs" />
+    <Compile Include="DeveloperExtensions\PwEntryExtensions.cs" />
     <Compile Include="BreachCheckers\BaseChecker.cs" />
     <Compile Include="BreachCheckers\HaveIBeenPwnedPassword\HaveIBeenPwnedPasswordChecker.cs" />
     <Compile Include="BreachCheckers\HaveIBeenPwnedPassword\HaveIBeenPwnedPasswordEntry.cs" />
@@ -134,6 +134,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="DeveloperExtensions\LICENSE" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'ReleasePlgx|AnyCPU' ">
     <DebugType>none</DebugType>
